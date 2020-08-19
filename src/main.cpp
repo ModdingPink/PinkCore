@@ -31,7 +31,7 @@ bool enableCustomDiffNames = true;
 bool alwaysOpenToCustomLevels = true;
 bool enableChromaLite = true;
 bool currentlyPlayingLevel = false;
-bool enableNoticeBoard = false;
+bool enableNoticeBoard = true;
 std::string Easy = "";
 std::string Normal = "";
 std::string Hard = "";
@@ -44,7 +44,7 @@ Il2CppObject *WebRequestAPI = nullptr;
 Il2CppObject *DownloadHandler = nullptr;
 Il2CppObject *WebRequestAsyncOp = nullptr;
 Il2CppString *JsonStr = nullptr;
-std::string modVersion = "1.1.0";
+std::string modVersion = "1.2.1";
 Il2CppObject *releaseInfoViewController = nullptr;
 
 bool currentlySelectedIsCustomSong = true;
@@ -379,7 +379,7 @@ MAKE_HOOK_OFFSETLESS(BeatmapLevelsModel, void, Il2CppObject *self) {
 		auto customSongArray = reinterpret_cast<Array<Il2CppObject*>*>(il2cpp_functions::array_new(il2cpp_utils::GetClassFromName("", "IBeatmapLevelPack"), ostarray->Length() - ostarraysize)); //create a new array to house the Custom Song packs
 		int customsongcounti = 0;
 		for (int i = 0; i < ostarray->Length(); i++) {//for all packs in the OST and Extras Pack
-			Il2CppString* packName = CRASH_UNLESS(il2cpp_utils::RunMethod<Il2CppString*>(ostarray->values[i], "get_packName")); 
+			Il2CppString* packName = CRASH_UNLESS(il2cpp_utils::RunMethod<Il2CppString*>(ostarray->values[i], "get_packID")); 
 			std::string packNameString = to_utf8(csstrtostr(packName)); 
 			bool inList = false;
 			for (int j = 0; j < ostarraysize; j++) {
@@ -527,12 +527,16 @@ MAKE_HOOK_OFFSETLESS(StandardLevelScenesTransitionSetupDataSO, void, Il2CppObjec
 			Color environmentColor1 = { 0.1882352977991104,0.5960784554481506,1.0, 1.0 };
 			Color obstaclesColor = { 1.0,0.1882353127002716,0.1882353127002716,1.0 }; //The First Colour Scheme
 
+			Color environmentleftBoost = { 0.0,0.0,0.0, 0.0 };
+			Color environmentrightBoost = { 0.0,0.0,0.0, 0.0 };
+
 			bool colorLeftFound = false;
 			bool colorRightFound = false;
 			bool envColorLeftFound = false;
 			bool envColorRightFound = false;
 			bool obstacleColorFound = false;
-
+			bool envBoostLeftFound = false;
+			bool envBoostRightFound = false;
 			auto firstarr = d["_difficultyBeatmapSets"].GetArray();
 			for (auto i = firstarr.Begin(); i != firstarr.End(); ++i) {
 				auto beatmapCharacteristicNameItr = i->GetObject().FindMember("_beatmapCharacteristicName");
@@ -566,6 +570,16 @@ MAKE_HOOK_OFFSETLESS(StandardLevelScenesTransitionSetupDataSO, void, Il2CppObjec
 									auto envColorRight = customData->value.FindMember("_envColorRight");
 									environmentColor1 = { envColorRight->value["r"].GetFloat(),envColorRight->value["g"].GetFloat(),envColorRight->value["b"].GetFloat(), 1.0 };
 								}
+								if (customData->value.HasMember("_envColorRightBoost")) {
+									auto envColorRightBoost = customData->value.FindMember("_envColorRightBoost");
+									environmentrightBoost = { envColorRightBoost->value["r"].GetFloat(),envColorRightBoost->value["g"].GetFloat(),envColorRightBoost->value["b"].GetFloat(), 1.0 };
+									envBoostRightFound = true;
+								}
+								if (customData->value.HasMember("_envColorLeftBoost")) {
+									auto envColorLeftBoost = customData->value.FindMember("_envColorLeftBoost");
+									environmentleftBoost = { envColorLeftBoost->value["r"].GetFloat(),envColorLeftBoost->value["g"].GetFloat(),envColorLeftBoost->value["b"].GetFloat(), 1.0 };
+									envBoostLeftFound = true;
+								}
 								if (customData->value.HasMember("_obstacleColor")) {
 									obstacleColorFound = true;
 									auto obstacleColor = customData->value.FindMember("_obstacleColor");
@@ -578,7 +592,7 @@ MAKE_HOOK_OFFSETLESS(StandardLevelScenesTransitionSetupDataSO, void, Il2CppObjec
 					break;
 				}
 			}
-			if ((!colorLeftFound) && (!colorRightFound) && (!envColorLeftFound) && (!envColorRightFound) && (!obstacleColorFound)) {
+			if ((!colorLeftFound) && (!colorRightFound) && (!envColorLeftFound) && (!envColorRightFound) && (!obstacleColorFound) && (!envBoostLeftFound) && (!envBoostRightFound)) {
 				StandardLevelScenesTransitionSetupDataSO(self, difficultyBeatmap, overrideEnvironmentSettings, overrideColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, backButtonText, useTestNoteCutSoundEffects);
 			}
 			else {
@@ -588,10 +602,18 @@ MAKE_HOOK_OFFSETLESS(StandardLevelScenesTransitionSetupDataSO, void, Il2CppObjec
 				if (!envColorRightFound) {
 					environmentColor1 = saberBColor;
 				}
+
+				if (!envBoostLeftFound) {
+					environmentleftBoost = environmentColor0;
+				}
+				if (!envBoostRightFound) {
+					environmentrightBoost = environmentColor1;
+				}
+				
 				Il2CppString * colorSchemeId = il2cpp_utils::createcsstr("PinkUtilsCustomColours");
 				Il2CppString * colorSchemeName = il2cpp_utils::createcsstr("Custom Song Colours");
 				bool isEditable = false;
-				Il2CppObject* newColorScheme = CRASH_UNLESS(il2cpp_utils::New(il2cpp_utils::GetClassFromName("", "ColorScheme"), colorSchemeId, colorSchemeName, isEditable, saberAColor, saberBColor, environmentColor0, environmentColor1, obstaclesColor));
+				Il2CppObject* newColorScheme = CRASH_UNLESS(il2cpp_utils::New(il2cpp_utils::GetClassFromName("", "ColorScheme"), colorSchemeId, colorSchemeName, isEditable, saberAColor, saberBColor, environmentColor0, environmentColor1, environmentleftBoost, environmentrightBoost, obstaclesColor));
 				StandardLevelScenesTransitionSetupDataSO(self, difficultyBeatmap, overrideEnvironmentSettings, newColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, backButtonText, useTestNoteCutSoundEffects);
 			}
 
@@ -658,6 +680,16 @@ MAKE_HOOK_OFFSETLESS(LevelListTableCell_SetDataFromLevelAsync, void, Il2CppObjec
 							else if (customData->value.HasMember("_envColorLeft")) {
 								colorFound = true;
 								auto envColorLeft = customData->value.FindMember("_envColorLeft");
+								saberAColor = { envColorLeft->value["r"].GetFloat(),envColorLeft->value["g"].GetFloat(),envColorLeft->value["b"].GetFloat(), 1.0 };
+							}
+							else if (customData->value.HasMember("_envColorRightBoost")) {
+								colorFound = true;
+								auto envColorRight = customData->value.FindMember("_envColorRightBoost");
+								saberAColor = { envColorRight->value["r"].GetFloat(),envColorRight->value["g"].GetFloat(),envColorRight->value["b"].GetFloat(), 1.0 };
+							}
+							else if (customData->value.HasMember("_envColorLeftBoost")) {
+								colorFound = true;
+								auto envColorLeft = customData->value.FindMember("_envColorLeftBoost");
 								saberAColor = { envColorLeft->value["r"].GetFloat(),envColorLeft->value["g"].GetFloat(),envColorLeft->value["b"].GetFloat(), 1.0 };
 							}
 							else if (customData->value.HasMember("_envColorRight")) {
@@ -801,11 +833,18 @@ MAKE_HOOK_OFFSETLESS(AnnotatedBeatmapLevelCollectionsViewController, void, Il2Cp
 
 	 //get the amount of songs in the OST playlist tab
 
+	if (!il2cpp_utils::RunMethod<Il2CppString*>(annotatedBeatmapLevelCollections->values[0], "get_packID")) {
+		AnnotatedBeatmapLevelCollectionsViewController(self, annotatedBeatmapLevelCollections, selectedItemIndex, hideIfOneOrNoPacks);
+		return;
+		//the Playlists Tab is different, and doesnt have a PackID which will cause the mod to crash
+	}
+
 	bool isTheOst = false;
 
 	for (int i = 0; i < annotatedBeatmapLevelCollections->Length(); i++) { //for every item in the currently selected tab list
-		Il2CppString* collectionName = CRASH_UNLESS(il2cpp_utils::RunMethod<Il2CppString*>(annotatedBeatmapLevelCollections->values[i], "get_collectionName"));
+		Il2CppString* collectionName = CRASH_UNLESS(il2cpp_utils::RunMethod<Il2CppString*>(annotatedBeatmapLevelCollections->values[i], "get_packID"));
 		std::string collectionNameString = to_utf8(csstrtostr(collectionName)); //get the collection name
+		//getLogger().info(collectionNameString);
 		if (collectionNameString == OstPackList[0].GetString()) { //and check if it has OST Vol 1
 			isTheOst = true; //If it does, then its the OST pack as PinkUtils removes custom packs from the main OST pack earlier
 			break;
@@ -816,11 +855,12 @@ MAKE_HOOK_OFFSETLESS(AnnotatedBeatmapLevelCollectionsViewController, void, Il2Cp
 		auto ostSongArray = reinterpret_cast<Array<Il2CppObject*>*>(il2cpp_functions::array_new(il2cpp_utils::GetClassFromName("", "IBeatmapLevelPackCollection"), ostarraysize)); //create a new OST song array
 		int ostsongcounti = 0; //int for looping later
 		for (int i = 0; i < annotatedBeatmapLevelCollections->Length(); i++) {
-			Il2CppString* collectionName = CRASH_UNLESS(il2cpp_utils::RunMethod<Il2CppString*>(annotatedBeatmapLevelCollections->values[i], "get_collectionName"));
+			Il2CppString* collectionName = CRASH_UNLESS(il2cpp_utils::RunMethod<Il2CppString*>(annotatedBeatmapLevelCollections->values[i], "get_packID"));
 			std::string collectionNameString = to_utf8(csstrtostr(collectionName));
 			bool inList = false;
 			for (int j = 0; j < ostarraysize; j++) {
 				if (collectionNameString == OstPackList[j].GetString()) {
+					
 					inList = true;
 					break; //If the currently selected path is a part of the OST pack name array, then we set inList to true to add it to the new array later
 				}
@@ -833,7 +873,7 @@ MAKE_HOOK_OFFSETLESS(AnnotatedBeatmapLevelCollectionsViewController, void, Il2Cp
 		//there is then a bug which occurs if the packs are in a wacky order, where clicking between the 'Custom Levels' and 'OST & Extras' tab can make the game
 		//still think that custom song packs are still in the OST and Extras tab, meaning they view visually on the level select screen but not in the
 		//playlists tab... not a game breaking bug but still enough of an issue to require fixing
-		Il2CppString* collectionName = CRASH_UNLESS(il2cpp_utils::RunMethod<Il2CppString*>(annotatedBeatmapLevelCollections->values[selectedItemIndex], "get_collectionName"));
+		Il2CppString* collectionName = CRASH_UNLESS(il2cpp_utils::RunMethod<Il2CppString*>(annotatedBeatmapLevelCollections->values[selectedItemIndex], "get_packID"));
 		std::string collectionNameString = to_utf8(csstrtostr(collectionName)); //gets the collection name of the beat map which is going to be selected after data is set
 		bool goingToBeSelectedIsOST = false;
 		for (int j = 0; j < ostarraysize; j++) {
@@ -860,6 +900,36 @@ MAKE_HOOK_OFFSETLESS(AnnotatedBeatmapLevelCollectionsViewController, void, Il2Cp
 }
 
 
+void resetconfig() {
+
+	getConfig().config.RemoveAllMembers();
+	getConfig().config.SetObject();
+	auto& allocator = getConfig().config.GetAllocator();
+
+	getConfig().config.AddMember("ModVersionDontChange", "1.2.1", allocator);
+	getConfig().config.AddMember("enablePCBurnMarks", burnMarkTrailsEnabled, allocator);
+	getConfig().config.AddMember("enableCustomLevelsTab", enableCustomLevelsTab, allocator);
+	getConfig().config.AddMember("enableCharacteristicsColours", enableCharacteristicsColours, allocator);
+	getConfig().config.AddMember("enableRequirementDetails", enableRequirementDetails, allocator);
+	getConfig().config.AddMember("enableExtraSongDetails", enableExtraSongDetails, allocator);
+	getConfig().config.AddMember("enableCustomSongColours", enableCustomSongColours, allocator);
+	getConfig().config.AddMember("alwaysOpenToCustomLevels", alwaysOpenToCustomLevels, allocator);
+	getConfig().config.AddMember("enableCustomDiffNames", enableCustomDiffNames, allocator);
+	getConfig().config.AddMember("enableChromaLite", enableChromaLite, allocator);
+	getConfig().config.AddMember("enableNoticeBoard", enableNoticeBoard, allocator);
+
+
+	auto arr = rapidjson::Value(rapidjson::kArrayType);
+	arr.PushBack("OstVol1", allocator);
+	arr.PushBack("OstVol2", allocator);
+	arr.PushBack("OstVol3", allocator);
+	arr.PushBack("Extras", allocator);
+	arr.PushBack("Camellia", allocator);
+
+
+	getConfig().config.AddMember("OstPackList", arr, allocator);
+	getConfig().Write();
+}
 
 // This function is called before a mod is constructed for the first time.
 // Perform one time setup, as well as specify the mod ID and version here.
@@ -877,33 +947,14 @@ extern "C" void setup(ModInfo& info) {
     // Can use getConfig().config to modify the rapidjson document
 
 
+	
+
+
+
+
 	if (!getConfig().config.HasMember("enableCustomLevelsTab")) {
-		getConfig().config.SetObject();
-		auto& allocator = getConfig().config.GetAllocator();
-
-		getConfig().config.AddMember("enablePCBurnMarks", true, allocator);
-		getConfig().config.AddMember("enableCustomLevelsTab", true, allocator);
-		getConfig().config.AddMember("enableCharacteristicsColours", true, allocator);
-		getConfig().config.AddMember("enableRequirementDetails", true, allocator);
-		getConfig().config.AddMember("enableExtraSongDetails", true, allocator);
-		getConfig().config.AddMember("enableCustomSongColours", true, allocator);
-		getConfig().config.AddMember("alwaysOpenToCustomLevels", true, allocator);
-		getConfig().config.AddMember("enableCustomDiffNames", true, allocator);
-		getConfig().config.AddMember("enableChromaLite", true, allocator);
-		getConfig().config.AddMember("enableNoticeBoard", true, allocator);
-
-
-		auto arr = rapidjson::Value(rapidjson::kArrayType);
-		arr.PushBack("Original Soundtrack Vol. 1", allocator);
-		arr.PushBack("Original Soundtrack Vol. 2", allocator);
-		arr.PushBack("Original Soundtrack Vol. 3", allocator);
-		arr.PushBack("Extras", allocator);
-		arr.PushBack("Camellia", allocator);
-
-		getConfig().config.AddMember("OstPackList", arr, allocator);
-		getConfig().Write();
+		resetconfig();
 	}
-
 	burnMarkTrailsEnabled = getConfig().config["enablePCBurnMarks"].GetBool();
 	enableCustomLevelsTab = getConfig().config["enableCustomLevelsTab"].GetBool();
 	enableCharacteristicsColours = getConfig().config["enableCharacteristicsColours"].GetBool();
@@ -914,6 +965,18 @@ extern "C" void setup(ModInfo& info) {
 	enableCustomDiffNames = getConfig().config["enableCustomDiffNames"].GetBool();
 	enableChromaLite = getConfig().config["enableChromaLite"].GetBool();
 	enableNoticeBoard = getConfig().config["enableNoticeBoard"].GetBool();
+
+
+	if (getConfig().config.HasMember("ModVersionDontChange")) {
+		if (getConfig().config["ModVersionDontChange"].GetString() != modVersion) {
+			resetconfig();
+		}
+	}
+	else {
+		resetconfig();
+	}
+
+
 }
 
 // This function is called when the mod is loaded for the first time, immediately after il2cpp_init.
