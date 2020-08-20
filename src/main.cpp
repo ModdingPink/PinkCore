@@ -44,7 +44,7 @@ Il2CppObject *WebRequestAPI = nullptr;
 Il2CppObject *DownloadHandler = nullptr;
 Il2CppObject *WebRequestAsyncOp = nullptr;
 Il2CppString *JsonStr = nullptr;
-std::string modVersion = "1.2.1";
+std::string modVersion = "1.2.2";
 Il2CppObject *releaseInfoViewController = nullptr;
 
 bool currentlySelectedIsCustomSong = true;
@@ -602,18 +602,20 @@ MAKE_HOOK_OFFSETLESS(StandardLevelScenesTransitionSetupDataSO, void, Il2CppObjec
 				if (!envColorRightFound) {
 					environmentColor1 = saberBColor;
 				}
-
+				bool HasBoost = true;
 				if (!envBoostLeftFound) {
 					environmentleftBoost = environmentColor0;
+					HasBoost = false;
 				}
 				if (!envBoostRightFound) {
 					environmentrightBoost = environmentColor1;
+					HasBoost = false;
 				}
 				
 				Il2CppString * colorSchemeId = il2cpp_utils::createcsstr("PinkUtilsCustomColours");
 				Il2CppString * colorSchemeName = il2cpp_utils::createcsstr("Custom Song Colours");
 				bool isEditable = false;
-				Il2CppObject* newColorScheme = CRASH_UNLESS(il2cpp_utils::New(il2cpp_utils::GetClassFromName("", "ColorScheme"), colorSchemeId, colorSchemeName, isEditable, saberAColor, saberBColor, environmentColor0, environmentColor1, environmentleftBoost, environmentrightBoost, obstaclesColor));
+				Il2CppObject* newColorScheme = CRASH_UNLESS(il2cpp_utils::New(il2cpp_utils::GetClassFromName("", "ColorScheme"), colorSchemeId, colorSchemeName, isEditable, saberAColor, saberBColor, environmentColor0, environmentColor1, HasBoost, environmentleftBoost, environmentrightBoost, obstaclesColor));
 				StandardLevelScenesTransitionSetupDataSO(self, difficultyBeatmap, overrideEnvironmentSettings, newColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, backButtonText, useTestNoteCutSoundEffects);
 			}
 
@@ -906,7 +908,7 @@ void resetconfig() {
 	getConfig().config.SetObject();
 	auto& allocator = getConfig().config.GetAllocator();
 
-	getConfig().config.AddMember("ModVersionDontChange", "1.2.1", allocator);
+	getConfig().config.AddMember("ModVersionDontChange", "1.2.2", allocator);
 	getConfig().config.AddMember("enablePCBurnMarks", burnMarkTrailsEnabled, allocator);
 	getConfig().config.AddMember("enableCustomLevelsTab", enableCustomLevelsTab, allocator);
 	getConfig().config.AddMember("enableCharacteristicsColours", enableCharacteristicsColours, allocator);
@@ -936,7 +938,7 @@ void resetconfig() {
 extern "C" void setup(ModInfo& info) {
     // This should be the first thing done
     info.id = "PinkUtils";
-    info.version = "1.1.0";
+    info.version = "1.2.2";
 	modInfo = info;
 
     getLogger().info("Completed setup!");
