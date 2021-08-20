@@ -62,7 +62,7 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}
         pwsh -Command ./CreateQmod.ps1
-
+        
     # Commit the change to the package, .vscode/c_cpp_properties.json, and Android.mk
     - name: Configure commit
       run: |
