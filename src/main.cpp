@@ -73,19 +73,17 @@ MAKE_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionViewCon
 
 // Implementation by https://github.com/StackDoubleFlow
 MAKE_HOOK_MATCH(StandardLevelInfoSaveData_DeserializeFromJSONString, &GlobalNamespace::StandardLevelInfoSaveData::DeserializeFromJSONString, GlobalNamespace::StandardLevelInfoSaveData*, Il2CppString *stringData) {
-	
 	auto* original = StandardLevelInfoSaveData_DeserializeFromJSONString(stringData);
-	
+	if (!original) return nullptr;
 	int origLength = original ? (original->difficultyBeatmapSets ? original->difficultyBeatmapSets->Length() : 0) : 0;
 	::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet*> *customBeatmapSets = 
 		::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet*>::NewLength(origLength);
-
 	CustomJSONData::CustomLevelInfoSaveData* customSaveData = CRASH_UNLESS(il2cpp_utils::New<CustomJSONData::CustomLevelInfoSaveData*>(original->songName, 
 		original->songSubName, original->songAuthorName, original->levelAuthorName, original->beatsPerMinute, original->songTimeOffset, 
 		original->shuffle, original->shufflePeriod, original->previewStartTime, original->previewDuration, original->songFilename, 
 		original->coverImageFilename, original->environmentName, original->allDirectionsEnvironmentName, customBeatmapSets));
 	
-	std::string str = to_utf8(csstrtostr(stringData));
+	std::string str = stringData ? to_utf8(csstrtostr(stringData)) : "{}";
 	
 	std::shared_ptr<rapidjson::Document> sharedDoc = std::make_shared<rapidjson::Document>();
 	customSaveData->doc = sharedDoc;
