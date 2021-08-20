@@ -76,7 +76,7 @@ MAKE_HOOK_MATCH(StandardLevelInfoSaveData_DeserializeFromJSONString, &GlobalName
 	
 	auto* original = StandardLevelInfoSaveData_DeserializeFromJSONString(stringData);
 	
-	int origLength = original ? (original->difficultyBeatmapSets ? original->difficultyBeatmapSets->Length : 0) : 0;
+	int origLength = original ? (original->difficultyBeatmapSets ? original->difficultyBeatmapSets->Length() : 0) : 0;
 	::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet*> *customBeatmapSets = 
 		::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet*>::NewLength(origLength);
 
