@@ -222,13 +222,12 @@ namespace RequirementUtils
 			bool interactable = AllowPlayerToStart();
 			if (SongUtils::SongInfo::get_currentlySelectedIsWIP())
 			{
-				levelViews->values[length - 1]->get_practiceButton()->set_interactable(true);
+				levelViews->values[length - 1]->get_practiceButton()->set_interactable(interactable);
 				levelViews->values[length - 1]->get_actionButton()->set_interactable(false);
 			}
 			else
 			{
-				#warning practiceButton still enabled by default
-				levelViews->values[length - 1]->get_practiceButton()->set_interactable(true);
+				levelViews->values[length - 1]->get_practiceButton()->set_interactable(interactable);
 				levelViews->values[length - 1]->get_actionButton()->set_interactable(interactable);
 			}
 		}
