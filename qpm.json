@@ -23,7 +23,9 @@
     {
       "id": "questui",
       "versionRange": "*",
-      "additionalData": {}
+      "additionalData": {
+        "private": true
+      }
     },
     {
       "id": "custom-types",
@@ -38,7 +40,9 @@
     {
       "id": "libcurl",
       "versionRange": "*",
-      "additionalData": {}
+      "additionalData": {
+        "private": true
+      }
     }
   ],
   "additionalData": {}
