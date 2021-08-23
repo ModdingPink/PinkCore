@@ -22,10 +22,7 @@ namespace PinkCore::UI
 		this->contributor = contributor;
 
 		std::string iconPath = SongUtils::GetCurrentSongPath() + "/" + contributor.iconPath;
-		if (fileexists(iconPath))
-			sprite = UIUtils::FileToSprite(iconPath);
-		else
-			sprite = nullptr;
+	        sprite = UIUtils::FileToSprite(iconPath);
 
 		get_gameObject()->set_name(il2cpp_utils::newcsstr(contributor.name + contributor.role));
 
