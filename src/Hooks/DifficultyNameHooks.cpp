@@ -20,9 +20,9 @@
 MAKE_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDifficultyMethods::Name, Il2CppString*, GlobalNamespace::BeatmapDifficulty difficulty) {
 	
 	if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && config.enableCustomDiffNames) {
-		std::string newDifficultyLabel = DifficultyNameUtils::GetDifficultyNameFromCache(difficulty);
-		if (newDifficultyLabel != "") {
-			return il2cpp_utils::createcsstr(newDifficultyLabel);
+		std::u16string newDifficultyLabel = DifficultyNameUtils::GetDifficultyNameFromCache(difficulty);
+		if (newDifficultyLabel != u"") {
+			return il2cpp_utils::newcsstr(newDifficultyLabel);
 		}
 	}
 	return BeatmapDifficultyMethods_Name(difficulty);
@@ -34,7 +34,7 @@ MAKE_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &GlobalName
 
 	if (SongUtils::SongInfo::get_currentlySelectedIsCustom()) {
 		if (difficultyBeatmaps->values[0] != nullptr) {
-			SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(to_utf8(csstrtostr(difficultyBeatmaps->values[0]->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->get_serializedName())));
+			SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(csstrtostr(difficultyBeatmaps->values[0]->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->get_serializedName()));
 			if (config.enableCustomDiffNames) {
 				DifficultyNameUtils::SetDifficultyNameCacheFromArray(difficultyBeatmaps);
 			}

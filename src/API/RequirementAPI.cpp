@@ -5,8 +5,6 @@
 
 namespace PinkCore::RequirementAPI
 {
-	std::vector<std::string> disablingIDs;
-
 	bool RegisterInstalled(std::string identifier)
 	{
 		return RequirementUtils::ExternalAPI::RegisterInstalled(identifier);
@@ -27,7 +25,7 @@ namespace PinkCore::RequirementAPI
 		return RequirementUtils::ExternalAPI::RemoveSuggestion(identifier);
 	}
 
-	bool GetCurrentlySelectedCustomData(rapidjson::Value& value)
+	bool GetCurrentlySelectedCustomData(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& value)
 	{
 		return SongUtils::CustomData::GetCurrentCustomData(SongUtils::GetCurrentInfoDat(), value);
 	}

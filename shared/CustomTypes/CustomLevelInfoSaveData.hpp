@@ -8,6 +8,9 @@
 #include "GlobalNamespace/StandardLevelInfoSaveData_DifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/StandardLevelInfoSaveData_DifficultyBeatmap.hpp"
 
+typedef rapidjson::GenericValue<rapidjson::UTF16<char16_t>> Value;
+typedef rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> Document;
+
 DECLARE_CLASS_CODEGEN(CustomJSONData, CustomLevelInfoSaveData, 
 					  GlobalNamespace::StandardLevelInfoSaveData,
 	
@@ -21,8 +24,8 @@ DECLARE_CLASS_CODEGEN(CustomJSONData, CustomLevelInfoSaveData,
 	DECLARE_SIMPLE_DTOR();
 
 public:
-	std::shared_ptr<rapidjson::Document> doc;
-	std::optional<std::reference_wrapper<rapidjson::Value>> customData;
+	std::shared_ptr<Document> doc;
+	std::optional< std::reference_wrapper<Value>> customData;
 )
 
 DECLARE_CLASS_CODEGEN(CustomJSONData, CustomDifficultyBeatmap, 
@@ -31,5 +34,5 @@ DECLARE_CLASS_CODEGEN(CustomJSONData, CustomDifficultyBeatmap,
 	DECLARE_CTOR(ctor, Il2CppString *difficultyName, int difficultyRank, Il2CppString *beatmapFilename, float noteJumpMovementSpeed, float noteJumpStartBeatOffset);
 
 public:
-	std::optional<std::reference_wrapper<rapidjson::Value>> customData;
+	std::optional<std::reference_wrapper<Value>> customData;
 )

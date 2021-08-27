@@ -5,6 +5,8 @@
 #include "GlobalNamespace/ColorScheme.hpp"
 
 #include "CustomTypes/CustomLevelInfoSaveData.hpp"
+
+#include <fstream>
 static std::string toLower(std::string in)
 {
 	std::string output = "";
@@ -32,13 +34,13 @@ extern Logger& getLogger();
 namespace SongUtils
 {
 	LoadedInfoEvent onLoadedInfoEvent;
-	std::shared_ptr<rapidjson::Document> currentInfoDat;
+	std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>> currentInfoDat;
 
 	bool currentInfoDatValid = false;
 
-	std::string lastPhysicallySelectedCharacteristic = "";
-	std::string lastPhysicallySelectedDifficulty = "";
-	std::string currentLevelPath = "";
+	std::u16string lastPhysicallySelectedCharacteristic = u"";
+	std::u16string lastPhysicallySelectedDifficulty = u"";
+	std::u16string currentLevelPath = u"";
 	
 	bool currrentlySelectedIsCustom = false;
 	bool currrentlySelectedIsWIP = false;
@@ -48,53 +50,53 @@ namespace SongUtils
 		return onLoadedInfoEvent;
 	}
 
-	std::shared_ptr<rapidjson::Document>& GetCurrentInfoDatPtr()
+	std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>& GetCurrentInfoDatPtr()
 	{
 		return currentInfoDat;
 	}
 
-	rapidjson::Document& GetCurrentInfoDat()
+	rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& GetCurrentInfoDat()
 	{
 		return *currentInfoDat;
 	}
 
-	const std::string& GetCurrentSongPath()
+	const std::u16string& GetCurrentSongPath()
 	{
 		return currentLevelPath;
 	}
 	
-	static inline std::optional<std::shared_ptr<rapidjson::Document>> getOptional(bool value) 
+	static inline std::optional<std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>> getOptional(bool value) 
 	{ 
 		if (value) return currentInfoDat;
 		else return std::nullopt; 
 	}
 
-	std::string GetDiffFromNumber(GlobalNamespace::BeatmapDifficulty selectedDifficulty)
+	std::u16string GetDiffFromNumber(GlobalNamespace::BeatmapDifficulty selectedDifficulty)
 	{
 		switch (selectedDifficulty.value)
 		{
 			case 0:
-				return "Easy";
+				return u"Easy";
 				break;
 			case 1:
-				return "Normal";
+				return u"Normal";
 				break;
 			case 2:
-				return "Hard";
+				return u"Hard";
 				break;
 			case 3:
-				return "Expert";
+				return u"Expert";
 				break;
 			case 4:
-				return "ExpertPlus";
+				return u"ExpertPlus";
 				break;
 			default:
-				return "Unknown";
+				return u"Unknown";
 				break;
 		}
 	}
 
-	GlobalNamespace::BeatmapDifficulty GetNumberFromDiff(std::string difficulty)
+	GlobalNamespace::BeatmapDifficulty GetNumberFromDiff(std::u16string difficulty)
 	{
 		// another way of doing it with a map
 		/*
@@ -111,19 +113,19 @@ namespace SongUtils
 		else return GlobalNamespace::BeatmapDifficulty::ExpertPlus;
 		return stringToDiff[difficulty];		
 		*/
-		if (difficulty == "Easy") {
+		if (difficulty == u"Easy") {
 			return GlobalNamespace::BeatmapDifficulty::Easy;
 		}
-		else if (difficulty == "Normal") {
+		else if (difficulty == u"Normal") {
 			return GlobalNamespace::BeatmapDifficulty::Normal;
 		}
-		else if (difficulty == "Hard") {
+		else if (difficulty == u"Hard") {
 			return GlobalNamespace::BeatmapDifficulty::Hard;
 		}
-		else if (difficulty == "Expert") {
+		else if (difficulty == u"Expert") {
 			return GlobalNamespace::BeatmapDifficulty::Expert;
 		}
-		else if (difficulty == "ExpertPlus") {
+		else if (difficulty == u"ExpertPlus") {
 			return GlobalNamespace::BeatmapDifficulty::ExpertPlus;
 		}
 		else {
@@ -134,7 +136,7 @@ namespace SongUtils
 	namespace CustomData
 	{
 		
-		bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, std::shared_ptr<rapidjson::Document>& doc)
+		bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>& doc)
 		{
 			// if level nullptr or not custom it fails
 			if (!level || !SongInfo::isCustom(level)) return false;
@@ -143,7 +145,7 @@ namespace SongUtils
 			GlobalNamespace::CustomPreviewBeatmapLevel* customLevel = reinterpret_cast<GlobalNamespace::CustomPreviewBeatmapLevel*>(level);
 
 			Il2CppString* levelPathCS = customLevel->get_customLevelPath();
-			std::string songPath = to_utf8(csstrtostr(levelPathCS));
+			std::u16string songPath(csstrtostr(levelPathCS));
 			currentLevelPath = songPath;
 
 			auto infoDataOpt = il2cpp_utils::try_cast<CustomJSONData::CustomLevelInfoSaveData>(customLevel->get_standardLevelInfoSaveData());
@@ -157,25 +159,33 @@ namespace SongUtils
 			}
 			else
 			{
-				songPath += "/info.dat";
+				songPath += u"/info.dat";
 				// get the path
-				getLogger().info("Getting info.dat for %s", songPath.c_str());
+				getLogger().info("Getting info.dat for %s", to_utf8(songPath).c_str());
 				// if the file doesnt exist, fail
-				if (!fileexists(songPath)) return false;
+				//if (!fileexists(songPath)) return false;
 
 				getLogger().info("Reading file");
 				// read file
-				std::string info = readfile(songPath);
+				std::ifstream instream(songPath, std::ios::in);
+				instream.seekg(0, instream.end);
+				size_t size = (size_t)instream.tellg();
+				size -= 2;
+				std::u16string info;
+				info.resize(size);
+				instream.seekg(2, instream.beg);
+				instream.read((char*)&info[0], size);
 
 				// parse into doc
-				doc->Parse(info.c_str());
+				if (!doc) doc = std::make_shared<typename rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>(); 
+				doc->Parse(info.data());
 				// return true if it read the file right, return false if there was a parse error
 				return !doc->GetParseError();
 			}
 		}
 		
 		/*
-		bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, rapidjson::Document& doc)
+		bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& doc)
 		{
 			// if level nullptr or not custom it fails
 			if (!level || !SongInfo::isCustom(level)) return false;
@@ -215,46 +225,46 @@ namespace SongUtils
 			}
 		}*/
 
-		bool GetCurrentCustomData(rapidjson::Document& in, rapidjson::Value& out)
+		bool GetCurrentCustomData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& out)
 		{
 			return GetCurrentCustomData(in, out, GetNumberFromDiff(SongUtils::SongInfo::get_lastPhysicallySelectedDifficulty()));
 		}
 
-		bool GetCurrentCustomData(rapidjson::Document& in, rapidjson::Value& out, GlobalNamespace::BeatmapDifficulty difficulty)
+		bool GetCurrentCustomData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& out, GlobalNamespace::BeatmapDifficulty difficulty)
 		{
 			bool hasCustomData = false;
 			auto& lastPhysicallySelectedCharacteristic = SongUtils::SongInfo::get_lastPhysicallySelectedCharacteristic();
-			std::string difficultyToFind = SongUtils::GetDiffFromNumber(difficulty);
-			getLogger().info("Looking for characteristic: %s", difficultyToFind.c_str());
-			getLogger().info("Looking for diff: %s", difficultyToFind.c_str());
+			std::u16string difficultyToFind = SongUtils::GetDiffFromNumber(difficulty);
+			getLogger().info("Looking for characteristic: %s", (char*)difficultyToFind.c_str());
+			getLogger().info("Looking for diff: %s", (char*)difficultyToFind.c_str());
 
-			auto difficultyBeatmapSetsitr = in.FindMember("_difficultyBeatmapSets");
+			auto difficultyBeatmapSetsitr = in.FindMember(u"_difficultyBeatmapSets");
 			// if we find the sets iterator
 			if (difficultyBeatmapSetsitr != in.MemberEnd())
 			{
 				auto setArr = difficultyBeatmapSetsitr->value.GetArray();
 				for (auto& beatmapCharacteristicItr : setArr)
 				{
-					std::string beatmapCharacteristicName = beatmapCharacteristicItr.FindMember("_beatmapCharacteristicName")->value.GetString();
-					getLogger().info("Found CharacteristicName: %s", beatmapCharacteristicName.c_str());
+					std::u16string beatmapCharacteristicName = beatmapCharacteristicItr.FindMember(u"_beatmapCharacteristicName")->value.GetString();
+					getLogger().info("Found CharacteristicName: %s", (char*)beatmapCharacteristicName.c_str());
 					// if the last selected beatmap characteristic is this specific one
 					if (beatmapCharacteristicName == lastPhysicallySelectedCharacteristic)
 					{
-						auto difficultyBeatmaps = beatmapCharacteristicItr.GetObject().FindMember("_difficultyBeatmaps");
+						auto difficultyBeatmaps = beatmapCharacteristicItr.GetObject().FindMember(u"_difficultyBeatmaps");
 						auto beatmaps = difficultyBeatmaps->value.GetArray();
 						for (auto& beatmap : beatmaps)
 						{
-							auto beatmapDiffNameItr = beatmap.GetObject().FindMember("_difficulty");
-							std::string diffString = beatmapDiffNameItr->value.GetString();
-							getLogger().info("Found diffstring: %s", diffString.c_str());
+							auto beatmapDiffNameItr = beatmap.GetObject().FindMember(u"_difficulty");
+							std::u16string diffString = beatmapDiffNameItr->value.GetString();
+							getLogger().info("Found diffstring: %s", (char*)diffString.c_str());
 							// if the last selected difficulty is this specific one
 							if (difficultyToFind == diffString)
 							{
-								auto customData = beatmap.GetObject().FindMember("_customData");
+								auto customData = beatmap.GetObject().FindMember(u"_customData");
 								if (customData != beatmap.MemberEnd())
 								{
 									hasCustomData = true;
-									out = customData->value;
+									out.CopyFrom(customData->value, in.GetAllocator());
 								}
 							}
 						}
@@ -267,7 +277,7 @@ namespace SongUtils
 		GlobalNamespace::ColorScheme* getCustomSongColour(GlobalNamespace::ColorScheme* defaultColorScheme, bool hasOverride) {
 
 			auto& d = SongUtils::GetCurrentInfoDat();
-			rapidjson::Value customData;
+			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
 			if (SongUtils::CustomData::GetCurrentCustomData(d, customData)) {
 
 				bool mapHasCustomColours = false;
@@ -288,47 +298,47 @@ namespace SongUtils
 
 				bool customBoostColours = false;
 
-				auto colorLeftItr = customData.FindMember("_colorLeft");
+				auto colorLeftItr = customData.FindMember(u"_colorLeft");
 				if (colorLeftItr != customData.MemberEnd()) {
-					colorLeft = { colorLeftItr->value["r"].GetFloat() , colorLeftItr->value["g"].GetFloat() , colorLeftItr->value["b"].GetFloat(), 1.0f };
+					colorLeft = { colorLeftItr->value[u"r"].GetFloat() , colorLeftItr->value[u"g"].GetFloat() , colorLeftItr->value[u"b"].GetFloat(), 1.0f };
 					mapHasCustomColours = true;
 				}
 
-				auto colorRightItr = customData.FindMember("_colorRight");
+				auto colorRightItr = customData.FindMember(u"_colorRight");
 				if (colorRightItr != customData.MemberEnd()) {
-					colorRight = { colorRightItr->value["r"].GetFloat() , colorRightItr->value["g"].GetFloat() , colorRightItr->value["b"].GetFloat(), 1.0f };
+					colorRight = { colorRightItr->value[u"r"].GetFloat() , colorRightItr->value[u"g"].GetFloat() , colorRightItr->value[u"b"].GetFloat(), 1.0f };
 					mapHasCustomColours = true;
 				}
 
-				auto envColorLeftItr = customData.FindMember("_envColorLeft");
+				auto envColorLeftItr = customData.FindMember(u"_envColorLeft");
 				if (envColorLeftItr != customData.MemberEnd()) {
-					envColorLeft = { envColorLeftItr->value["r"].GetFloat() , envColorLeftItr->value["g"].GetFloat() , envColorLeftItr->value["b"].GetFloat(), 1.0f };
+					envColorLeft = { envColorLeftItr->value[u"r"].GetFloat() , envColorLeftItr->value[u"g"].GetFloat() , envColorLeftItr->value[u"b"].GetFloat(), 1.0f };
 					mapHasCustomColours = true;
 				}
 
-				auto envColorRightItr = customData.FindMember("_envColorRight");
+				auto envColorRightItr = customData.FindMember(u"_envColorRight");
 				if (envColorRightItr != customData.MemberEnd()) {
-					envColorRight = { envColorRightItr->value["r"].GetFloat() , envColorRightItr->value["g"].GetFloat() , envColorRightItr->value["b"].GetFloat(), 1.0f };
+					envColorRight = { envColorRightItr->value[u"r"].GetFloat() , envColorRightItr->value[u"g"].GetFloat() , envColorRightItr->value[u"b"].GetFloat(), 1.0f };
 					mapHasCustomColours = true;
 				}
 
-				auto envColorLeftBoostItr = customData.FindMember("_envColorLeftBoost");
+				auto envColorLeftBoostItr = customData.FindMember(u"_envColorLeftBoost");
 				if (envColorLeftBoostItr != customData.MemberEnd()) {
-					envColorLeftBoost = { envColorLeftBoostItr->value["r"].GetFloat() , envColorLeftBoostItr->value["g"].GetFloat() , envColorLeftBoostItr->value["b"].GetFloat(), 1.0f };
+					envColorLeftBoost = { envColorLeftBoostItr->value[u"r"].GetFloat() , envColorLeftBoostItr->value[u"g"].GetFloat() , envColorLeftBoostItr->value[u"b"].GetFloat(), 1.0f };
 					mapHasCustomColours = true;
 					customBoostColours = true;
 				}
 
-				auto envColorRightBoostItr = customData.FindMember("_envColorRightBoost");
+				auto envColorRightBoostItr = customData.FindMember(u"_envColorRightBoost");
 				if (envColorRightBoostItr != customData.MemberEnd()) {
-					envColorRightBoost = { envColorRightBoostItr->value["r"].GetFloat() , envColorRightBoostItr->value["g"].GetFloat() , envColorRightBoostItr->value["b"].GetFloat(), 1.0f };
+					envColorRightBoost = { envColorRightBoostItr->value[u"r"].GetFloat() , envColorRightBoostItr->value[u"g"].GetFloat() , envColorRightBoostItr->value[u"b"].GetFloat(), 1.0f };
 					mapHasCustomColours = true;
 					customBoostColours = true;
 				}
 
-				auto obstacleColorItr = customData.FindMember("_obstacleColor");
+				auto obstacleColorItr = customData.FindMember(u"_obstacleColor");
 				if (obstacleColorItr != customData.MemberEnd()) {
-					obstacleColor = { obstacleColorItr->value["r"].GetFloat() , obstacleColorItr->value["g"].GetFloat() , obstacleColorItr->value["b"].GetFloat(), 1.0f };
+					obstacleColor = { obstacleColorItr->value[u"r"].GetFloat() , obstacleColorItr->value[u"g"].GetFloat() , obstacleColorItr->value[u"b"].GetFloat(), 1.0f };
 					mapHasCustomColours = true;
 				}
 
@@ -358,12 +368,12 @@ namespace SongUtils
 			}
 		}
 
-		void ExtractRequirements(const rapidjson::Value& requirementsArray, std::vector<std::string>& output)
+		void ExtractRequirements(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& requirementsArray, std::vector<std::string>& output)
 		{
 			auto actualArray = requirementsArray.GetArray();
 			for (auto& requirement : actualArray)
 			{
-				std::string requirementName = requirement.GetString();
+				std::string requirementName = to_utf8(requirement.GetString());
 				std::string requirementNameWithoutSpaces = removeSpaces(requirementName);
 
 				auto it = std::find(output.begin(), output.end(), requirementName);
@@ -429,23 +439,23 @@ namespace SongUtils
 		}
 		/*-------------------------------------------------*/
 
-		const std::string& get_lastPhysicallySelectedCharacteristic()
+		const std::u16string& get_lastPhysicallySelectedCharacteristic()
 		{
 			return lastPhysicallySelectedCharacteristic;
 		}
 
-		void set_lastPhysicallySelectedCharacteristic(std::string value)
+		void set_lastPhysicallySelectedCharacteristic(std::u16string_view value)
 		{
 			lastPhysicallySelectedCharacteristic = value;
 		}
 		/*-------------------------------------------------*/
 
-		const std::string& get_lastPhysicallySelectedDifficulty()
+		const std::u16string& get_lastPhysicallySelectedDifficulty()
 		{
 			return lastPhysicallySelectedDifficulty;
 		}
 
-		void set_lastPhysicallySelectedDifficulty(std::string value)
+		void set_lastPhysicallySelectedDifficulty(std::u16string_view value)
 		{
 			lastPhysicallySelectedDifficulty = value;
 		}

@@ -10,7 +10,7 @@
 
 namespace SongUtils
 {
-	using LoadedInfoEvent = UnorderedEventCallback<std::optional<std::shared_ptr<rapidjson::Document>>>;
+	using LoadedInfoEvent = UnorderedEventCallback<std::optional<std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>>>;
 	
 	/// @brief gets the event for info loading
 	/// @return event callback reference
@@ -18,18 +18,18 @@ namespace SongUtils
 
 	/// @brief gets a reference to the currentl internally loaded info dat
 	/// @return rapidjson Document reference of current loaded info dat
-	rapidjson::Document& GetCurrentInfoDat();
+	rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& GetCurrentInfoDat();
 	
 	/// @brief gets a reference to the currentl internally loaded info dat
 	/// @return rapidjson Document reference of current loaded info dat
-	std::shared_ptr<rapidjson::Document>& GetCurrentInfoDatPtr();
+	std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>& GetCurrentInfoDatPtr();
 
 	/// @brief returns the current song path
-	const std::string& GetCurrentSongPath();
+	const std::u16string& GetCurrentSongPath();
 	
 	/// @brief returns string name for specific difficulty
 	/// @param selectedDifficulty enum selected
-	std::string GetDiffFromNumber(GlobalNamespace::BeatmapDifficulty selectedDifficulty);
+	std::u16string GetDiffFromNumber(GlobalNamespace::BeatmapDifficulty selectedDifficulty);
 
 	namespace CustomData
 	{
@@ -37,30 +37,30 @@ namespace SongUtils
 		/// @param level the preview level
 		/// @param doc reference to the output variable
 		/// @return bool success finding file
-		//bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, rapidjson::Document& doc);
+		//bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& doc);
 
 		/// @brief gets the info json and loads it into a rapidjson doc if available
 		/// @param level the preview level
 		/// @param doc reference to the output variable
 		/// @return bool success finding file
-		bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, std::shared_ptr<rapidjson::Document>& doc);
+		bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>& doc);
 
 		/// @brief gets the current custom data from the passed document, and puts it in the passed output
 		/// @param in this needs to be a valid info.dat
 		/// @param out the value which will be output to
 		/// @return bool custom data found and assigned, true for success
-		bool GetCurrentCustomData(rapidjson::Document& in, rapidjson::Value& out);		
+		bool GetCurrentCustomData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& out);		
 		
 		/// @brief gets the current custom data from the passed document, and puts it in the passed output
 		/// @param in this needs to be a valid info.dat
 		/// @param out the value which will be output to
 		/// @return bool custom data found and assigned, true for success
-		bool GetCurrentCustomData(rapidjson::Document& in, rapidjson::Value& out, GlobalNamespace::BeatmapDifficulty difficulty);
+		bool GetCurrentCustomData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& out, GlobalNamespace::BeatmapDifficulty difficulty);
 
 		/// @brief using the requirements array, this will extract the requirements for the current array, 
 		/// @param requirementsArray the array of requirements
 		/// @param output the output to put the requirements into
-		void ExtractRequirements(const rapidjson::Value& requirementsArray, std::vector<std::string>& output);
+		void ExtractRequirements(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& requirementsArray, std::vector<std::string>& output);
 
 		GlobalNamespace::ColorScheme* getCustomSongColour(GlobalNamespace::ColorScheme* defaultColorScheme, bool hasOverride);
 
@@ -101,20 +101,20 @@ namespace SongUtils
 
 		/// @brief gets the last selected characteristic string
 		/// @return const string reference
-		const std::string& get_lastPhysicallySelectedCharacteristic();
+		const std::u16string& get_lastPhysicallySelectedCharacteristic();
 
 		/// @brief sets the last selected characteristic string
 		/// @param value what to set
-		void set_lastPhysicallySelectedCharacteristic(std::string value);
+		void set_lastPhysicallySelectedCharacteristic(std::u16string_view value);
 		/*--------------------------------------------------------------*/
 
 		/// @brief gets the last selected Difficulty string
 		/// @return const string reference
-		const std::string& get_lastPhysicallySelectedDifficulty();
+		const std::u16string& get_lastPhysicallySelectedDifficulty();
 
 		/// @brief sets the last selected Difficulty string
 		/// @param value what to set
-		void set_lastPhysicallySelectedDifficulty(std::string value);
+		void set_lastPhysicallySelectedDifficulty(std::u16string_view value);
 		/*--------------------------------------------------------------*/
 	}
 }

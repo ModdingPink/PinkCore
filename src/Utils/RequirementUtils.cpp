@@ -54,21 +54,21 @@ namespace RequirementUtils
 		if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && SongUtils::SongInfo::get_currentInfoDatValid())
 		{
 			auto& doc = SongUtils::GetCurrentInfoDat();
-			getLogger().info("handling requirements for %s", doc["_songName"].GetString());
-			rapidjson::Value customData;
+			//getLogger().info("handling requirements for %s", doc["_songName"].GetString());
+			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
 			// get the custom data, if it exists
 			if (SongUtils::CustomData::GetCurrentCustomData(doc, customData))
 			{
 				getLogger().info("There was custom data!");
 				// there was custom data
-				auto requirementsArray = customData.FindMember("_requirements");
+				auto requirementsArray = customData.FindMember(u"_requirements");
 				if (requirementsArray != customData.MemberEnd())
 				{
 					getLogger().info("Extracting Requirements");
 					SongUtils::CustomData::ExtractRequirements(requirementsArray->value, currentRequirements);
 				}
 
-				auto suggestionsArray = customData.FindMember("_suggestions");
+				auto suggestionsArray = customData.FindMember(u"_suggestions");
 				if (suggestionsArray != customData.MemberEnd())
 				{
 					getLogger().info("Extracting Suggestions");

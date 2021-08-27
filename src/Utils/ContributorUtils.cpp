@@ -19,12 +19,12 @@ namespace ContributorUtils
 		{   
 			auto& doc = SongUtils::GetCurrentInfoDat();
 			// try to find the custom data, which has the contributors
-			auto customDataitr = doc.FindMember("_customData");
+			auto customDataitr = doc.FindMember(u"_customData");
 			if (customDataitr != doc.MemberEnd())
 			{
-				rapidjson::Value& customData = customDataitr->value;
+				rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData = customDataitr->value;
 				// try to find the contributors array
-				auto contributorsMemberItr = customData.FindMember("_contributors");
+				auto contributorsMemberItr = customData.FindMember(u"_contributors");
 				if (contributorsMemberItr != customData.MemberEnd())
 				{
 					// get the array

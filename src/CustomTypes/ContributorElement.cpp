@@ -21,8 +21,8 @@ namespace PinkCore::UI
 		inited = true;
 		this->contributor = contributor;
 
-		std::string iconPath = SongUtils::GetCurrentSongPath() + "/" + contributor.iconPath;
-	        sprite = UIUtils::FileToSprite(iconPath);
+		std::u16string iconPath = SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath;
+	        sprite = UIUtils::FileToSprite(to_utf8(iconPath));
 
 		get_gameObject()->set_name(il2cpp_utils::newcsstr(contributor.name + contributor.role));
 
@@ -62,13 +62,13 @@ namespace PinkCore::UI
 		textGroup->set_childAlignment(UnityEngine::TextAnchor::MiddleLeft);
 
 		// which contributor is it? 
-		auto name = QuestUI::BeatSaberUI::CreateText(textGroup->get_transform(), contributor.name);
+		auto name = QuestUI::BeatSaberUI::CreateText(textGroup->get_transform(), to_utf8(contributor.name));
 		name->set_alignment(TMPro::TextAlignmentOptions::MidlineLeft);
 		
 		layoutelem = name->get_gameObject()->AddComponent<UnityEngine::UI::LayoutElement*>();
 		layoutelem->set_preferredHeight(0.3f);
 
-		auto role = QuestUI::BeatSaberUI::CreateText(textGroup->get_transform(), contributor.role);
+		auto role = QuestUI::BeatSaberUI::CreateText(textGroup->get_transform(), to_utf8(contributor.role));
 		layoutelem = role->get_gameObject()->AddComponent<UnityEngine::UI::LayoutElement*>();
 		layoutelem->set_preferredHeight(0.3f);
 

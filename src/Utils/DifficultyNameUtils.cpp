@@ -9,13 +9,13 @@ extern Logger& getLogger();
 
 namespace DifficultyNameUtils
 {
-	std::string easyCache = "";
-	std::string normalCache = "";
-	std::string hardCache = "";
-	std::string expertCache = "";
-	std::string expertPlusCache = "";
+	std::u16string easyCache = u"";
+	std::u16string normalCache = u"";
+	std::u16string hardCache = u"";
+	std::u16string expertCache = u"";
+	std::u16string expertPlusCache = u"";
 
-	void setDifficultyNameCacheFromDifficulty(GlobalNamespace::BeatmapDifficulty difficulty, std::string name){
+	void setDifficultyNameCacheFromDifficulty(GlobalNamespace::BeatmapDifficulty difficulty, std::u16string_view name){
 		switch (difficulty) {
 		case GlobalNamespace::BeatmapDifficulty::Easy:
 			easyCache = name;
@@ -35,22 +35,22 @@ namespace DifficultyNameUtils
 		}
 	}
 
-	std::string GetDifficultyNameFromDoc(rapidjson::Document& d, GlobalNamespace::BeatmapDifficulty difficulty)
+	std::u16string GetDifficultyNameFromDoc(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& d, GlobalNamespace::BeatmapDifficulty difficulty)
 	{
-		std::string customDifficultyName = "";
-		rapidjson::Value customData;
+		std::u16string customDifficultyName = u"";
+		rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
 		if (SongUtils::CustomData::GetCurrentCustomData(d, customData, difficulty)) {
-			auto customDiffItr = customData.FindMember("_difficultyLabel");
+			auto customDiffItr = customData.FindMember(u"_difficultyLabel");
 			if (customDiffItr != customData.MemberEnd()) {
-				customDifficultyName = customDiffItr->value.GetString();
+				customDifficultyName = std::u16string(customDiffItr->value.GetString(), customDiffItr->value.GetStringLength());
 			}
 		}
 		return customDifficultyName;
 	}
 
 
-	std::string GetDifficultyNameFromCache(GlobalNamespace::BeatmapDifficulty difficulty) {
-		std::string diffLabel = "";
+	std::u16string GetDifficultyNameFromCache(GlobalNamespace::BeatmapDifficulty difficulty) {
+		std::u16string diffLabel;
 		switch (difficulty) {
 			case GlobalNamespace::BeatmapDifficulty::Easy:
 				diffLabel = easyCache;
@@ -68,9 +68,10 @@ namespace DifficultyNameUtils
 				diffLabel = expertPlusCache;
 				break;
 			default:
+				diffLabel = u"";
 				break;
 		}
-		setDifficultyNameCacheFromDifficulty(difficulty, "");
+		setDifficultyNameCacheFromDifficulty(difficulty, u"");
 		return diffLabel;
 	}
 

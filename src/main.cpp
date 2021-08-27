@@ -45,7 +45,7 @@ MAKE_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionViewCon
 	if (isCustom)
 	{
 		// clear current info dat
-		std::shared_ptr<rapidjson::Document>& d = SongUtils::GetCurrentInfoDatPtr();
+		auto& d = SongUtils::GetCurrentInfoDatPtr();
 		if (SongUtils::CustomData::GetInfoJson(level, d))
 		{
 			SongUtils::SongInfo::set_currentInfoDatValid(true);
@@ -75,43 +75,54 @@ MAKE_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionViewCon
 MAKE_HOOK_MATCH(StandardLevelInfoSaveData_DeserializeFromJSONString, &GlobalNamespace::StandardLevelInfoSaveData::DeserializeFromJSONString, GlobalNamespace::StandardLevelInfoSaveData*, Il2CppString *stringData) {
 	auto* original = StandardLevelInfoSaveData_DeserializeFromJSONString(stringData);
 	if (!original) return nullptr;
-	int origLength = original ? (original->difficultyBeatmapSets ? original->difficultyBeatmapSets->Length() : 0) : 0;
+
 	::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet*> *customBeatmapSets = 
-		::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet*>::NewLength(origLength);
+		::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet*>::NewLength(original->difficultyBeatmapSets->Length());
+		
 	CustomJSONData::CustomLevelInfoSaveData* customSaveData = CRASH_UNLESS(il2cpp_utils::New<CustomJSONData::CustomLevelInfoSaveData*>(original->songName, 
 		original->songSubName, original->songAuthorName, original->levelAuthorName, original->beatsPerMinute, original->songTimeOffset, 
 		original->shuffle, original->shufflePeriod, original->previewStartTime, original->previewDuration, original->songFilename, 
 		original->coverImageFilename, original->environmentName, original->allDirectionsEnvironmentName, customBeatmapSets));
 	
-	std::string str = stringData ? to_utf8(csstrtostr(stringData)) : "{}";
+	std::u16string str(stringData ? csstrtostr(stringData) : u"{}");
 	
-	std::shared_ptr<rapidjson::Document> sharedDoc = std::make_shared<rapidjson::Document>();
+	std::shared_ptr<typename rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>> sharedDoc = std::make_shared<typename rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>();
 	customSaveData->doc = sharedDoc;
 
-	rapidjson::Document& doc = *sharedDoc;
+	rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& doc = *sharedDoc;
 	doc.Parse(str.c_str());
 
-	if (doc.HasMember("_customData")) {
-		customSaveData->customData = doc["_customData"];
+	auto dataItr = doc.FindMember(u"_customData");
+	if (dataItr != doc.MemberEnd()) {
+		customSaveData->customData = dataItr->value;
 	}
+	//if (doc.HasMember(u"_customData")) {
+	//	customSaveData->customData = doc["_customData"];
+	//}
 
-	rapidjson::Value& beatmapSetsArr = doc["_difficultyBeatmapSets"];
+	Value& beatmapSetsArr = doc.FindMember(u"_difficultyBeatmapSets")->value;
+	
+	getLogger().info("beatmapSets length orig: %d", original->difficultyBeatmapSets->Length());
+	getLogger().info("beatmapSets length json: %d", beatmapSetsArr.Size());
 
 	for (rapidjson::SizeType i = 0; i < beatmapSetsArr.Size(); i++) {
-		rapidjson::Value& beatmapSetJson = beatmapSetsArr[i];
+		Value& beatmapSetJson = beatmapSetsArr[i];
 		GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet *standardBeatmapSet = original->difficultyBeatmapSets->values[i];
+		getLogger().info("beatmapset: %p", standardBeatmapSet);
+		getLogger().info("standardBeatmapSet->difficultyBeatmaps: %p", standardBeatmapSet->difficultyBeatmaps);
 		::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmap*> *customBeatmaps = 
 			::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmap*>::NewLength(standardBeatmapSet->difficultyBeatmaps->Length());
 
 		for (rapidjson::SizeType j = 0; j < standardBeatmapSet->difficultyBeatmaps->Length(); j++) {
-			rapidjson::Value& difficultyBeatmapJson = beatmapSetJson["_difficultyBeatmaps"][j];
+			Value& difficultyBeatmapJson = beatmapSetJson.FindMember(u"_difficultyBeatmaps")->value[j];
 			GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmap *standardBeatmap = standardBeatmapSet->difficultyBeatmaps->values[j];
 
 			CustomJSONData::CustomDifficultyBeatmap *customBeatmap = CRASH_UNLESS(il2cpp_utils::New<CustomJSONData::CustomDifficultyBeatmap*>(standardBeatmap->difficulty, 
 				standardBeatmap->difficultyRank, standardBeatmap->beatmapFilename, standardBeatmap->noteJumpMovementSpeed, standardBeatmap->noteJumpStartBeatOffset));
 			
-			if (difficultyBeatmapJson.HasMember("_customData")) {
-				customBeatmap->customData = difficultyBeatmapJson["_customData"];
+			auto customDataItr = difficultyBeatmapJson.FindMember(u"_customData");
+			if (customDataItr != difficultyBeatmapJson.MemberEnd()) {
+				customBeatmap->customData = customDataItr->value;
 			}
 
 			customBeatmaps->values[j] = customBeatmap;

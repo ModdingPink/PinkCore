@@ -13,9 +13,9 @@
 
 namespace DifficultyNameUtils
 {
-	void setDifficultyNameCacheFromDifficulty(GlobalNamespace::BeatmapDifficulty difficulty, std::string name);
-	std::string GetDifficultyNameFromDoc(rapidjson::Document& d, GlobalNamespace::BeatmapDifficulty difficulty);
-	std::string GetDifficultyNameFromCache(GlobalNamespace::BeatmapDifficulty difficulty);
+	void setDifficultyNameCacheFromDifficulty(GlobalNamespace::BeatmapDifficulty difficulty, std::u16string_view name);
+	std::u16string GetDifficultyNameFromDoc(rapidjson::Document& d, GlobalNamespace::BeatmapDifficulty difficulty);
+	std::u16string GetDifficultyNameFromCache(GlobalNamespace::BeatmapDifficulty difficulty);
 	void SetDifficultyNameCacheFromArray(::Array<GlobalNamespace::IDifficultyBeatmap*>* difficultyArray);
 
 }

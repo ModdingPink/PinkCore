@@ -8,6 +8,7 @@
 
 namespace PinkCore::RequirementAPI
 {
+	using Value16 = rapidjson::GenericValue<rapidjson::UTF16<char16_t>>;
 	/// @brief Register a given string as installed
 	/// @param identifier the string to register
 	/// @return optional bool, true for success, false for failed
@@ -31,7 +32,7 @@ namespace PinkCore::RequirementAPI
 	/// @brief Gets the currently selected custom data (diff and characteristic wise)
 	/// @param value the reference to the value that will be written to, this will be overwritten!
 	/// @return false for failure, true for success
-	bool GetCurrentlySelectedCustomData(rapidjson::Value& value);
+	bool GetCurrentlySelectedCustomData(Value16& value);
 
 	/// @brief disables the play button with your mod, allowing the player to not play maps
 	/// @param info your mod info, always pass the same modinfo to the method or we'll get weird behaviour

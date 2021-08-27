@@ -19,10 +19,11 @@
 #include "UnityEngine/UI/Button.hpp"
 
 #include <cstdlib>
+#include <string>
 
-std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+std::u16string ReplaceAll(std::u16string str, const std::u16string& from, const std::u16string& to) {
 	size_t start_pos = 0;
-	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+	while ((start_pos = str.find(from, start_pos)) != std::u16string::npos) {
 		str.replace(start_pos, from.length(), to);
 		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
 	}
@@ -47,21 +48,21 @@ MAKE_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace::Leve
 	{
 		self->songAuthorText->set_richText(true);
 		if (!level->get_levelAuthorName()->IsNullOrWhiteSpace(level->get_levelAuthorName())) {
-			std::string songAuthorName = to_utf8(csstrtostr(level->get_songAuthorName()));
-			std::string levelAuthorName = to_utf8(csstrtostr(level->get_levelAuthorName()));
+			std::u16string songAuthorName(csstrtostr(level->get_songAuthorName()));
+			std::u16string levelAuthorName(csstrtostr(level->get_levelAuthorName()));
 
-			levelAuthorName = ReplaceAll(levelAuthorName, "<", "\\u200B");
-			levelAuthorName = ReplaceAll(levelAuthorName, ">", "\\u200B");
+			levelAuthorName = ReplaceAll(levelAuthorName, u"<", u"\\u200B");
+			levelAuthorName = ReplaceAll(levelAuthorName, u">", u"\\u200B");
 
-			std::string colourToUse = "ff69b4";
+			std::u16string colourToUse = u"ff69b4";
 
 			if (!(rand() % 100))
 			{
 				//RedBrumblerMoment
-				colourToUse = "db4848";
+				colourToUse = u"db4848";
 			}
 
-			Il2CppString* newAuthorIl2cppString = il2cpp_utils::createcsstr("<size=80%>" + songAuthorName + "</size> <size=90%>[<color=#" + colourToUse + ">" + levelAuthorName + "</color>]</size>");
+			Il2CppString* newAuthorIl2cppString = il2cpp_utils::newcsstr(u"<size=80%>" + songAuthorName + u"</size> <size=90%>[<color=#" + colourToUse + u">" + levelAuthorName + u"</color>]</size>");
 			self->songAuthorText->set_text(newAuthorIl2cppString);
 		}
 	}
