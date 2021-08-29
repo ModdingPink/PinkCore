@@ -6,6 +6,7 @@
 #include "GlobalNamespace/MainSettingsModelSO.hpp"
 #include "GlobalNamespace/SaberBurnMarkArea.hpp"
 #include "GlobalNamespace/BoolSO.hpp"
+#include "UnityEngine/Camera.hpp"
 
 MAKE_HOOK_MATCH(MainSettingsModelSO_Load, &GlobalNamespace::MainSettingsModelSO::Load, void, GlobalNamespace::MainSettingsModelSO* self, bool forced)
 {
@@ -19,7 +20,7 @@ MAKE_HOOK_MATCH(SaberBurnMarkArea_LateUpdate, &GlobalNamespace::SaberBurnMarkAre
 	if (config.enableBurnMarks) {
 		SaberBurnMarkArea_LateUpdate(self); 
 	} else {
-                self->get_camera()->Render();
+                self->camera->Render();
         }
 }
 
