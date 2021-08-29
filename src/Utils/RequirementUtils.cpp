@@ -219,7 +219,10 @@ namespace RequirementUtils
 		if (length > 0)
 		{
 			bool interactable = AllowPlayerToStart();
-			if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && SongUtils::SongInfo::get_currentlySelectedIsWIP())
+                        bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
+                        bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
+			getLogger().info("interactable: %d, custom: %d, wip: %d", interactable, isCustom, isWip);
+                        if (isCustom && isWip)
 			{
 				levelViews->values[length - 1]->get_practiceButton()->set_interactable(interactable);
 				levelViews->values[length - 1]->get_actionButton()->set_interactable(false);
