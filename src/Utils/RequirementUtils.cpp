@@ -214,13 +214,12 @@ namespace RequirementUtils
 
 	void UpdatePlayButton()
 	{
-		if (!SongUtils::SongInfo::get_currentlySelectedIsCustom()) return;
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
 		int length = levelViews->Length();
 		if (length > 0)
 		{
 			bool interactable = AllowPlayerToStart();
-			if (SongUtils::SongInfo::get_currentlySelectedIsWIP())
+			if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && SongUtils::SongInfo::get_currentlySelectedIsWIP())
 			{
 				levelViews->values[length - 1]->get_practiceButton()->set_interactable(interactable);
 				levelViews->values[length - 1]->get_actionButton()->set_interactable(false);
