@@ -18,7 +18,9 @@ MAKE_HOOK_MATCH(SaberBurnMarkArea_LateUpdate, &GlobalNamespace::SaberBurnMarkAre
 {
 	if (config.enableBurnMarks) {
 		SaberBurnMarkArea_LateUpdate(self); 
-	}
+	} else {
+                self->get_camera()->Render();
+        }
 }
 
 void InstallBurnMarkHooks(Logger& logger)
