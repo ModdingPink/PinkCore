@@ -7,6 +7,10 @@
 #include "GlobalNamespace/SaberBurnMarkArea.hpp"
 #include "GlobalNamespace/BoolSO.hpp"
 #include "UnityEngine/Camera.hpp"
+#include "UnityEngine/LineRenderer.hpp"
+#include "UnityEngine/Renderer.hpp"
+#include "UnityEngine/Texture2D.hpp"
+#include "UnityEngine/Material.hpp"
 
 MAKE_HOOK_MATCH(MainSettingsModelSO_Load, &GlobalNamespace::MainSettingsModelSO::Load, void, GlobalNamespace::MainSettingsModelSO* self, bool forced)
 {
@@ -20,8 +24,8 @@ MAKE_HOOK_MATCH(SaberBurnMarkArea_LateUpdate, &GlobalNamespace::SaberBurnMarkAre
 	if (config.enableBurnMarks) {
 		SaberBurnMarkArea_LateUpdate(self); 
 	} else {
-                self->camera->Render();
-        }
+		self->renderer->get_sharedMaterial()->set_mainTexture(UnityEngine::Texture2D::get_blackTexture());
+    }
 }
 
 void InstallBurnMarkHooks(Logger& logger)
