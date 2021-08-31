@@ -50,48 +50,15 @@ MAKE_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement::Scen
 MAKE_HOOK_MATCH(MainFlowCoordinator_DidActivate, &GlobalNamespace::MainFlowCoordinator::DidActivate, void, GlobalNamespace::MainFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 {
 	// when activating, we want to provide our own view controller for the right screen, so just take whatever is activated and display ours for right
-	MainFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 	if (firstActivation)
 	{
 		auto controller = PinkCore::UI::NoticeBoard::get_instance();
-		self->ProvideInitialViewControllers(self->mainMenuViewController, self->leftScreenViewController, controller, self->bottomScreenViewController, self->topScreenViewController);
+		self->providedRightScreenViewController = controller;
+		MainFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+		self->providedRightScreenViewController = controller;
+		//self->ProvideInitialViewControllers(self->mainMenuViewController, self->leftScreenViewController, controller, self->bottomScreenViewController, self->topScreenViewController);
 	}
-}
-
-MAKE_HOOK_MATCH(MainFlowCoordinator_TopViewControllerWillChange, &GlobalNamespace::MainFlowCoordinator::TopViewControllerWillChange, void, GlobalNamespace::MainFlowCoordinator* self, HMUI::ViewController* oldViewController, HMUI::ViewController* newViewController, HMUI::ViewController::AnimationType animationType)
-{
-	// due to the menu behaving weird in how to play, this is the best way to get it to not look weird when switching the menus
-	if (newViewController->Equals(self->howToPlayViewController))
-	{
-		self->SetLeftScreenViewController(nullptr, animationType);
-		self->SetRightScreenViewController(nullptr, animationType);
-		self->SetBottomScreenViewController(nullptr, animationType);
-		static auto key = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("LABEL_HOW_TO_PLAY");
-		self->SetTitle(Polyglot::Localization::Get(key), animationType);
-		self->SetLeftScreenViewController(self->playerStatisticsViewController, animationType);
-		self->set_showBackButton(true);
-		return;
-	}
-
-	MainFlowCoordinator_TopViewControllerWillChange(self, oldViewController, newViewController, animationType);
-
-	// if going to the main view controller
-	// we want to then set our own controller as the right view controller, that way it should always display on the right in the main menu
-	if (newViewController->Equals(self->mainMenuViewController))
-	{
-		INFO("Presenting noticeboard ViewController");
-		auto controller = PinkCore::UI::NoticeBoard::get_instance();
-		self->SetRightScreenViewController(controller, animationType);
-	}
-	/*
-	else if (newViewController->Equals(self->howToPlayViewController))
-	{
-		// if we are going to present the how to play view controller, we need to do some fanagling to get it to not keep displaying our menu
-		self->SetRightScreenViewController(nullptr, animationType);
-		self->SetLeftScreenViewController(self->playerStatisticsViewController, animationType);
-		//self->SetRightScreenViewController(self->playerStatisticsViewController, HMUI::ViewController::AnimationType::In);
-	}
-	*/
+	else MainFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
 // using unsafe cause I can't bother with actually getting the types correct since they are irrelevant anyways
@@ -105,7 +72,6 @@ void InstallNoticeBoardHooks(Logger& logger)
 {
 	SIMPLE_INSTALL_HOOK(SceneManager_SetActiveScene);
 	SIMPLE_INSTALL_HOOK(MainFlowCoordinator_DidActivate);
-	SIMPLE_INSTALL_HOOK(MainFlowCoordinator_TopViewControllerWillChange);
 	SIMPLE_INSTALL_HOOK(MenuTransitionsHelper_RestartGame);
 }
 
