@@ -235,8 +235,8 @@ namespace SongUtils
 			bool hasCustomData = false;
 			auto& lastPhysicallySelectedCharacteristic = SongUtils::SongInfo::get_lastPhysicallySelectedCharacteristic();
 			std::u16string difficultyToFind = SongUtils::GetDiffFromNumber(difficulty);
-			getLogger().info("Looking for characteristic: %s", (char*)difficultyToFind.c_str());
-			getLogger().info("Looking for diff: %s", (char*)difficultyToFind.c_str());
+			getLogger().info("Looking for characteristic: %s", to_utf8(difficultyToFind).c_str());
+			getLogger().info("Looking for diff: %s", to_utf8(difficultyToFind).c_str());
 
 			auto difficultyBeatmapSetsitr = in.FindMember(u"_difficultyBeatmapSets");
 			// if we find the sets iterator

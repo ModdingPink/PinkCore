@@ -96,9 +96,6 @@ MAKE_HOOK_MATCH(StandardLevelInfoSaveData_DeserializeFromJSONString, &GlobalName
 	if (dataItr != doc.MemberEnd()) {
 		customSaveData->customData = dataItr->value;
 	}
-	//if (doc.HasMember(u"_customData")) {
-	//	customSaveData->customData = doc["_customData"];
-	//}
 
 	Value& beatmapSetsArr = doc.FindMember(u"_difficultyBeatmapSets")->value;
 	

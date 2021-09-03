@@ -12,6 +12,8 @@
 
 using namespace GlobalNamespace;
 
+extern Logger& getLogger();
+
 int addBeatmapObjectDataLineIndex;
 MAKE_HOOK_MATCH(BeatmapData_AddBeatmapObjectData, &BeatmapData::AddBeatmapObjectData, void,
 				BeatmapData *self, BeatmapObjectData *item) {
@@ -34,31 +36,37 @@ MAKE_HOOK_MATCH(BeatmapLineData_AddBeatmapObjectData, &BeatmapLineData::AddBeatm
 }
 
 MAKE_HOOK_MATCH(NoteProcessorClampPatch, &BeatmapObjectsInTimeRowProcessor::ProcessAllNotesInTimeRow, void,
-				BeatmapObjectsInTimeRowProcessor *self, List<NoteData *> *notes) {
-	std::map<int, int> extendedLanesMap;
-	for (int i = 0; i < notes->size; ++i) {
-		auto *item = notes->items->values[i];
-		if (item->lineIndex > 3) {
-			extendedLanesMap[i] = item->lineIndex;
-			item->lineIndex = 3;
-		} else if (item->lineIndex < 0) {
-			extendedLanesMap[i] = item->lineIndex;
-			item->lineIndex = 0;
-		}
+				BeatmapObjectsInTimeRowProcessor *self, List<NoteData *> *notesInTimeRow) {
+	if (!notesInTimeRow->get_Count())
+	{
+		NoteProcessorClampPatch(self, notesInTimeRow);
+		return;
+	}
+	// save all the original information
+	std::vector<int> extendedLanes(notesInTimeRow->size);
+	int idx = 0;
+	for (auto& lane : extendedLanes)
+	{
+		auto *item = notesInTimeRow->items->values[idx];
+		lane = item->lineIndex;
+		item->lineIndex = std::max(std::min(item->lineIndex, 3), 0);
+		idx++;
 	}
 
-	// NotesInTimeRowProcessor_ProcessAllNotesInTimeRow(self, notes);
+	// NotesInTimeRowProcessor_ProcessAllNotesInTimeRow(self, notesInTimeRow);
 	// Instead, we have a reimplementation of the hooked method to deal with precision
 	// noteLineLayers:
+	int columnsLength = self->notesInColumns->Length();
 	for (il2cpp_array_size_t i = 0; i < self->notesInColumns->Length(); i++) {
 		self->notesInColumns->values[i]->Clear();
 	}
-	for (int j = 0; j < notes->size; j++) {
-		auto *noteData = notes->items->values[j];
-		auto *list = self->notesInColumns->values[noteData->lineIndex];
+	
+	for (int j = 0; j < notesInTimeRow->get_Count(); j++) {
+		auto* noteData = notesInTimeRow->items->values[j];
+		auto* list = self->notesInColumns->values[noteData->lineIndex];
 
 		bool flag = false;
-		for (int k = 0; k < list->size; k++) {
+		for (int k = 0; k < list->get_Count(); k++) {
 			if (list->items->values[k]->noteLineLayer.value > noteData->noteLineLayer.value) {
 				list->Insert(k, noteData);
 				flag = true;
@@ -71,20 +79,21 @@ MAKE_HOOK_MATCH(NoteProcessorClampPatch, &BeatmapObjectsInTimeRowProcessor::Proc
 	}
 	for (il2cpp_array_size_t l = 0; l < self->notesInColumns->Length(); l++) {
 		auto *list2 = self->notesInColumns->values[l];
-		for (int m = 0; m < list2->size; m++) {
+		for (int m = 0; m < list2->get_Count(); m++) {
 			auto *note = list2->items->values[m];
 			if (note->noteLineLayer.value >= 0 && note->noteLineLayer.value <= 2) {
 				note->SetBeforeJumpNoteLineLayer(m);
 			}
 		}
 	}
-
-	for (int i = 0; i < notes->size; ++i) {
-		if (extendedLanesMap.find(i) != extendedLanesMap.end()) {
-			auto *item = notes->items->values[i];
-			item->lineIndex = extendedLanesMap[i];
-		}
+	idx = 0;
+	for (auto& lane : extendedLanes)
+	{
+		notesInTimeRow->items->values[idx]->lineIndex = lane;
+		idx++;
 	}
+
+	notesInTimeRow->Clear();
 }
 
 
