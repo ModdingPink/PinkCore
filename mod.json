@@ -5,7 +5,7 @@
   "author": "RedBrumbler, Pink, StackDoubleFlow, Lillie, Darknight1050",
   "version": "1.5.0",
   "packageId": "com.beatgames.beatsaber",
-  "packageVersion": "1.16.4",
+  "packageVersion": "1.17.0",
   "coverImage": "cover.jpg",
   "description": "PinkCore is a core mod that ports over the rest of SongCore's features.\nThis includes adding information to your game such as Mappers names, Mod Requirements, Custom Colours, Custom Difficulty names, Burn Marks, and more!",
   "dependencies": [],
@@ -13,7 +13,7 @@
     "libpinkcore.so"
   ],
   "libraryFiles": [
-    "libbeatsaber-hook_2_2_5.so"
+    "libbeatsaber-hook_2_3_0.so"
   ],
   "fileCopies": [
     {

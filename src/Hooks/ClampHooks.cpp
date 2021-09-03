@@ -6,7 +6,7 @@
 #include "GlobalNamespace/BeatmapLineData.hpp"
 #include "GlobalNamespace/BeatmapObjectData.hpp"
 #include "GlobalNamespace/NoteData.hpp"
-#include "GlobalNamespace/NotesInTimeRowProcessor.hpp"
+#include "GlobalNamespace/BeatmapObjectsInTimeRowProcessor.hpp"
 
 #include <map>
 
@@ -26,14 +26,15 @@ MAKE_HOOK_MATCH(BeatmapData_AddBeatmapObjectData, &BeatmapData::AddBeatmapObject
 
 	BeatmapData_AddBeatmapObjectData(self, item);
 }
+
 MAKE_HOOK_MATCH(BeatmapLineData_AddBeatmapObjectData, &BeatmapLineData::AddBeatmapObjectData, void,
 				BeatmapLineData *self, BeatmapObjectData *item) {
 	item->lineIndex = addBeatmapObjectDataLineIndex;
 	BeatmapLineData_AddBeatmapObjectData(self, item);
 }
 
-MAKE_HOOK_MATCH(NoteProcessorClampPatch, &NotesInTimeRowProcessor::ProcessAllNotesInTimeRow, void,
-				NotesInTimeRowProcessor *self, List<NoteData *> *notes) {
+MAKE_HOOK_MATCH(NoteProcessorClampPatch, &BeatmapObjectsInTimeRowProcessor::ProcessAllNotesInTimeRow, void,
+				BeatmapObjectsInTimeRowProcessor *self, List<NoteData *> *notes) {
 	std::map<int, int> extendedLanesMap;
 	for (int i = 0; i < notes->size; ++i) {
 		auto *item = notes->items->values[i];
@@ -85,6 +86,7 @@ MAKE_HOOK_MATCH(NoteProcessorClampPatch, &NotesInTimeRowProcessor::ProcessAllNot
 		}
 	}
 }
+
 
 MAKE_HOOK_MATCH(BeatmapObjectsDataClampPatch, &BeatmapData::$get_beatmapObjectsData$d__31::MoveNext,
 				bool, BeatmapData::$get_beatmapObjectsData$d__31 *self) {

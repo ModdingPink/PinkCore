@@ -112,7 +112,7 @@ $modJson.version = $qpmJson.info.version
 $modJson.modFiles = $modlib
 $modJson.libraryFiles = $libs
 $modText = $modJson | ConvertTo-Json -Depth 50 -EscapeHandling EscapeNonAscii
-
+echo $modText
 Set-Content $mod $modText
 
 # if the qmod exists, rename it to zip to update it, we'll rename it back later

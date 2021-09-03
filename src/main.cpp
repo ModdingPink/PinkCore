@@ -102,7 +102,7 @@ MAKE_HOOK_MATCH(StandardLevelInfoSaveData_DeserializeFromJSONString, &GlobalName
 
 	Value& beatmapSetsArr = doc.FindMember(u"_difficultyBeatmapSets")->value;
 	
-	getLogger().info("beatmapSets length orig: %d", original->difficultyBeatmapSets->Length());
+	getLogger().info("beatmapSets length orig: %lu", original->difficultyBeatmapSets->Length());
 	getLogger().info("beatmapSets length json: %d", beatmapSetsArr.Size());
 
 	for (rapidjson::SizeType i = 0; i < beatmapSetsArr.Size(); i++) {
