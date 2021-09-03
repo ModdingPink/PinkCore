@@ -73,7 +73,7 @@ MAKE_HOOK_MATCH(NoteProcessorClampPatch, &NotesInTimeRowProcessor::ProcessAllNot
 		for (int m = 0; m < list2->size; m++) {
 			auto *note = list2->items->values[m];
 			if (note->noteLineLayer.value >= 0 && note->noteLineLayer.value <= 2) {
-				note->SetNoteStartLineLayer(m);
+				note->SetBeforeJumpNoteLineLayer(m);
 			}
 		}
 	}
