@@ -69,6 +69,6 @@ LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += questui
 LOCAL_STATIC_LIBRARIES += curl
 LOCAL_LDLIBS += -llog -lz
-LOCAL_CFLAGS += -DID='"PinkCore"' -DVERSION='"1.5.0"' -Wno-inaccessible-base
+LOCAL_CFLAGS += -DID='"PinkCore"' -DVERSION='"1.6.1"' -Wno-inaccessible-base
 LOCAL_C_INCLUDES += ./include ./shared ./src ./extern ./extern/libil2cpp/il2cpp/libil2cpp ./extern/codegen/include
 include $(BUILD_SHARED_LIBRARY)
