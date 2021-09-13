@@ -20,10 +20,9 @@ MAKE_HOOK_MATCH(LevelFilteringNavigationController_Setup, &GlobalNamespace::Leve
 {
 	LevelFilteringNavigationController_Setup(self, songPackMask, levelPackToBeSelectedAfterPresent, startLevelCategory, hidePacksIfOneOrNone, enableCustomLevels);
 	
-	if (levelPackToBeSelectedAfterPresent == nullptr && config.openToCustomLevels) {
+	if (levelPackToBeSelectedAfterPresent == nullptr && config.openToCustomLevels && enableCustomLevels) {
 		self->selectLevelCategoryViewController->Setup(startLevelCategory.CustomSongs, self->enabledLevelCategories);
 	}
-
 }
 
 void InstallOpenToCustomHooks(Logger& logger)
