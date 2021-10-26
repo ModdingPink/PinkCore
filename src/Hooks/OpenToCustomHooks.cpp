@@ -19,7 +19,7 @@
 MAKE_HOOK_MATCH(LevelFilteringNavigationController_Setup, &GlobalNamespace::LevelFilteringNavigationController::Setup, void, GlobalNamespace::LevelFilteringNavigationController* self, GlobalNamespace::SongPackMask songPackMask, GlobalNamespace::IBeatmapLevelPack* levelPackToBeSelectedAfterPresent, GlobalNamespace::SelectLevelCategoryViewController::LevelCategory startLevelCategory, bool hidePacksIfOneOrNone, bool enableCustomLevels)
 {
 	LevelFilteringNavigationController_Setup(self, songPackMask, levelPackToBeSelectedAfterPresent, startLevelCategory, hidePacksIfOneOrNone, enableCustomLevels);
-	
+
 	if (levelPackToBeSelectedAfterPresent == nullptr && config.openToCustomLevels && enableCustomLevels) {
 		self->selectLevelCategoryViewController->Setup(startLevelCategory.CustomSongs, self->enabledLevelCategories);
 	}
@@ -27,7 +27,7 @@ MAKE_HOOK_MATCH(LevelFilteringNavigationController_Setup, &GlobalNamespace::Leve
 
 void InstallOpenToCustomHooks(Logger& logger)
 {
-	SIMPLE_INSTALL_HOOK(LevelFilteringNavigationController_Setup);
+	SIMPLE_INSTALL_HOOK_ORIG(LevelFilteringNavigationController_Setup);
 }
 
 // using a macro to register the method pointer to the class that stores all of the install methods, for automatic execution
