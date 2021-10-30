@@ -43,6 +43,11 @@
       "additionalData": {
         "private": true
       }
+    },
+    {
+      "id": "libil2cpp",
+      "versionRange": "^0.2.3",
+      "additionalData": {}
     }
   ],
   "additionalData": {}
