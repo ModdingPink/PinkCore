@@ -32,3 +32,4 @@ struct __PCRegister##func { \
 static __PCRegister##func __PCRegisterInstance##func;
 
 #define SIMPLE_INSTALL_HOOK(identifier) INSTALL_HOOK(logger, identifier);
+#define SIMPLE_INSTALL_HOOK_ORIG(identifier) INSTALL_HOOK_ORIG(logger, identifier);
