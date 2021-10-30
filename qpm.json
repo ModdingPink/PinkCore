@@ -22,7 +22,7 @@
     },
     {
       "id": "questui",
-      "versionRange": "*",
+      "versionRange": "^0.11.1",
       "additionalData": {
         "private": true
       }
