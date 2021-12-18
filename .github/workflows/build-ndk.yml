@@ -84,7 +84,7 @@ jobs:
         
     - name: Apply Legacy Fix
       run: |
-        ./QPM/QPM cache legacy-fix
+        ./QPM/qpm-rust cache legacy-fix
 
     - name: Build
       run: |
