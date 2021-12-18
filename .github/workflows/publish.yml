@@ -68,7 +68,11 @@ jobs:
         ls -la ${GITHUB_WORKSPACE}/extern/libs
         echo cache:
         ls -la $HOME/.local/share/QPM-Rust/cache
-        
+    
+    - name: Apply Legacy Fix
+      run: |
+        ./QPM/QPM cache legacy-fix
+
     - name: Get Tag Version
       id: get_tag_version
       run: |
