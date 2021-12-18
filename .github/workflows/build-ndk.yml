@@ -3,7 +3,7 @@ name: NDK build
 on:
   workflow_dispatch:
   push:
-    branches: master
+    branches: [master, qpm_rust]
     paths-ignore:
       - '**.yml'
       - '!.github/workflows/build-ndk.yml'
