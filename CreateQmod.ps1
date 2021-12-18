@@ -1,66 +1,48 @@
-if (-not $env:qmodName) 
+Param(
+    [String]$qmodname="",
+    [Parameter(Mandatory=$false)]
+    [Switch]$clean
+)
+
+if ($qmodName -eq "")
 {
-    $env:qmodName = "PinkCore"
-}  
-if (-not $env:module_id)
-{
-    $env:module_id = "pinkcore"
+    echo "Give a proper qmod name and try again"
+    exit
 }
-
-$zip = $env:qmodName + ".zip"
-$qmod = $env:qmodName + ".qmod"
-
 $mod = "./mod.json"
 $modJson = Get-Content $mod -Raw | ConvertFrom-Json
 
-$allLibs = Get-ChildItem ./libs/arm64-v8a/*.so | Select -Expand Name
-$libs = @()
+$filelist = @($mod)
 
 $cover = "./" + $modJson.coverImage
-
-$fileList = @($cover, $mod)
-
-$bannedLibList = @("modloader", "questui", "codegen", "custom-types")
-
-$modlib = @()
-
-foreach ($lib in $allLibs) 
-{
-    # ignore modloader
-    $contains = 0
-    foreach ($ban in $bannedLibList)
-    {
-        if ($lib.Contains($ban))
-        {
-            $contains = 1
-            break
-        }
-    }
-
-    if ($contains)
-    {
-        continue
-    }
-    # if its the actual mod lib
-    else
-    {
-        if ($lib.Contains($env:module_id))
-        {
-            $path = "./libs/arm64-v8a/" + $lib;
-            $fileList += ,$path;
-            $modlib += ,$lib;
-            continue
-        }
-    }
-    $path = "./libs/arm64-v8a/" + $lib
-    $fileList += ,$path
-    $libs += ,$lib
+if ((-not ($cover -eq "./")) -and (Test-Path $cover))
+{ 
+    $filelist += ,$cover
 }
 
-$extraFiles = @()
+foreach ($mod in $modJson.modFiles)
+{
+        $path = "./build/" + $mod
+    if (-not (Test-Path $path))
+    {
+        $path = "./extern/libs/" + $mod
+    }
+    $filelist += $path
+}
+
+foreach ($lib in $modJson.libraryFiles)
+{
+    $path = "./extern/libs/" + $lib
+    if (-not (Test-Path $path))
+    {
+        $path = "./build/" + $lib
+    }
+    $filelist += $path
+}
 
 if (Test-Path "./ExtraFiles")
 {
+    $extraFiles = @()
     $extraEntries = Get-ChildItem ./ExtraFiles/* -Recurse
 
     foreach ($entry in $extraEntries)
@@ -96,33 +78,22 @@ if (Test-Path "./ExtraFiles")
     foreach ($file in $extraFiles)
     {
         $path = "./ExtraFiles/" + $file
-        $fileList += ,$path
+        $filelist += ,$path
     } 
 }
 else
 {
     echo "No ExtraFiles Directory Found"
 }
-# update version from qpm json
-$qpm = "./qpm.json"
-$qpmJson = Get-Content $qpm | ConvertFrom-Json 
-$modJson.version = $qpmJson.info.version
 
-# add the thing to the libs list because we don't need it as a mod file
-$modJson.modFiles = $modlib
-$modJson.libraryFiles = $libs
-$modText = $modJson | ConvertTo-Json -Depth 50 -EscapeHandling EscapeNonAscii
-echo $modText
-Set-Content $mod $modText
+$zip = $qmodName + ".zip"
+$qmod = $qmodName + ".qmod"
 
-# if the qmod exists, rename it to zip to update it, we'll rename it back later
-if (Test-Path $qmod) 
+if (($clean.IsPresent) -and (Test-Path $qmod))
 {
-    move-item -Force $qmod $zip
+    echo "Making Clean Qmod"
+    Move-Item $qmod $zip -Force
 }
-$msg = "Creating qmod for module " + $env:module_id + " With name " + $qmod
-echo $msg
-echo $fileList
-Compress-Archive -Path $fileList -DestinationPath $zip -Update
 
-& move-item -Force $zip $qmod
+Compress-Archive -Path $filelist -DestinationPath $zip -Update
+Move-Item $zip $qmod -Force
