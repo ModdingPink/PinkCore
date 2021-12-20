@@ -5,7 +5,6 @@
 
 namespace PinkCore::API
 {
-
 	bool get_currentlySelectedIsCustom()
 	{
 		return SongUtils::SongInfo::get_currentlySelectedIsCustom();
