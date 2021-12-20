@@ -6,7 +6,8 @@
         "VERSION=\"0.0.1\"",
         "__GNUC__",
         "__aarch64__",
-        "ID=\"PinkCore\""
+        "ID=\"PinkCore\"",
+        "USE_CODEGEN_FIELDS"
       ],
       "includePath": [
         "${workspaceFolder}/",

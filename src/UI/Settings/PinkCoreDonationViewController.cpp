@@ -35,7 +35,7 @@ namespace PinkCore::UI
 			{
 				backgroundable = container->AddComponent<Backgroundable*>();
 			}
-			backgroundable->ApplyBackgroundWithAlpha(il2cpp_utils::createcsstr("round-rect-panel"), 0.5f);
+			backgroundable->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
 
 			auto* layoutgroup = container->GetComponent<VerticalLayoutGroup*>();
 			RectOffset* offset = RectOffset::New_ctor(2, 2, 0, 0);

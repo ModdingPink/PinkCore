@@ -6,6 +6,7 @@
 #include "Utils/UIUtils.hpp"
 
 #include "HMUI/ButtonSpriteSwap.hpp"
+#include "logging.hpp"
 
 DEFINE_TYPE(PinkCore::UI, RequirementElement);
 
@@ -14,8 +15,6 @@ using namespace UnityEngine::UI;
 using namespace HMUI;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
-
-extern Logger& getLogger();
 
 constexpr const char* hints[4] = { "<i>Requirement Found</i>", "<i>Requirement Missing</i>", "<i>Suggestion Found</i>", "<i>Suggestion Missing</i>" };
 Il2CppString* hintsCS[4] = { nullptr, nullptr, nullptr, nullptr };
@@ -88,14 +87,12 @@ namespace PinkCore::UI
 
 	void RequirementElement::CheckRequirementState()
 	{
-		static LoggerContextObject logger = getLogger().WithContext("RequirementElement");
-
 		bool installed = RequirementUtils::GetRequirementInstalled(requirementName);
 		bool required = RequirementUtils::GetSongHasRequirement(requirementName);
 		bool suggested = RequirementUtils::GetSongHasSuggestion(requirementName);
 		bool forcedSuggestion = RequirementUtils::GetIsForcedSuggestion(requirementName);
 
-		logger.info("Requirement %s is installed: %d, required: %d, suggested: %d", requirementName.c_str(), installed, required, suggested);
+		INFO("Requirement %s is installed: %d, required: %d, suggested: %d", requirementName.c_str(), installed, required, suggested);
 
 		/// if required and (not forced or is suggested)
 		if (required && (!forcedSuggestion || suggested))

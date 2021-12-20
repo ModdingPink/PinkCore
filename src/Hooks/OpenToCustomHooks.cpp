@@ -1,6 +1,6 @@
 #include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "Hooks.hpp"
+#include "hooks.hpp"
 #include "config.hpp"
 
 #include "Utils/SongUtils.hpp"
@@ -16,7 +16,7 @@
 
 #include <cstdlib>
 
-MAKE_HOOK_MATCH(LevelFilteringNavigationController_Setup, &GlobalNamespace::LevelFilteringNavigationController::Setup, void, GlobalNamespace::LevelFilteringNavigationController* self, GlobalNamespace::SongPackMask songPackMask, GlobalNamespace::IBeatmapLevelPack* levelPackToBeSelectedAfterPresent, GlobalNamespace::SelectLevelCategoryViewController::LevelCategory startLevelCategory, bool hidePacksIfOneOrNone, bool enableCustomLevels)
+MAKE_AUTO_HOOK_MATCH(LevelFilteringNavigationController_Setup, &GlobalNamespace::LevelFilteringNavigationController::Setup, void, GlobalNamespace::LevelFilteringNavigationController* self, GlobalNamespace::SongPackMask songPackMask, GlobalNamespace::IBeatmapLevelPack* levelPackToBeSelectedAfterPresent, GlobalNamespace::SelectLevelCategoryViewController::LevelCategory startLevelCategory, bool hidePacksIfOneOrNone, bool enableCustomLevels)
 {
 	LevelFilteringNavigationController_Setup(self, songPackMask, levelPackToBeSelectedAfterPresent, startLevelCategory, hidePacksIfOneOrNone, enableCustomLevels);
 
@@ -24,11 +24,3 @@ MAKE_HOOK_MATCH(LevelFilteringNavigationController_Setup, &GlobalNamespace::Leve
 		self->selectLevelCategoryViewController->Setup(startLevelCategory.CustomSongs, self->enabledLevelCategories);
 	}
 }
-
-void InstallOpenToCustomHooks(Logger& logger)
-{
-	SIMPLE_INSTALL_HOOK_ORIG(LevelFilteringNavigationController_Setup);
-}
-
-// using a macro to register the method pointer to the class that stores all of the install methods, for automatic execution
-PCInstallHooks(InstallOpenToCustomHooks)

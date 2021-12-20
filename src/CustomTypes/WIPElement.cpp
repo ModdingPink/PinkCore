@@ -5,6 +5,7 @@
 #include "Utils/UIUtils.hpp"
 
 #include "static-defines.h"
+#include "logging.hpp"
 #include "HMUI/ButtonSpriteSwap.hpp"
 
 DEFINE_TYPE(PinkCore::UI, WIPElement);
@@ -14,8 +15,6 @@ using namespace UnityEngine::UI;
 using namespace HMUI;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
-
-extern Logger& getLogger();
 
 namespace PinkCore::UI
 {

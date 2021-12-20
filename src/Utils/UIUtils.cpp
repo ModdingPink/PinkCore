@@ -47,6 +47,7 @@
 
 #include "static-defines.h"
 #include <fstream>
+#include "logging.hpp"
 
 using namespace VRUIControls;
 using namespace HMUI;
@@ -57,9 +58,6 @@ using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 
-extern Logger& getLogger();
-#define INFO(value...) getLogger().info(value);
-#define ERROR(value...) getLogger().error(value);
 
 namespace UIUtils
 {
@@ -103,7 +101,7 @@ namespace UIUtils
 		layoutelem->set_preferredWidth(size.x);
 
 		Backgroundable* background = horizontal->get_gameObject()->AddComponent<Backgroundable*>();
-		background->ApplyBackgroundWithAlpha(il2cpp_utils::createcsstr("title-gradient"), 1.0f);
+		background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"), 1.0f);
 
 		ImageView* imageView = background->get_gameObject()->GetComponentInChildren<ImageView*>();
 		imageView->gradient = true;
@@ -125,8 +123,8 @@ namespace UIUtils
 		}
 
 		Transform* title_T = titleView->get_transform();
-		Transform* BG_T = title_T->Find(il2cpp_utils::createcsstr("BG"));
-		Transform* BackButtonBG_T = title_T->Find(il2cpp_utils::createcsstr("BackButton/BG"));
+		Transform* BG_T = title_T->Find(il2cpp_utils::newcsstr("BG"));
+		Transform* BackButtonBG_T = title_T->Find(il2cpp_utils::newcsstr("BackButton/BG"));
 
 		ImageView* imageView = BG_T->get_gameObject()->GetComponent<ImageView*>();
 		Color oldColor = imageView->get_color();
@@ -175,7 +173,7 @@ namespace UIUtils
 		if (!requirementsHandler && showModal)
 		{
 			isNew = true;
-			getLogger().info("RequirementHandler did not exist, making it...");
+			INFO("RequirementHandler did not exist, making it...");
 			using namespace UnityEngine;
 			using namespace UnityEngine::UI;
 
@@ -193,7 +191,7 @@ namespace UIUtils
 			
 			
 			/*
-			Transform* BG_T = button->get_transform()->Find(il2cpp_utils::createcsstr("BG"));
+			Transform* BG_T = button->get_transform()->Find(il2cpp_utils::newcsstr("BG"));
 			auto imageView = BG_T->GetComponentInChildren<HMUI::ImageView*>();
 			imageView->set_color(Color::get_white());
 			imageView->set_color0(Color::get_red());

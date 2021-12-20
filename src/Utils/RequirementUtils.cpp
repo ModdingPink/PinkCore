@@ -1,6 +1,7 @@
 #include "Utils/RequirementUtils.hpp"
 #include "Utils/DifficultyNameUtils.hpp"
 #include "Utils/SongUtils.hpp"
+#include "logging.hpp"
 
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/UI/Button.hpp"
@@ -8,8 +9,6 @@
 using StandardLevelDetailView = GlobalNamespace::StandardLevelDetailView;
 
 #include <algorithm>
-
-extern Logger& getLogger();
 
 static std::string toLower(std::string in)
 {
@@ -54,24 +53,24 @@ namespace RequirementUtils
 		if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && SongUtils::SongInfo::get_currentInfoDatValid())
 		{
 			auto& doc = SongUtils::GetCurrentInfoDat();
-			//getLogger().info("handling requirements for %s", doc["_songName"].GetString());
+			//INFO("handling requirements for %s", doc["_songName"].GetString());
 			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
 			// get the custom data, if it exists
 			if (SongUtils::CustomData::GetCurrentCustomData(doc, customData))
 			{
-				getLogger().info("There was custom data!");
+				INFO("There was custom data!");
 				// there was custom data
 				auto requirementsArray = customData.FindMember(u"_requirements");
 				if (requirementsArray != customData.MemberEnd())
 				{
-					getLogger().info("Extracting Requirements");
+					INFO("Extracting Requirements");
 					SongUtils::CustomData::ExtractRequirements(requirementsArray->value, currentRequirements);
 				}
 
 				auto suggestionsArray = customData.FindMember(u"_suggestions");
 				if (suggestionsArray != customData.MemberEnd())
 				{
-					getLogger().info("Extracting Suggestions");
+					INFO("Extracting Suggestions");
 					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, currentSuggestions);
 				}
 
@@ -79,7 +78,7 @@ namespace RequirementUtils
 			else
 			{
 				// there was no custom data
-				getLogger().info("There was no custom data!");
+				INFO("There was no custom data!");
 			}
 		}
 	}
@@ -122,14 +121,12 @@ namespace RequirementUtils
 
 	bool GetRequirementInstalled(std::string requirement)
 	{
-		static LoggerContextObject logger = getLogger().WithContext("Install Check");
-
 		// find the req in the suggestions list, if found return true, else return false
 		for (auto req : installedRequirements)
 		{
 			if (req.find(requirement) != std::string::npos)
 			{
-				logger.info("Match installed %s, %s", req.c_str(), requirement.c_str());
+				INFO("Match installed %s, %s", req.c_str(), requirement.c_str());
 				return true;
 			}
 		}
@@ -138,13 +135,12 @@ namespace RequirementUtils
 
 	bool GetIsForcedSuggestion(std::string requirement)
 	{
-		static LoggerContextObject logger = getLogger().WithContext("Forced Suggestion Check");
 		// find the req in the suggestions list, if found return true, else return false
 		for (auto sug : forcedSuggestions)
 		{
 			if (sug.find(requirement) != std::string::npos)
 			{
-				logger.info("Match requirement %s, %s", sug.c_str(), requirement.c_str());
+				INFO("Match requirement %s, %s", sug.c_str(), requirement.c_str());
 				return true;
 			}
 		}
@@ -153,13 +149,12 @@ namespace RequirementUtils
 
 	bool GetSongHasRequirement(std::string requirement)
 	{
-		static LoggerContextObject logger = getLogger().WithContext("Requirement Check");
 		// find the req in the suggestions list, if found return true, else return false
 		for (auto req : currentRequirements)
 		{
 			if (req.find(requirement) != std::string::npos)
 			{
-				logger.info("Match requirement %s, %s", req.c_str(), requirement.c_str());
+				INFO("Match requirement %s, %s", req.c_str(), requirement.c_str());
 				return true;
 			}
 		}
@@ -168,13 +163,12 @@ namespace RequirementUtils
 
 	bool GetSongHasSuggestion(std::string requirement)
 	{
-		static LoggerContextObject logger = getLogger().WithContext("Suggestion Check");
 		// find the req in the suggestions list, if found return true, else return false
 		for (auto sug : currentSuggestions)
 		{
 			if (sug.find(requirement) != std::string::npos)
 			{
-				logger.info("Match Suggestion %s, %s", sug.c_str(), requirement.c_str());
+				INFO("Match Suggestion %s, %s", sug.c_str(), requirement.c_str());
 				return true;
 			}
 		}
@@ -190,14 +184,14 @@ namespace RequirementUtils
 			if (mod.second.get_loaded())
 			{
 				installedRequirements.push_back(mod.second.info.id);
-				getLogger().info("Found loaded id: %s", mod.second.info.id.c_str());
+				INFO("Found loaded id: %s", mod.second.info.id.c_str());
 			}
 		}
 	}
 
 	void UpdateRequirementHandler(PinkCore::UI::RequirementHandler* handler, bool firstUpdate)
 	{
-		getLogger().info("Handler ptr: %p", handler);
+		INFO("Handler ptr: %p", handler);
 		if (!handler) return;
 		for (auto req : currentRequirements)
 		{
@@ -215,22 +209,22 @@ namespace RequirementUtils
 	void UpdatePlayButton()
 	{
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
-		int length = levelViews->Length();
+		int length = levelViews.Length();
 		if (length > 0)
 		{
 			bool interactable = AllowPlayerToStart();
                         bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
                         bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
-			getLogger().info("interactable: %d, custom: %d, wip: %d", interactable, isCustom, isWip);
+			INFO("interactable: %d, custom: %d, wip: %d", interactable, isCustom, isWip);
                         if (isCustom && isWip)
 			{
-				levelViews->values[length - 1]->get_practiceButton()->set_interactable(interactable);
-				levelViews->values[length - 1]->get_actionButton()->set_interactable(false);
+				levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
+				levelViews[length - 1]->get_actionButton()->set_interactable(false);
 			}
 			else
 			{
-				levelViews->values[length - 1]->get_practiceButton()->set_interactable(interactable);
-				levelViews->values[length - 1]->get_actionButton()->set_interactable(interactable);
+				levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
+				levelViews[length - 1]->get_actionButton()->set_interactable(interactable);
 			}
 		}
 	}
@@ -291,12 +285,12 @@ namespace RequirementUtils
 			auto itr = std::find(disablingModIds.begin(), disablingModIds.end(), id);
 			if (itr != disablingModIds.end()) 
 			{
-				getLogger().info("Mod %s is trying to disable the play button again!", id.c_str());
+				INFO("Mod %s is trying to disable the play button again!", id.c_str());
 				return;
 			}
 			else
 			{
-				getLogger().info("Mod %s is disabling the play button!", id.c_str());
+				INFO("Mod %s is disabling the play button!", id.c_str());
 				disablingModIds.push_back(id);
 				std::sort(disablingModIds.begin(), disablingModIds.end());
 			}
@@ -308,7 +302,7 @@ namespace RequirementUtils
 			auto itr = std::find(disablingModIds.begin(), disablingModIds.end(), id);
 			if (itr != disablingModIds.end()) 
 			{
-				getLogger().info("Mod %s is no longer disabling the play button", id.c_str());
+				INFO("Mod %s is no longer disabling the play button", id.c_str());
 				disablingModIds.erase(itr, itr++);
 				return;
 			}

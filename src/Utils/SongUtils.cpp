@@ -3,6 +3,7 @@
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "GlobalNamespace/CustomPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/ColorScheme.hpp"
+#include "logging.hpp"
 
 #include "CustomTypes/CustomLevelInfoSaveData.hpp"
 
@@ -28,8 +29,6 @@ static std::string removeSpaces(std::string input)
 	}
 	return output;
 }
-
-extern Logger& getLogger();
 
 namespace SongUtils
 {
@@ -152,7 +151,7 @@ namespace SongUtils
 			// if an info.dat already exists on the given level, don't read the file again
 			if (infoDataOpt)
 			{
-				getLogger().info("Found custom json data on level");
+				INFO("Found custom json data on level");
 				auto infoData = infoDataOpt.value();
 				doc = infoData->doc;
 				return true;
@@ -161,11 +160,11 @@ namespace SongUtils
 			{
 				songPath += u"/info.dat";
 				// get the path
-				getLogger().info("Getting info.dat for %s", to_utf8(songPath).c_str());
+				INFO("Getting info.dat for %s", to_utf8(songPath).c_str());
 				// if the file doesnt exist, fail
 				//if (!fileexists(songPath)) return false;
 
-				getLogger().info("Reading file");
+				INFO("Reading file");
 				// read file
 				std::ifstream instream(songPath, std::ios::in);
 				instream.seekg(0, instream.end);
@@ -201,7 +200,7 @@ namespace SongUtils
 			// if an info.dat already exists on the given level, don't read the file again
 			if (infoDataOpt)
 			{
-				getLogger().info("Found custom json data on level");
+				INFO("Found custom json data on level");
 				auto infoData = infoDataOpt.value();
 				doc.CopyFrom(*infoData->doc, doc.GetAllocator());
 				return true;
@@ -210,11 +209,11 @@ namespace SongUtils
 			{
 				songPath += "/info.dat";
 				// get the path
-				getLogger().info("Getting info.dat for %s", songPath.c_str());
+				INFO("Getting info.dat for %s", songPath.c_str());
 				// if the file doesnt exist, fail
 				if (!fileexists(songPath)) return false;
 
-				getLogger().info("Reading file");
+				INFO("Reading file");
 				// read file
 				std::string info = readfile(songPath);
 
@@ -235,8 +234,8 @@ namespace SongUtils
 			bool hasCustomData = false;
 			auto& lastPhysicallySelectedCharacteristic = SongUtils::SongInfo::get_lastPhysicallySelectedCharacteristic();
 			std::u16string difficultyToFind = SongUtils::GetDiffFromNumber(difficulty);
-			getLogger().info("Looking for characteristic: %s", to_utf8(difficultyToFind).c_str());
-			getLogger().info("Looking for diff: %s", to_utf8(difficultyToFind).c_str());
+			INFO("Looking for characteristic: %s", to_utf8(difficultyToFind).c_str());
+			INFO("Looking for diff: %s", to_utf8(difficultyToFind).c_str());
 
 			auto difficultyBeatmapSetsitr = in.FindMember(u"_difficultyBeatmapSets");
 			// if we find the sets iterator
@@ -246,7 +245,7 @@ namespace SongUtils
 				for (auto& beatmapCharacteristicItr : setArr)
 				{
 					std::u16string beatmapCharacteristicName = beatmapCharacteristicItr.FindMember(u"_beatmapCharacteristicName")->value.GetString();
-					getLogger().info("Found CharacteristicName: %s", (char*)beatmapCharacteristicName.c_str());
+					INFO("Found CharacteristicName: %s", (char*)beatmapCharacteristicName.c_str());
 					// if the last selected beatmap characteristic is this specific one
 					if (beatmapCharacteristicName == lastPhysicallySelectedCharacteristic)
 					{
@@ -256,7 +255,7 @@ namespace SongUtils
 						{
 							auto beatmapDiffNameItr = beatmap.GetObject().FindMember(u"_difficulty");
 							std::u16string diffString = beatmapDiffNameItr->value.GetString();
-							getLogger().info("Found diffstring: %s", (char*)diffString.c_str());
+							INFO("Found diffstring: %s", (char*)diffString.c_str());
 							// if the last selected difficulty is this specific one
 							if (difficultyToFind == diffString)
 							{
@@ -282,8 +281,8 @@ namespace SongUtils
 
 				bool mapHasCustomColours = false;
 
-				Il2CppString* colorSchemeId = il2cpp_utils::createcsstr("PinkCoreMapColorScheme");
-				Il2CppString* colorSchemeNameLocalizationKey = il2cpp_utils::createcsstr("PinkCore Map Color Scheme");
+				Il2CppString* colorSchemeId = il2cpp_utils::newcsstr("PinkCoreMapColorScheme");
+				Il2CppString* colorSchemeNameLocalizationKey = il2cpp_utils::newcsstr("PinkCore Map Color Scheme");
 				bool useNonLocalizedName = true;
 				Il2CppString* nonLocalizedName = colorSchemeNameLocalizationKey;
 				bool isEditable = false;

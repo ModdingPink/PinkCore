@@ -1,6 +1,6 @@
 #include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "Hooks.hpp"
+#include "hooks.hpp"
 #include "config.hpp"
 
 #include "Utils/SongUtils.hpp"
@@ -20,7 +20,7 @@
 
 #include "UnityEngine/UI/Button.hpp"
 
-MAKE_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::StandardLevelDetailView::RefreshContent, void, GlobalNamespace::StandardLevelDetailView* self)
+MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::StandardLevelDetailView::RefreshContent, void, GlobalNamespace::StandardLevelDetailView* self)
 {
 	StandardLevelDetailView_RefreshContent(self);
 	auto beatmapCharacteristicSegmentedControlController = self->beatmapCharacteristicSegmentedControlController;
@@ -39,16 +39,9 @@ MAKE_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::Standa
 	RequirementUtils::UpdatePlayButton();
 }
 
-MAKE_HOOK_MATCH(StandardLevelDetailViewController_UpdateActionButtonIntractability, &GlobalNamespace::StandardLevelDetailViewController::UpdateActionButtonIntractability, void, GlobalNamespace::StandardLevelDetailViewController* self) 
+/* HACK: Not sure if this should be gone but I have no real other choice here
+MAKE_AUTO_HOOK_MATCH(StandardLevelDetailViewController_UpdateActionButtonIntractability, &GlobalNamespace::StandardLevelDetailViewController::UpdateActionButtonIntractability, void, GlobalNamespace::StandardLevelDetailViewController* self) 
 {
 	// we hook this one because if we don't, the play button gets set to active at all times, even if we want it to be disabled
 }
-
-void InstallRequirementHooks(Logger& logger)
-{
-	SIMPLE_INSTALL_HOOK(StandardLevelDetailView_RefreshContent);
-	SIMPLE_INSTALL_HOOK(StandardLevelDetailViewController_UpdateActionButtonIntractability);
-}
-
-// using a macro to register the method pointer to the class that stores all of the install methods, for automatic execution
-PCInstallHooks(InstallRequirementHooks)
+*/

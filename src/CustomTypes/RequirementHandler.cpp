@@ -5,6 +5,7 @@
 #include "questui/shared/BeatSaberUI.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/UI/LayoutRebuilder.hpp"
+#include "logging.hpp"
 
 DEFINE_TYPE(PinkCore::UI, RequirementHandler);
 
@@ -13,7 +14,6 @@ using namespace UnityEngine::UI;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 
-extern Logger& getLogger();
 namespace PinkCore::UI
 {
 	void RequirementHandler::OnEnable()
@@ -24,14 +24,9 @@ namespace PinkCore::UI
 	void RequirementHandler::CheckAllRequirements()
 	{
 		/// check the state for all requirements, even the inactive ones
-		Array<RequirementElement*>* elements = GetComponentsInChildren<RequirementElement*>(true);
-		int length = elements->Length();
-
-		for (int i = 0; i < length; i++)
-		{
-			auto elem = elements->values[i];
+		auto elements = GetComponentsInChildren<RequirementElement*>(true);
+		for (auto elem : elements)
 			if (elem) elem->CheckRequirementState();
-		}
 
 		// WIP is sort of a requirement so it can live here
 		auto wipElement = GetComponentInChildren<WIPElement*>();
@@ -47,7 +42,7 @@ namespace PinkCore::UI
 
 	void RequirementHandler::AddID(std::string id)
 	{
-		Array<RequirementElement*>* elements = GetComponentsInChildren<RequirementElement*>(true);
+		ArrayW<RequirementElement*> elements = GetComponentsInChildren<RequirementElement*>(true);
 		Il2CppString* name = il2cpp_utils::newcsstr(id);
 		
 		// if we find an object with the same name, that means this requirement already exists

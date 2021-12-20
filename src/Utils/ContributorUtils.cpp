@@ -1,18 +1,16 @@
 #include "Utils/ContributorUtils.hpp"
 #include "Utils/SongUtils.hpp"
+#include "logging.hpp"
 
 #include "CustomTypes/ContributorHandler.hpp"
 
 using Contributor = PinkCore::Contributor;
-extern Logger& getLogger();
 namespace ContributorUtils
 {
 	std::vector<Contributor> currentContributors;
 
 	void FetchListOfContributors()
 	{
-		LoggerContextObject logger = getLogger().WithContext("FetchListOfContributors");
-
 		currentContributors.clear();
 		// if current info is not valid, there is no use in trying to read it
 		if (SongUtils::SongInfo::get_currentInfoDatValid())

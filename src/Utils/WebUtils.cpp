@@ -1,7 +1,7 @@
 // this file is mostly just copied from https://github.com/darknight1050/SongDownloader/blob/master/src/Utils/WebUtils.cpp,
 // all credit for it goes to darknight1050 unless other credit is given
 #include "Utils/WebUtils.hpp"
-#include "beatsaber-hook/shared/utils/logging.hpp"
+#include "logging.hpp"
 
 #include "libcurl/shared/curl.h"
 #include "libcurl/shared/easy.h"
@@ -10,8 +10,6 @@
 #include "static-defines.h"
 #define TIMEOUT 10
 #define USER_AGENT useragent
-
-extern Logger& getLogger();
 
 namespace WebUtils
 {   
@@ -89,7 +87,7 @@ namespace WebUtils
 			s->append((char*)contents, newLength);
 		} catch(std::bad_alloc &e) {
 			//handle memory problem
-			getLogger().critical("Failed to allocate string of size: %lu", newLength);
+			CRITICAL("Failed to allocate string of size: %lu", newLength);
 			return 0;
 		}
 		return newLength;
@@ -152,7 +150,7 @@ namespace WebUtils
 				auto res = curl_easy_perform(curl);
 				/* Check for errors */ 
 				if (res != CURLE_OK) {
-					getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
+					CRITICAL("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
 				}
 				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
 				curl_easy_cleanup(curl);

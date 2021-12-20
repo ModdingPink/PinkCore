@@ -1,6 +1,6 @@
 #include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "Hooks.hpp"
+#include "hooks.hpp"
 #include "config.hpp"
 
 #include "Utils/SongUtils.hpp"
@@ -30,7 +30,7 @@ std::u16string ReplaceAll(std::u16string str, const std::u16string& from, const 
 	return str;
 }
 
-MAKE_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace::LevelListTableCell::SetDataFromLevelAsync, void, GlobalNamespace::LevelListTableCell* self, GlobalNamespace::IPreviewBeatmapLevel* level, bool isFavorite)
+MAKE_AUTO_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace::LevelListTableCell::SetDataFromLevelAsync, void, GlobalNamespace::LevelListTableCell* self, GlobalNamespace::IPreviewBeatmapLevel* level, bool isFavorite)
 {
 	LevelListTableCell_SetDataFromLevelAsync(self, level, isFavorite);
 
@@ -41,7 +41,7 @@ MAKE_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace::Leve
 
 	// Rounding BPM display for all maps, including official ones
 	std::string BPMString = std::to_string((int)level->get_beatsPerMinute());
-	Il2CppString* BPMIl2cppString = il2cpp_utils::createcsstr(BPMString);
+	Il2CppString* BPMIl2cppString = il2cpp_utils::newcsstr(BPMString);
 	self->songBpmText->set_text(BPMIl2cppString);
 	
 	if (SongUtils::SongInfo::isCustom(level) && config.enableExtraSongDetails)
@@ -68,11 +68,3 @@ MAKE_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace::Leve
 	}
 
 }
-
-void InstallDetailHooks(Logger& logger)
-{
-	SIMPLE_INSTALL_HOOK(LevelListTableCell_SetDataFromLevelAsync);
-}
-
-// using a macro to register the method pointer to the class that stores all of the install methods, for automatic execution
-PCInstallHooks(InstallDetailHooks)
