@@ -17,6 +17,7 @@ add_compile_options(-frtti -fPIE -fPIC -fexceptions)
 # compile definitions used
 add_compile_definitions(VERSION=\"${MOD_VERSION}\")
 add_compile_definitions(ID=\"${MOD_ID}\")
+add_compile_definitions(USE_CODEGEN_FIELDS)
 
 # recursively get all src files
 RECURSE_FILES(cpp_file_list ${SOURCE_DIR}/*.cpp)
@@ -43,6 +44,8 @@ target_link_libraries(${COMPILE_ID} PRIVATE -llog -lz)
 # add extern stuff like libs and other includes
 include(extern.cmake)
 
+# temp while waiting for questui to release
+
 add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
             COMMAND ${CMAKE_STRIP} -g -S -d --strip-all
             "lib${COMPILE_ID}.so" -o "stripped_lib${COMPILE_ID}.so"
@@ -57,3 +60,10 @@ add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E rename stripped_lib${COMPILE_ID}.so lib${COMPILE_ID}.so
             COMMENT "Rename the stripped lib to regular"
             )
+
+foreach(so_file ${so_list})
+    cmake_path(GET so_file FILENAME file)
+    add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
+            COMMAND ${CMAKE_STRIP} -g -S -d --strip-all ${so_file} -o ${file}
+            COMMENT "Strip debug symbols from the dependencies")
+endforeach()
