@@ -49,6 +49,8 @@ namespace RequirementUtils
 		currentRequirements.clear();
 		currentSuggestions.clear();
 		
+		bool hasNoodle = false;
+
 		// if custom
 		if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && SongUtils::SongInfo::get_currentInfoDatValid())
 		{
@@ -74,6 +76,16 @@ namespace RequirementUtils
 					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, currentSuggestions);
 				}
 
+				for (auto req : currentRequirements)
+				{
+					INFO("ReqName: %s", req.c_str());
+
+					if (req.find("Noodle Extensions") != std::string::npos)
+					{
+						hasNoodle = true;
+						break;
+					}
+				}
 			}
 			else
 			{
@@ -81,6 +93,10 @@ namespace RequirementUtils
 				INFO("There was no custom data!");
 			}
 		}
+
+		SongUtils::SongInfo::set_currentlySelectedIsNoodle(hasNoodle);
+
+
 	}
 
 	bool AllowPlayerToStart()
@@ -213,18 +229,28 @@ namespace RequirementUtils
 		if (length > 0)
 		{
 			bool interactable = AllowPlayerToStart();
-                        bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
-                        bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
-			INFO("interactable: %d, custom: %d, wip: %d", interactable, isCustom, isWip);
-                        if (isCustom && isWip)
+            bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
+            bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
+            bool isNoodle = SongUtils::SongInfo::get_currentlySelectedIsNoodle();
+			INFO("interactable: %d, custom: %d, wip: %d, noodle: %d", interactable, isCustom, isWip, isNoodle);
+            if (isCustom)
 			{
-				levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
-				levelViews[length - 1]->get_actionButton()->set_interactable(false);
+				if (isWip) { //if its a WIP Level, then only play in practice mode
+					levelViews[length - 1]->get_actionButton()->set_interactable(false);
+					levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
+				} else if (isNoodle && interactable) { //if its and is playable, then turn practice mode off
+					levelViews[length - 1]->get_actionButton()->set_interactable(interactable);
+					levelViews[length - 1]->get_practiceButton()->set_interactable(false);
+				}
+				else {
+					levelViews[length - 1]->get_actionButton()->set_interactable(interactable);
+					levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
+				}
 			}
 			else
 			{
-				levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
 				levelViews[length - 1]->get_actionButton()->set_interactable(interactable);
+				levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
 			}
 		}
 	}

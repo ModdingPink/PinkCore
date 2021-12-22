@@ -60,3 +60,9 @@ add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E rename stripped_lib${COMPILE_ID}.so lib${COMPILE_ID}.so
             COMMENT "Rename the stripped lib to regular"
             )
+
+foreach(lib ${so_list})
+    add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
+            COMMAND ${CMAKE_STRIP} -g -S -d --strip-all ${lib}
+            COMMENT "Strip debug symbols from the dependencies")
+endforeach()

@@ -4,14 +4,15 @@
 #include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
-class Hooks {
-    private:
-        static inline std::vector<void (*)(Logger& logger)> installFuncs;
-    public:
-        static inline void AddInstallFunc(void (*installFunc)(Logger& logger))
-        {
-            installFuncs.push_back(installFunc);
-        }
+class Hooks 
+{
+	private:
+		inline static std::vector<void(*)(Logger& logger)> installFuncs;
+	public:
+		static void AddInstallFunc(void(*installFunc)(Logger& logger)) 
+		{
+			installFuncs.push_back(installFunc);
+		}
 
         static inline void InstallHooks(Logger& logger)
         {

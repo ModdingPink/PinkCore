@@ -88,6 +88,14 @@ namespace SongUtils
 
 		/// @brief setter for whether the current song is WIP
 		void set_currentlySelectedIsWIP(bool val);
+		/*--------------------------------------------------------------*/		
+		
+		/// @brief getter for whether the current song is a Noodle Extension Map
+		/// @return true for Noodle
+		bool get_currentlySelectedIsNoodle();
+
+		/// @brief setter for whether the current song is a Noodle Extension Map
+		void set_currentlySelectedIsNoodle(bool val);
 		/*--------------------------------------------------------------*/
 
 		/// @brief gets if the current info dat is valid
