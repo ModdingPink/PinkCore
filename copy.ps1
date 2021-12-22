@@ -7,9 +7,9 @@ param (
 
 & ./build.ps1
 if ($debug.IsPresent) {
-    & adb push build/debug_libpinkcore.so /sdcard/Android/data/com.beatgames.beatsaber/files/libs/libpinkcore.so
+    & adb push build/debug_libpinkcore.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libpinkcore.so
 } else {
-    & adb push build/libpinkcore.so /sdcard/Android/data/com.beatgames.beatsaber/files/libs/libpinkcore.so
+    & adb push build/libpinkcore.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libpinkcore.so
 }
 
 & adb shell am force-stop com.beatgames.beatsaber
