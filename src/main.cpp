@@ -18,11 +18,10 @@
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 
-#include "Hooks.hpp"
+#include "hooks.hpp"
 
 #include "config.hpp"
 
-std::vector<void (*)(Logger& logger)> Hooks::installFuncs;
 ModInfo modInfo;
 
 Logger& getLogger()

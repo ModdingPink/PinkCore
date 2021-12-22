@@ -1,4 +1,4 @@
-#include "Hooks.hpp"
+#include "hooks.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
 #include "GlobalNamespace/BeatmapData.hpp"

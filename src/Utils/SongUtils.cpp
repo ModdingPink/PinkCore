@@ -44,6 +44,7 @@ namespace SongUtils
 	
 	bool currrentlySelectedIsCustom = false;
 	bool currrentlySelectedIsWIP = false;
+	bool currrentlySelectedIsNoodle = false;
 
 	LoadedInfoEvent& onLoadedInfo()
 	{
@@ -294,7 +295,7 @@ namespace SongUtils
 				bool supportsEnvironmentColorBoost = defaultColorScheme->supportsEnvironmentColorBoost;
 				UnityEngine::Color envColorLeftBoost = defaultColorScheme->environmentColor0Boost;
 				UnityEngine::Color envColorRightBoost = defaultColorScheme->environmentColor1Boost;
-				UnityEngine::Color obstacleColor;
+				UnityEngine::Color obstacleColor = defaultColorScheme->obstaclesColor;
 
 				bool customBoostColours = false;
 
@@ -403,6 +404,7 @@ namespace SongUtils
 			return false;
 			*/
 		}
+
 		/*-------------------------------------------------*/
 
 		bool get_currentlySelectedIsCustom()
@@ -426,6 +428,16 @@ namespace SongUtils
 			currrentlySelectedIsWIP = val;
 		}
 		/*-------------------------------------------------*/
+
+		bool get_currentlySelectedIsNoodle()
+		{
+			return currrentlySelectedIsNoodle;
+		}
+
+		void set_currentlySelectedIsNoodle(bool val)
+		{
+			currrentlySelectedIsNoodle = val;
+		}
 
 		bool get_currentInfoDatValid()
 		{

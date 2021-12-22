@@ -1,6 +1,6 @@
 #include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "Hooks.hpp"
+#include "hooks.hpp"
 #include "config.hpp"
 
 #include "GlobalNamespace/MainSettingsModelSO.hpp"
