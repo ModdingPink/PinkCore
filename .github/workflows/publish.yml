@@ -87,7 +87,7 @@ jobs:
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm-rust qmod build --include_libs "libpinkcore.so"
+        ./QPM/qpm-rust qmod build --include_libs lib${module_id}.so libbeatsaber-hook_2_3_2.so
         pwsh -Command ./build.ps1
     
     - name: Create Qmod
