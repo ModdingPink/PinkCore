@@ -85,7 +85,7 @@ jobs:
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm-rust qmod build --include_libs lib${module_id}.so libbeatsaber-hook_2_3_2.so
+        ./QPM/qpm-rust qmod build --exclude_libs libcustom-types.so libquestui.so libcodegen.so
         pwsh -Command ./build.ps1
 
     - name: Create Qmod
@@ -111,7 +111,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: debug_${{ steps.libname.outputs.NAME }}
-        path: ./build/debug_${{ steps.libname.outputs.NAME }}
+        path: ./build/debug/${{ steps.libname.outputs.NAME }}
         if-no-files-found: error
 
     - name: Upload qmod artifact

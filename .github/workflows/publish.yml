@@ -83,7 +83,7 @@ jobs:
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm-rust qmod build --include_libs lib${module_id}.so libbeatsaber-hook_2_3_2.so
+        ./QPM/qpm-rust qmod build --exclude_libs libcustom-types.so libquestui.so libcodegen.so
         pwsh -Command ./build.ps1
     
     - name: Create Qmod
@@ -161,7 +161,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
-        asset_path: ./build/debug_${{ steps.libname.outputs.NAME }}
+        asset_path: ./build/debug/${{ steps.libname.outputs.NAME }}
         asset_name: debug_${{ steps.libname.outputs.NAME }}
         asset_content_type: application/octet-stream
 
