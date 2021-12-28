@@ -39,7 +39,7 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::S
 	RequirementUtils::UpdatePlayButton();
 }
 
-/* HACK: Not sure if this should be gone but I have no real other choice here
+/* HACK: Not sure if this should be gone but I have no real other choice here since this is removed (is what it does still being done ?)
 MAKE_AUTO_HOOK_MATCH(StandardLevelDetailViewController_UpdateActionButtonIntractability, &GlobalNamespace::StandardLevelDetailViewController::UpdateActionButtonIntractability, void, GlobalNamespace::StandardLevelDetailViewController* self) 
 {
 	// we hook this one because if we don't, the play button gets set to active at all times, even if we want it to be disabled
