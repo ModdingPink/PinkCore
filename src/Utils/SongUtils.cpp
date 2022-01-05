@@ -5,7 +5,7 @@
 #include "GlobalNamespace/ColorScheme.hpp"
 #include "logging.hpp"
 
-#include "CustomTypes/CustomLevelInfoSaveData.hpp"
+#include "songloader/shared/CustomTypes/CustomLevelInfoSaveData.hpp"
 
 #include <fstream>
 static std::string toLower(std::string in)
