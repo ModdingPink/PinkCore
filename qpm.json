@@ -51,6 +51,11 @@
       "id": "questui",
       "versionRange": "^0.12.0",
       "additionalData": {}
+    },
+    {
+      "id": "songloader",
+      "versionRange": "^0.8.0",
+      "additionalData": {}
     }
   ],
   "additionalData": {}
