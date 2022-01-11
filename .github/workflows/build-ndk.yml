@@ -85,7 +85,7 @@ jobs:
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm-rust qmod build --exclude_libs libcustom-types.so libquestui.so libcodegen.so
+        ./QPM/qpm-rust qmod build
         pwsh -Command ./build.ps1
 
     - name: Create Qmod
