@@ -31,7 +31,7 @@ static Auto_Hook_##name_ Auto_Hook_Instance_##name_;
 #define AUTO_INSTALL_ORIG(name_) \
 struct Auto_Hook_##name_ { \
     Auto_Hook_##name_() { \
-        Hooks::AddInstallFunc(::Hooking::InstallHookOrig<Hook_##name_>);\
+        Hooks::AddInstallFunc(::Hooking::InstallOrigHook<Hook_##name_>);\
     } \
 }; \
 static Auto_Hook_##name_ Auto_Hook_Instance_##name_;
