@@ -34,7 +34,7 @@ MAKE_AUTO_HOOK_MATCH(BeatmapLineData_AddBeatmapObjectData, &BeatmapLineData::Add
 	BeatmapLineData_AddBeatmapObjectData(self, item);
 }
 
-MAKE_AUTO_HOOK_MATCH(NoteProcessorClampPatch, &BeatmapObjectsInTimeRowProcessor::ProcessAllNotesInTimeRow, void,
+MAKE_AUTO_HOOK_ORIG_MATCH(NoteProcessorClampPatch, &BeatmapObjectsInTimeRowProcessor::ProcessAllNotesInTimeRow, void,
 				BeatmapObjectsInTimeRowProcessor *self, List<NoteData *> *notesInTimeRow) {
 	if (!notesInTimeRow->get_Count())
 	{
