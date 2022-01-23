@@ -1,3 +1,5 @@
+#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+
 #include "Utils/SongUtils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"

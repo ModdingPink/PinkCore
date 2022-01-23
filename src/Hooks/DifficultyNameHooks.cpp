@@ -17,11 +17,11 @@
 
 #include "UnityEngine/UI/Button.hpp"
 
-MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDifficultyMethods::Name, Il2CppString*, GlobalNamespace::BeatmapDifficulty difficulty) {
+MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDifficultyMethods::Name, StringW, GlobalNamespace::BeatmapDifficulty difficulty) {
 	
 	if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && config.enableCustomDiffNames) {
 		std::u16string newDifficultyLabel = DifficultyNameUtils::GetDifficultyNameFromCache(difficulty);
-		if (newDifficultyLabel != u"") {
+		if (!newDifficultyLabel.empty()) {
 			return il2cpp_utils::newcsstr(newDifficultyLabel);
 		}
 	}

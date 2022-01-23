@@ -13,6 +13,9 @@
 
 using namespace GlobalNamespace;
 
+//  a mistake - Fern
+// pink cute
+
 int addBeatmapObjectDataLineIndex;
 MAKE_AUTO_HOOK_MATCH(BeatmapData_AddBeatmapObjectData, &BeatmapData::AddBeatmapObjectData, void,
 				BeatmapData *self, BeatmapObjectData *item) {
