@@ -21,14 +21,16 @@ static std::string toLower(std::string in)
 	return output;
 }
 
-static std::string removeSpaces(std::string input)
+static std::string removeSpaces(std::string_view input)
 {
-	std::string output = "";
+	std::string output;
+    output.reserve(input.size());
 	for (auto c : input)
 	{
 		if (c == ' ') continue;
 		output += c;
 	}
+    output.shrink_to_fit();
 	return output;
 }
 
