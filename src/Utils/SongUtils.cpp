@@ -1,3 +1,5 @@
+#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+
 #include "Utils/SongUtils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
@@ -19,14 +21,16 @@ static std::string toLower(std::string in)
 	return output;
 }
 
-static std::string removeSpaces(std::string input)
+static std::string removeSpaces(std::string_view input)
 {
-	std::string output = "";
+	std::string output;
+    output.reserve(input.size());
 	for (auto c : input)
 	{
 		if (c == ' ') continue;
 		output += c;
 	}
+    output.shrink_to_fit();
 	return output;
 }
 
