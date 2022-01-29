@@ -148,8 +148,7 @@ namespace SongUtils
 			// cast to custom level
 			GlobalNamespace::CustomPreviewBeatmapLevel* customLevel = reinterpret_cast<GlobalNamespace::CustomPreviewBeatmapLevel*>(level);
 
-			Il2CppString* levelPathCS = customLevel->get_customLevelPath();
-			std::u16string songPath(csstrtostr(levelPathCS));
+			std::u16string songPath(customLevel->get_customLevelPath());
 			currentLevelPath = songPath;
 
 			auto infoDataOpt = il2cpp_utils::try_cast<CustomJSONData::CustomLevelInfoSaveData>(customLevel->get_standardLevelInfoSaveData());
@@ -197,8 +196,7 @@ namespace SongUtils
 			// cast to custom level
 			GlobalNamespace::CustomPreviewBeatmapLevel* customLevel = reinterpret_cast<GlobalNamespace::CustomPreviewBeatmapLevel*>(level);
 
-			Il2CppString* levelPathCS = customLevel->get_customLevelPath();
-			std::string songPath = to_utf8(csstrtostr(levelPathCS));
+			std::string songPath(customLevel->get_customLevelPath());
 			currentLevelPath = songPath;
 
 			auto infoDataOpt = il2cpp_utils::try_cast<CustomJSONData::CustomLevelInfoSaveData>(customLevel->get_standardLevelInfoSaveData());

@@ -34,7 +34,7 @@ MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &Globa
 
 	if (SongUtils::SongInfo::get_currentlySelectedIsCustom()) {
 		if (difficultyBeatmaps[0] != nullptr) {
-			SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(csstrtostr(difficultyBeatmaps[0]->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->get_serializedName()));
+			SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(difficultyBeatmaps[0]->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->get_serializedName());
 			if (config.enableCustomDiffNames) {
 				DifficultyNameUtils::SetDifficultyNameCacheFromArray(difficultyBeatmaps);
 			}

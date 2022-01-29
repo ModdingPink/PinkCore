@@ -59,7 +59,7 @@ MAKE_AUTO_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionVi
 		}
 
 		// if the level ID contains `WIP` then the song is a WIP song 
-		std::string levelIDString = to_utf8(csstrtostr(level->get_levelID()));
+		std::string levelIDString = level->get_levelID();
 		bool isWIP = levelIDString.find("WIP") != std::string::npos;
 		SongUtils::SongInfo::set_currentlySelectedIsWIP(isWIP);
 	}

@@ -26,7 +26,7 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::S
 	auto beatmapCharacteristicSegmentedControlController = self->beatmapCharacteristicSegmentedControlController;
 	auto selectedBeatmapCharacteristic = beatmapCharacteristicSegmentedControlController ? beatmapCharacteristicSegmentedControlController->selectedBeatmapCharacteristic : nullptr;
 	auto serializedNameCS = selectedBeatmapCharacteristic ? selectedBeatmapCharacteristic->get_serializedName() : nullptr;
-	std::u16string serializedName(serializedNameCS ? csstrtostr(serializedNameCS) : u"");
+	std::u16string serializedName(serializedNameCS ? serializedNameCS : u"");
 
 	SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(serializedName);
 	SongUtils::SongInfo::set_lastPhysicallySelectedDifficulty(SongUtils::GetDiffFromNumber(self->beatmapDifficultySegmentedControlController->selectedDifficulty));

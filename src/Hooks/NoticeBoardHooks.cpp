@@ -19,8 +19,9 @@
 bool firstWarmup = true;
 MAKE_AUTO_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement::SceneManager::SetActiveScene, bool, UnityEngine::SceneManagement::Scene scene)
 {
-	Il2CppString* sceneNameCS = scene.get_name();
-	std::string activeSceneName = sceneNameCS ? to_utf8(csstrtostr(sceneNameCS)) : "";
+	StringW sceneNameCS = scene.get_name();
+	std::string activeSceneName("");
+	if (sceneNameCS) activeSceneName = static_cast<std::string>(sceneNameCS);
 	INFO("Found scene %s", activeSceneName.c_str());
 	
 	bool result = SceneManager_SetActiveScene(scene);
