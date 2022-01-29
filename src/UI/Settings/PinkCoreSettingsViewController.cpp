@@ -32,34 +32,6 @@ namespace PinkCore::UI
 			TOGGLE(enableCustomDiffNames, "Enable Custom Difficulty Names");
 			TOGGLE(enableBurnMarks, "Enable Burn Marks");
 			TOGGLE(openToCustomLevels, "Open To Custom Levels");
-
-			CreateUIButton(container->get_transform(), "string", [](){
-				std::string test1 = "test";
-				StringW test2(test1);
-				std::string test3 = test2.operator std::string();
-				INFO("%s == %s: %d", test1.c_str(), test3.c_str(), test1 == test3);
-			});
-
-			CreateUIButton(container->get_transform(), "u16string", [](){
-				std::u16string test1 = u"test";
-				StringW test2(test1);
-				std::u16string test3 = test2.operator std::u16string();
-				INFO("%s == %s: %d", to_utf8(test1).c_str(), to_utf8(test3).c_str(), test1 == test3);
-			});
-
-			CreateUIButton(container->get_transform(), "string -> u16string", [](){
-				std::string test1 = "test";
-				StringW test2(test1);
-				std::u16string test3 = test2.operator std::u16string();
-				INFO("%s == %s: %d", test1.c_str(), to_utf8(test3).c_str(), test1 == to_utf8(test3));
-			});
-
-			CreateUIButton(container->get_transform(), "u16string -> string", [](){
-				std::u16string test1 = u"test";
-				StringW test2(test1);
-				std::string test3 = test2.operator std::string();
-				INFO("%s == %s: %d", to_utf8(test1).c_str(), test3.c_str(), to_utf8(test1) == test3);
-			});
 		}
 	}
 }

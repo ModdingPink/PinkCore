@@ -37,7 +37,7 @@ namespace PinkCore::UI
         if (!tableCell)
         {
             if (!songListTableCellInstance)
-                songListTableCellInstance = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>(), [](auto x){ return x->get_name().operator std::u16string_view() == u"LevelListTableCell"; });
+                songListTableCellInstance = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>(), [](auto x){ return x->get_name() == u"LevelListTableCell"; });
 
             tableCell = Instantiate(songListTableCellInstance);
         }
