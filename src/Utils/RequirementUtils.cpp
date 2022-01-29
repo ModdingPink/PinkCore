@@ -2,6 +2,7 @@
 #include "Utils/DifficultyNameUtils.hpp"
 #include "Utils/SongUtils.hpp"
 #include "logging.hpp"
+//#include "CustomTypes/RequirementHandler.hpp"
 
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/UI/Button.hpp"
@@ -41,6 +42,9 @@ namespace RequirementUtils
 	std::vector<std::string> currentSuggestions = {};
 
 	std::vector<std::string> disablingModIds = {};
+	
+	FoundRequirementsEvent onFoundRequirementsEvent;
+	FoundSuggestionsEvent onFoundSuggestionsEvent;
 	
 	//void HandleRequirementDetails(StandardLevelDetailView* detailView)
 	void HandleRequirementDetails()
@@ -205,6 +209,17 @@ namespace RequirementUtils
 		}
 	}
 
+	const std::vector<std::string>& GetCurrentRequirements()
+	{
+		return currentRequirements;
+	}
+
+	const std::vector<std::string>& GetCurrentSuggestions()
+	{
+		return currentSuggestions;
+	}
+
+	/*
 	void UpdateRequirementHandler(PinkCore::UI::RequirementHandler* handler, bool firstUpdate)
 	{
 		INFO("Handler ptr: %p", handler);
@@ -221,7 +236,7 @@ namespace RequirementUtils
 
 		if (!firstUpdate) handler->CheckAllRequirements();
 	}
-
+	*/
 	void UpdatePlayButton()
 	{
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
@@ -229,28 +244,18 @@ namespace RequirementUtils
 		if (length > 0)
 		{
 			bool interactable = AllowPlayerToStart();
-            bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
-            bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
-            bool isNoodle = SongUtils::SongInfo::get_currentlySelectedIsNoodle();
-			INFO("interactable: %d, custom: %d, wip: %d, noodle: %d", interactable, isCustom, isWip, isNoodle);
-            if (isCustom)
+                        bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
+                        bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
+			INFO("interactable: %d, custom: %d, wip: %d", interactable, isCustom, isWip);
+                        if (isCustom && isWip)
 			{
-				if (isWip) { //if its a WIP Level, then only play in practice mode
-					levelViews[length - 1]->get_actionButton()->set_interactable(false);
-					levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
-				} else if (isNoodle && interactable) { //if its and is playable, then turn practice mode off
-					levelViews[length - 1]->get_actionButton()->set_interactable(interactable);
-					levelViews[length - 1]->get_practiceButton()->set_interactable(false);
-				}
-				else {
-					levelViews[length - 1]->get_actionButton()->set_interactable(interactable);
-					levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
-				}
+				levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
+				levelViews[length - 1]->get_actionButton()->set_interactable(false);
 			}
 			else
 			{
-				levelViews[length - 1]->get_actionButton()->set_interactable(interactable);
 				levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
+				levelViews[length - 1]->get_actionButton()->set_interactable(interactable);
 			}
 		}
 	}
@@ -334,5 +339,13 @@ namespace RequirementUtils
 			}
 			UpdatePlayButton();
 		}
+	}
+
+	FoundRequirementsEvent& onFoundRequirements() {
+		return onFoundRequirementsEvent;
+	}
+
+	FoundSuggestionsEvent& onFoundSuggestions() {
+		return onFoundSuggestionsEvent;
 	}
 }

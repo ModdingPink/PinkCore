@@ -12,11 +12,13 @@
 #include "UI/Settings/PinkCoreFlowCoordinator.hpp"
 #include "UI/Settings/PinkCoreDonationViewController.hpp"
 #include "UI/Settings/PinkCoreFlowCoordinator.hpp"
-#include "CustomTypes/RequirementElement.hpp"
+//#include "CustomTypes/RequirementElement.hpp"
 
 #include "GlobalNamespace/LevelCollectionNavigationController.hpp"
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
+#include "HMUI/CurvedTextMeshPro.hpp"
+#include "HMUI/ImageView.hpp"
 
 #include "hooks.hpp"
 #include "logging.hpp"
@@ -43,11 +45,16 @@ MAKE_AUTO_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionVi
 		if (SongUtils::CustomData::GetInfoJson(level, d))
 		{
 			SongUtils::SongInfo::set_currentInfoDatValid(true);
+			RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
+			RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
 			INFO("Info.dat read successful!");
 		}
 		else
 		{
 			SongUtils::SongInfo::set_currentInfoDatValid(false);
+			RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
+			RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
+
 			INFO("Info.dat read not successful!");
 		}
 
@@ -59,6 +66,8 @@ MAKE_AUTO_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionVi
 	else
 	{
 		SongUtils::SongInfo::set_currentInfoDatValid(false);
+		RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
+		RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
 	}
 
 	LevelCollectionNavigationController_HandleLevelCollectionViewControllerDidSelectLevel(self, viewController, level);
@@ -76,6 +85,8 @@ extern "C" void setup(ModInfo& info)
 
 extern "C" void load()
 {
+	il2cpp_functions::Class_Init(classof(HMUI::ImageView*));
+    il2cpp_functions::Class_Init(classof(HMUI::CurvedTextMeshPro*));
 	Logger& logger = PinkCore::Logging::getLogger();
 	logger.info("Loading pinkcore!");
 	QuestUI::Init();
@@ -90,6 +101,4 @@ extern "C" void load()
 	custom_types::Register::AutoRegister();
 
 	QuestUI::Register::RegisterModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({ID, VERSION});
-
-	INFO("rank: %u", classof(PinkCore::UI::RequirementElement*)->rank);
 }

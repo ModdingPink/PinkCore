@@ -452,6 +452,7 @@ namespace SongUtils
 			currentInfoDatValid = value;
 			onLoadedInfoEvent.invoke(getOptional(value));
 		}
+		
 		/*-------------------------------------------------*/
 
 		const std::u16string& get_lastPhysicallySelectedCharacteristic()

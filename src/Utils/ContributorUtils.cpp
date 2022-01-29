@@ -2,7 +2,7 @@
 #include "Utils/SongUtils.hpp"
 #include "logging.hpp"
 
-#include "CustomTypes/ContributorHandler.hpp"
+//#include "CustomTypes/ContributorHandler.hpp"
 
 using Contributor = PinkCore::Contributor;
 namespace ContributorUtils
@@ -58,9 +58,11 @@ namespace ContributorUtils
 		return currentContributors.size() != 0;
 	}
 	
+	/*
 	void UpdateContributorHandler(PinkCore::UI::ContributorHandler* handler, bool firstUpdate)
 	{
 		if (!handler) return;
 		handler->GetAllCurrentContributors();
 	}
+	*/
 }

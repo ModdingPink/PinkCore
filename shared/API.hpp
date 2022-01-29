@@ -21,6 +21,14 @@ namespace PinkCore::API
 	/// The passed document pointer CAN be nullptr, this means that the loaded song didn't have an info.dat or was not custom, be sure to check this!
 	/// @return optional ref, nullopt means not installed
 	LoadedInfoEvent& GetInfoDatLoadedCallbackSafe();
+
+	using FoundRequirementsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
+	/// @brief gets a reference to an even that gets ran when the requirements vector has been determined for the specific map
+	FoundRequirementsEvent& GetFoundRequirementCallbackSafe();
+	
+	using FoundSuggestionsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
+	/// @brief gets a reference to an even that gets ran when the suggestions vector has been determined for the specific map
+	FoundSuggestionsEvent& GetFoundSuggestionCallbackSafe();
 }
 
 #undef pinkcore_id

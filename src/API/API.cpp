@@ -15,9 +15,18 @@ namespace PinkCore::API
 		return SongUtils::SongInfo::get_currentlySelectedIsWIP();
 	}
 
-	SongUtils::LoadedInfoEvent* GetInfoDatLoadedCallbackSafe()
+	SongUtils::LoadedInfoEvent& GetInfoDatLoadedCallbackSafe()
 	{
-		return &SongUtils::onLoadedInfo();
+		return SongUtils::onLoadedInfo();
 	}
 
+	RequirementUtils::FoundRequirementsEvent& GetFoundRequirementCallbackSafe()
+	{
+		return RequirementUtils::onFoundRequirements();
+	}
+
+	RequirementUtils::FoundSuggestionsEvent& GetFoundSuggestionCallbackSafe()
+	{
+		return RequirementUtils::onFoundSuggestions();
+	}
 }
