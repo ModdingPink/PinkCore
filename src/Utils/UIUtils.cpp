@@ -267,7 +267,8 @@ namespace UIUtils
 				modal = modalView;
 		}
 
-		requirementsList->Refresh();
+		if (requirementsList) 
+			requirementsList->Refresh();
 		//RequirementUtils::UpdateRequirementHandler(requirementsHandler, isNew);
 		//ContributorUtils::UpdateContributorHandler(contributorsHandler, isNew);
 	}
