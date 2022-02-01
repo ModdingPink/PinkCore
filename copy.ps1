@@ -1,13 +1,13 @@
 param (
     [Parameter(Mandatory=$false)]
-    [Switch]$debug_so,
+    [Switch]$useDebug,
     [Parameter(Mandatory=$false)]
     [Switch]$log
 )
 
 & ./build.ps1
-if ($debug.IsPresent) {
-    & adb push build/debug_libpinkcore.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libpinkcore.so
+if ($useDebug.IsPresent) {
+    & adb push build/debug/libpinkcore.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libpinkcore.so
 } else {
     & adb push build/libpinkcore.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libpinkcore.so
 }

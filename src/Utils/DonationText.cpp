@@ -1,9 +1,7 @@
 #include "Utils/DonationText.hpp"
 #include "Utils/WebUtils.hpp"
 #include "static-defines.h"
-#include "beatsaber-hook/shared/utils/logging.hpp"
-
-extern Logger& getLogger();
+#include "logging.hpp"
 
 namespace PinkCore
 {
@@ -13,7 +11,7 @@ namespace PinkCore
 		// safety to prevent from downloading multiple times
 		if (text != "") return;
 		
-		getLogger().info("Getting text from URL %s", donationURL);
+		INFO("Getting text from URL %s", donationURL);
 
 		WebUtils::GetAsync(donationURL, [&](long code, std::string result){
 			switch (code)

@@ -79,9 +79,14 @@ namespace UIUtils
 	/// @param selectedName the path to the image for button highlighted
 	void SwapButtonSprites(UnityEngine::UI::Button* button, std::string normalName, std::string selectedName);
 
+	void SwapButtonSprites(UnityEngine::UI::Button* button, UnityEngine::Sprite* normal, UnityEngine::Sprite* highlighted);
+
 	/// @brief sets up or updates the requirements modal
 	void SetupOrUpdateRequirementsModal(GlobalNamespace::StandardLevelDetailView* self);
 
 	/// @brief loads sprite at given path
 	UnityEngine::Sprite* FileToSprite(std::string_view path);
+
+	/// @brief loads sprite at given u16 path
+	UnityEngine::Sprite* FileToSprite(std::u16string_view path); 
 }

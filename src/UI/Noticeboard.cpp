@@ -1,5 +1,7 @@
+#include "logging.hpp"
 #include "UI/Noticeboard.hpp"
 #include "static-defines.h"
+#include "assets.hpp"
 
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
@@ -30,8 +32,6 @@ using namespace UnityEngine::UI;
 using namespace TMPro;
 using namespace HMUI;
 
-extern Logger& getLogger();
-
 constexpr const char* titles[2] = { "<i>NoticeBoard</i>", "<i>Patreon</i>" };
 
 #define TEXT_SWITCH(theState, theText) \
@@ -48,7 +48,7 @@ namespace PinkCore::UI
 		// if this is the first time this viewcontroller was activated
 		if (firstActivation)
 		{
-			getLogger().info("NoticeBoard activated!");
+			INFO("NoticeBoard activated!");
 			title = UIUtils::AddHeader(get_transform(), titles[state], Color(0.94f, 0.11f, 0.5f, 1.0f));
 			CreateSwitchingButtons();
 
@@ -63,7 +63,7 @@ namespace PinkCore::UI
 			{
 				backgroundable = container->AddComponent<Backgroundable*>();
 			}
-			backgroundable->ApplyBackgroundWithAlpha(il2cpp_utils::createcsstr("round-rect-panel"), 0.5f);
+			backgroundable->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
 
 			auto* layoutgroup = container->GetComponent<VerticalLayoutGroup*>();
 			RectOffset* offset = RectOffset::New_ctor(2, 2, 0, 0);
@@ -103,7 +103,7 @@ namespace PinkCore::UI
 		{
 			backgroundable = horizon->get_gameObject()->AddComponent<Backgroundable*>();
 		}
-		backgroundable->ApplyBackgroundWithAlpha(il2cpp_utils::createcsstr("round-rect-panel"), 0.5f);
+		backgroundable->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
 		RectOffset* offset = RectOffset::New_ctor(2, 2, 2, 2);
 		horizon->set_padding(offset);
 		*/
@@ -129,7 +129,8 @@ namespace PinkCore::UI
 			if (boardLayout) boardLayout->SetActive(true);
 			else CreateTextLayout(container->get_transform(), NoticeBoardText::get_text(), boardLayout);
 		});
-		UIUtils::SwapButtonSprites(noticeBoardButton, mangoImagePath, activeMangoImagePath);
+
+		UIUtils::SwapButtonSprites(noticeBoardButton, VectorToSprite(std::vector<uint8_t>(_binary_Mango_png_start, _binary_Mango_png_end)), VectorToSprite(std::vector<uint8_t>(_binary_MangoActive_png_start, _binary_MangoActive_png_end)));
 
 		Button* donationButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
 			if (state == BoardState::Donation) return;
@@ -141,7 +142,7 @@ namespace PinkCore::UI
 			else CreateTextLayout(container->get_transform(), DonationText::get_text(), donationLayout);
 		});
 
-		UIUtils::SwapButtonSprites(donationButton, donationImagePath, activeDonationImagePath);
+		UIUtils::SwapButtonSprites(donationButton, VectorToSprite(std::vector<uint8_t>(_binary_Donation_png_start, _binary_Donation_png_end)), VectorToSprite(std::vector<uint8_t>(_binary_DonationActive_png_start, _binary_DonationActive_png_end)));
 		
 		LayoutElement* layoutelem = horizon->get_gameObject()->AddComponent<LayoutElement*>();
 		layoutelem->set_preferredHeight(30.0f);

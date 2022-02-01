@@ -2,6 +2,7 @@
 #include "questui/shared/BeatSaberUI.hpp"
 #include "Utils/UIUtils.hpp"
 #include "config.hpp"
+#include "logging.hpp"
 
 DEFINE_TYPE(PinkCore::UI, PinkCoreSettingsViewController);
 

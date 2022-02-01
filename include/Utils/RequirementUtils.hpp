@@ -4,10 +4,15 @@
 #include <vector>
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "beatsaber-hook/shared/rapidjson/include/rapidjson/document.h"
-#include "CustomTypes/RequirementHandler.hpp"
 
+namespace PinkCore::UI {
+	class RequirementHandler;
+}
 namespace RequirementUtils
 {
+	using FoundRequirementsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
+	using FoundSuggestionsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
+
 	/// @brief handle hte requirement details so all backing information is up to date
 	//void HandleRequirementDetails(GlobalNamespace::StandardLevelDetailView* detailView);
 	void HandleRequirementDetails();
@@ -46,14 +51,19 @@ namespace RequirementUtils
 	/// @brief whether or not anything is not installed
 	/// @return true for something missing, false for all installed
 	bool IsAnythingMissing();
-
+	/*
 	/// @brief updates the requirementHandler in a way that makes it properly show the requirements
 	/// @param handler the handler to use
 	void UpdateRequirementHandler(PinkCore::UI::RequirementHandler* handler, bool firstUpdate);
-
+	*/
 	/// @brief updates the play button based on if the player is allowed to start
 	void UpdatePlayButton();
 
+	/// @brief gets a const reference to the current requirement vector
+	const std::vector<std::string>& GetCurrentRequirements();
+
+	/// @brief gets a const reference to the current suggestion vector
+	const std::vector<std::string>& GetCurrentSuggestions();
 	namespace ExternalAPI
 	{
 		/// @brief
@@ -84,4 +94,10 @@ namespace RequirementUtils
 		/// @param id mod ID
 		void RemoveDisablingModId(std::string id);
 	}
+
+	/// @brief returns a reference to the internal found requirements callback
+	FoundRequirementsEvent& onFoundRequirements();
+
+	/// @brief returns a reference to the internal found suggestions callback
+	FoundSuggestionsEvent& onFoundSuggestions(); 
 }

@@ -5,54 +5,12 @@
   "author": "RedBrumbler, Pink, StackDoubleFlow, Lillie, Darknight1050",
   "version": "${version}",
   "packageId": "com.beatgames.beatsaber",
-  "packageVersion": "1.17.1",
+  "packageVersion": "1.19.0",
   "coverImage": "cover.jpg",
   "description": "PinkCore is a core mod that ports over the rest of SongCore's features.\nThis includes adding information to your game such as Mappers names, Mod Requirements, Custom Colours, Custom Difficulty names, Burn Marks, and more!",
   "dependencies": [],
   "modFiles": [
   ],
-  "libraryFiles": [
-  ],
-  "fileCopies": [
-    {
-      "name": "Donation.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/Donation.png"
-    },
-    {
-      "name": "DonationActive.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/DonationActive.png"
-    },
-    {
-      "name": "Mango.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/Mango.png"
-    },
-    {
-      "name": "MangoActive.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/MangoActive.png"
-    },
-    {
-      "name": "RequirementFound.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/Requirements/RequirementFound.png"
-    },
-    {
-      "name": "RequirementMissing.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/Requirements/RequirementMissing.png"
-    },
-    {
-      "name": "SuggestionFound.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/Requirements/SuggestionFound.png"
-    },
-    {
-      "name": "SuggestionMissing.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/Requirements/SuggestionMissing.png"
-    },
-    {
-      "name": "WIP.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/Requirements/WIP.png"
-    },
-    {
-      "name": "MissingSprite.png",
-      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/UI/Requirements/MissingSprite.png"
-    }
-  ]
+  "libraryFiles": [],
+  "fileCopies": []
 }

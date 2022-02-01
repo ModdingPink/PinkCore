@@ -4,33 +4,30 @@
 #include "custom-types/shared/register.hpp"
 #include "questui/shared/QuestUI.hpp"
 
+#include "songloader/shared/CustomTypes/CustomLevelInfoSaveData.hpp"
+
 #include "Utils/SongUtils.hpp"
 #include "Utils/RequirementUtils.hpp"
 #include "UI/Noticeboard.hpp"
 #include "UI/Settings/PinkCoreFlowCoordinator.hpp"
 #include "UI/Settings/PinkCoreDonationViewController.hpp"
 #include "UI/Settings/PinkCoreFlowCoordinator.hpp"
-#include "CustomTypes/RequirementElement.hpp"
-
-#include "CustomTypes/CustomLevelInfoSaveData.hpp"
+//#include "CustomTypes/RequirementElement.hpp"
 
 #include "GlobalNamespace/LevelCollectionNavigationController.hpp"
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
+#include "HMUI/CurvedTextMeshPro.hpp"
+#include "HMUI/ImageView.hpp"
 
 #include "hooks.hpp"
+#include "logging.hpp"
 
 #include "config.hpp"
 
 ModInfo modInfo;
 
-Logger& getLogger()
-{
-	static Logger* logger = new Logger(modInfo, LoggerOptions(false, true));
-	return *logger;
-}
-
-MAKE_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionViewControllerDidSelectLevel, &GlobalNamespace::LevelCollectionNavigationController::HandleLevelCollectionViewControllerDidSelectLevel, void, GlobalNamespace::LevelCollectionNavigationController* self, GlobalNamespace::LevelCollectionViewController* viewController, GlobalNamespace::IPreviewBeatmapLevel* level) 
+MAKE_AUTO_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionViewControllerDidSelectLevel, &GlobalNamespace::LevelCollectionNavigationController::HandleLevelCollectionViewControllerDidSelectLevel, void, GlobalNamespace::LevelCollectionNavigationController* self, GlobalNamespace::LevelCollectionViewController* viewController, GlobalNamespace::IPreviewBeatmapLevel* level) 
 {
 	if (!level)
 	{
@@ -48,87 +45,35 @@ MAKE_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionViewCon
 		if (SongUtils::CustomData::GetInfoJson(level, d))
 		{
 			SongUtils::SongInfo::set_currentInfoDatValid(true);
-			getLogger().info("Info.dat read successful!");
+			RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
+			RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
+			INFO("Info.dat read successful!");
 		}
 		else
 		{
 			SongUtils::SongInfo::set_currentInfoDatValid(false);
-			getLogger().info("Info.dat read not successful!");
+			RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
+			RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
+
+			INFO("Info.dat read not successful!");
 		}
 
 		// if the level ID contains `WIP` then the song is a WIP song 
-		std::string levelIDString = to_utf8(csstrtostr(level->get_levelID()));
+		std::string levelIDString = level->get_levelID();
 		bool isWIP = levelIDString.find("WIP") != std::string::npos;
 		SongUtils::SongInfo::set_currentlySelectedIsWIP(isWIP);
 	}
 	else
 	{
 		SongUtils::SongInfo::set_currentInfoDatValid(false);
+		RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
+		RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
 	}
 
 	LevelCollectionNavigationController_HandleLevelCollectionViewControllerDidSelectLevel(self, viewController, level);
 }
 
 
-// Implementation by https://github.com/StackDoubleFlow
-MAKE_HOOK_MATCH(StandardLevelInfoSaveData_DeserializeFromJSONString, &GlobalNamespace::StandardLevelInfoSaveData::DeserializeFromJSONString, GlobalNamespace::StandardLevelInfoSaveData*, Il2CppString *stringData) {
-	auto* original = StandardLevelInfoSaveData_DeserializeFromJSONString(stringData);
-	if (!original) return nullptr;
-
-	::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet*> *customBeatmapSets = 
-		::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet*>::NewLength(original->difficultyBeatmapSets->Length());
-		
-	CustomJSONData::CustomLevelInfoSaveData* customSaveData = CRASH_UNLESS(il2cpp_utils::New<CustomJSONData::CustomLevelInfoSaveData*>(original->songName, 
-		original->songSubName, original->songAuthorName, original->levelAuthorName, original->beatsPerMinute, original->songTimeOffset, 
-		original->shuffle, original->shufflePeriod, original->previewStartTime, original->previewDuration, original->songFilename, 
-		original->coverImageFilename, original->environmentName, original->allDirectionsEnvironmentName, customBeatmapSets));
-	
-	std::u16string str(stringData ? csstrtostr(stringData) : u"{}");
-	
-	std::shared_ptr<typename rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>> sharedDoc = std::make_shared<typename rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>();
-	customSaveData->doc = sharedDoc;
-
-	rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& doc = *sharedDoc;
-	doc.Parse(str.c_str());
-
-	auto dataItr = doc.FindMember(u"_customData");
-	if (dataItr != doc.MemberEnd()) {
-		customSaveData->customData = dataItr->value;
-	}
-
-	Value& beatmapSetsArr = doc.FindMember(u"_difficultyBeatmapSets")->value;
-	
-	getLogger().info("beatmapSets length orig: %lu", original->difficultyBeatmapSets->Length());
-	getLogger().info("beatmapSets length json: %d", beatmapSetsArr.Size());
-
-	for (rapidjson::SizeType i = 0; i < beatmapSetsArr.Size(); i++) {
-		Value& beatmapSetJson = beatmapSetsArr[i];
-		GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet *standardBeatmapSet = original->difficultyBeatmapSets->values[i];
-		getLogger().info("beatmapset: %p", standardBeatmapSet);
-		getLogger().info("standardBeatmapSet->difficultyBeatmaps: %p", standardBeatmapSet->difficultyBeatmaps);
-		::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmap*> *customBeatmaps = 
-			::Array<GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmap*>::NewLength(standardBeatmapSet->difficultyBeatmaps->Length());
-
-		for (rapidjson::SizeType j = 0; j < standardBeatmapSet->difficultyBeatmaps->Length(); j++) {
-			Value& difficultyBeatmapJson = beatmapSetJson.FindMember(u"_difficultyBeatmaps")->value[j];
-			GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmap *standardBeatmap = standardBeatmapSet->difficultyBeatmaps->values[j];
-
-			CustomJSONData::CustomDifficultyBeatmap *customBeatmap = CRASH_UNLESS(il2cpp_utils::New<CustomJSONData::CustomDifficultyBeatmap*>(standardBeatmap->difficulty, 
-				standardBeatmap->difficultyRank, standardBeatmap->beatmapFilename, standardBeatmap->noteJumpMovementSpeed, standardBeatmap->noteJumpStartBeatOffset));
-			
-			auto customDataItr = difficultyBeatmapJson.FindMember(u"_customData");
-			if (customDataItr != difficultyBeatmapJson.MemberEnd()) {
-				customBeatmap->customData = customDataItr->value;
-			}
-
-			customBeatmaps->values[j] = customBeatmap;
-		}
-
-		customBeatmapSets->values[i] = GlobalNamespace::StandardLevelInfoSaveData::DifficultyBeatmapSet::New_ctor(standardBeatmapSet->beatmapCharacteristicName, customBeatmaps);
-	}
-
-	return customSaveData;
-}
 
 extern "C" void setup(ModInfo& info)
 {
@@ -140,7 +85,10 @@ extern "C" void setup(ModInfo& info)
 
 extern "C" void load()
 {
-	Logger& logger = getLogger();
+	il2cpp_functions::Class_Init(classof(HMUI::ImageView*));
+    il2cpp_functions::Class_Init(classof(HMUI::CurvedTextMeshPro*));
+	Logger& logger = PinkCore::Logging::getLogger();
+	logger.info("Loading pinkcore!");
 	QuestUI::Init();
 	
 
@@ -153,14 +101,4 @@ extern "C" void load()
 	custom_types::Register::AutoRegister();
 
 	QuestUI::Register::RegisterModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({ID, VERSION});
-
-	getLogger().info("rank: %u", classof(PinkCore::UI::RequirementElement*)->rank);
 }
-  
-void installMainHooks(Logger& logger)
-{
-	INSTALL_HOOK(logger, LevelCollectionNavigationController_HandleLevelCollectionViewControllerDidSelectLevel);
-	INSTALL_HOOK(logger, StandardLevelInfoSaveData_DeserializeFromJSONString);
-}
-// using a macro to register the method pointer to the class that stores all of the install methods, for automatic execution
-PCInstallHooks(installMainHooks)

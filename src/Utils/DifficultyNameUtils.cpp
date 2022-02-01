@@ -1,11 +1,9 @@
 #include "Utils/DifficultyNameUtils.hpp"
 #include "Utils/SongUtils.hpp"
+#include "logging.hpp"
 
 
 #include <algorithm>
-
-extern Logger& getLogger();
-
 
 namespace DifficultyNameUtils
 {
@@ -75,10 +73,10 @@ namespace DifficultyNameUtils
 		return diffLabel;
 	}
 
-	void SetDifficultyNameCacheFromArray(::Array<GlobalNamespace::IDifficultyBeatmap*>* difficultyArray) {
+	void SetDifficultyNameCacheFromArray(::ArrayW<GlobalNamespace::IDifficultyBeatmap*>& difficultyArray) {
 		auto& doc = SongUtils::GetCurrentInfoDat();
-		for (int i = 0; i < difficultyArray->Length(); i++) {
-			GlobalNamespace::BeatmapDifficulty difficulty = difficultyArray->values[i]->get_difficulty();
+		for (int i = 0; i < difficultyArray.Length(); i++) {
+			GlobalNamespace::BeatmapDifficulty difficulty = difficultyArray[i]->get_difficulty();
 			setDifficultyNameCacheFromDifficulty(difficulty, GetDifficultyNameFromDoc(doc, difficulty));
 		}
 	}

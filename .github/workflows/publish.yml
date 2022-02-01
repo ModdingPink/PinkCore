@@ -68,10 +68,6 @@ jobs:
         ls -la ${GITHUB_WORKSPACE}/extern/libs
         echo cache:
         ls -la $HOME/.local/share/QPM-Rust/cache
-    
-    - name: Apply Legacy Fix
-      run: |
-        ./QPM/qpm-rust cache legacy-fix
 
     - name: Get Tag Version
       id: get_tag_version
@@ -87,7 +83,7 @@ jobs:
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm-rust qmod build --include_libs lib${module_id}.so libbeatsaber-hook_2_3_2.so
+        ./QPM/qpm-rust qmod build
         pwsh -Command ./build.ps1
     
     - name: Create Qmod
@@ -165,7 +161,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
-        asset_path: ./build/debug_${{ steps.libname.outputs.NAME }}
+        asset_path: ./build/debug/${{ steps.libname.outputs.NAME }}
         asset_name: debug_${{ steps.libname.outputs.NAME }}
         asset_content_type: application/octet-stream
 
@@ -204,9 +200,6 @@ jobs:
         git push origin HEAD:version-${{ steps.get_tag_version.outputs.TAG }} --force
         git tag --force ${{ steps.get_tag_version.outputs.TAG }} ${{ steps.get_created_commit_id.outputs.ID }}
         git push --tags --force
-        
-#     - name: Merge this branch into whatever branch we were originally built off of.
-#       TODO
         
     - name: QPM Publish
       run: ./QPM/qpm-rust publish

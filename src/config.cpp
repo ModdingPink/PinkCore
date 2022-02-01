@@ -1,18 +1,8 @@
 #include "config.hpp"
+#include "logging.hpp"
 #include "beatsaber-hook/shared/config/config-utils.hpp"
 
 config_t config;
-
-extern Logger& getLogger();
-
-static LoggerContextObject& getConfigLogger()
-{
-	static LoggerContextObject logger = getLogger().WithContext("Config");
-	return logger;
-}
-
-#define INFO(...) getConfigLogger().info(__VA_ARGS__)
-#define ERROR(...) getConfigLogger().error(__VA_ARGS__)
 
 Configuration& getConfig() {
 	static Configuration config({ID, VERSION});

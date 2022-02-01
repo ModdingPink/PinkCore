@@ -33,8 +33,9 @@
 #include "HMUI/ButtonSpriteSwap.hpp"
 
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
-#include "CustomTypes/RequirementHandler.hpp"
-#include "CustomTypes/ContributorHandler.hpp"
+//#include "CustomTypes/RequirementHandler.hpp"
+//#include "CustomTypes/ContributorHandler.hpp"
+#include "CustomTypes/RequirementModalListTableData.hpp"
 
 #include "Utils/RequirementUtils.hpp"
 #include "Utils/ContributorUtils.hpp"
@@ -47,6 +48,9 @@
 
 #include "static-defines.h"
 #include <fstream>
+#include "logging.hpp"
+
+#include "assets.hpp"
 
 using namespace VRUIControls;
 using namespace HMUI;
@@ -57,9 +61,6 @@ using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 
-extern Logger& getLogger();
-#define INFO(value...) getLogger().info(value);
-#define ERROR(value...) getLogger().error(value);
 
 namespace UIUtils
 {
@@ -103,7 +104,7 @@ namespace UIUtils
 		layoutelem->set_preferredWidth(size.x);
 
 		Backgroundable* background = horizontal->get_gameObject()->AddComponent<Backgroundable*>();
-		background->ApplyBackgroundWithAlpha(il2cpp_utils::createcsstr("title-gradient"), 1.0f);
+		background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"), 1.0f);
 
 		ImageView* imageView = background->get_gameObject()->GetComponentInChildren<ImageView*>();
 		imageView->gradient = true;
@@ -125,8 +126,8 @@ namespace UIUtils
 		}
 
 		Transform* title_T = titleView->get_transform();
-		Transform* BG_T = title_T->Find(il2cpp_utils::createcsstr("BG"));
-		Transform* BackButtonBG_T = title_T->Find(il2cpp_utils::createcsstr("BackButton/BG"));
+		Transform* BG_T = title_T->Find(il2cpp_utils::newcsstr("BG"));
+		Transform* BackButtonBG_T = title_T->Find(il2cpp_utils::newcsstr("BackButton/BG"));
 
 		ImageView* imageView = BG_T->get_gameObject()->GetComponent<ImageView*>();
 		Color oldColor = imageView->get_color();
@@ -140,6 +141,25 @@ namespace UIUtils
 
 		ButtonStaticAnimations* anim = BackButtonBG_T->get_parent()->get_gameObject()->GetComponent<ButtonStaticAnimations*>();
 		anim->set_enabled(buttonanim);
+	}
+
+	void SwapButtonSprites(UnityEngine::UI::Button* button, UnityEngine::Sprite* normal, UnityEngine::Sprite* highlighted)
+	{
+		Texture* highl = highlighted->get_texture();
+		highl->set_wrapMode(UnityEngine::TextureWrapMode::_get_Clamp());
+		UnityEngine::Sprite* pressed = highlighted;
+		UnityEngine::Sprite* selected = normal;
+		Texture* sel = selected->get_texture();
+		sel->set_wrapMode(UnityEngine::TextureWrapMode::_get_Clamp());
+		UnityEngine::Sprite* disabled = selected;
+		HMUI::ButtonSpriteSwap* spriteSwap = button->get_gameObject()->GetComponent<HMUI::ButtonSpriteSwap*>();
+		spriteSwap->normalStateSprite = selected;
+		spriteSwap->highlightStateSprite = highlighted;
+		spriteSwap->pressedStateSprite = pressed;
+		spriteSwap->disabledStateSprite = disabled;
+
+		auto imageView = button->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>();
+		if (imageView) imageView->skew = 0.18f; 
 	}
 
 	void SwapButtonSprites(UnityEngine::UI::Button* button, std::string normalName, std::string selectedName)
@@ -162,20 +182,22 @@ namespace UIUtils
 		if (imageView) imageView->skew = 0.18f; 
 	}
 
+	
 	void SetupOrUpdateRequirementsModal(GlobalNamespace::StandardLevelDetailView* self)
 	{
-		auto requirementsHandler = self->GetComponentInChildren<PinkCore::UI::RequirementHandler*>(true);
-		auto contributorsHandler = self->GetComponentInChildren<PinkCore::UI::ContributorHandler*>(true);
+		auto requirementsList = self->get_gameObject()->GetComponentInChildren<PinkCore::UI::RequirementModalListTableData*>(true);
+		//auto requirementsHandler = self->GetComponentInChildren<PinkCore::UI::RequirementHandler*>(true);
+		//auto contributorsHandler = self->GetComponentInChildren<PinkCore::UI::ContributorHandler*>(true);
 
 		bool isNew = false;
 
 		// if anything is needed, anyone worked on it, or the song is WIP, show the modal
 		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_currentlySelectedIsWIP());
 		
-		if (!requirementsHandler && showModal)
+		if (!requirementsList && showModal)
 		{
 			isNew = true;
-			getLogger().info("RequirementHandler did not exist, making it...");
+			INFO("requirementsList did not exist, making it...");
 			using namespace UnityEngine;
 			using namespace UnityEngine::UI;
 
@@ -186,20 +208,9 @@ namespace UIUtils
 
 			
 
-			UnityEngine::UI::Button* button = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "PlayButton", Vector2(0.0f, 0.0f), Vector2(12.0f, 9.0f), [&](){
+			UnityEngine::UI::Button* button = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "PlayButton", Vector2(0.0f, 0.0f), Vector2(15.0f, 12.0f), [&](){
 				modal->Show(true, false, nullptr);
 			});
-
-			
-			
-			/*
-			Transform* BG_T = button->get_transform()->Find(il2cpp_utils::createcsstr("BG"));
-			auto imageView = BG_T->GetComponentInChildren<HMUI::ImageView*>();
-			imageView->set_color(Color::get_white());
-			imageView->set_color0(Color::get_red());
-			imageView->set_color1(Color::get_blue());
-			*/
-
 			
 			auto text = QuestUI::BeatSaberUI::CreateText(button->get_transform(), "?");
 			text->set_alignment(TMPro::TextAlignmentOptions::Center);
@@ -209,8 +220,8 @@ namespace UIUtils
 
 			
 
-			modal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(55.0f, 70.0f), nullptr);
-			UnityEngine::GameObject* container = QuestUI::BeatSaberUI::CreateScrollableModalContainer(modal);
+			modal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(55.0f, 70.0f), UnityEngine::Vector2(-15.0f, 0.0f), nullptr);
+			//UnityEngine::GameObject* container = QuestUI::BeatSaberUI::CreateScrollableModalContainer(modal);
 
 			
 
@@ -218,17 +229,17 @@ namespace UIUtils
 			layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizon->get_transform());*/
 			
 			
-			requirementsHandler = container->get_gameObject()->AddComponent<PinkCore::UI::RequirementHandler*>();
-		
+			//requirementsHandler = container->get_gameObject()->AddComponent<PinkCore::UI::RequirementHandler*>();
+			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(modal->get_transform(), Vector2(0.0f, -35.0f), Vector2(55.0f, 70.0f), nullptr);
 			/*horizon = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(container->get_transform());
 			layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizon->get_transform());*/
 			
-			contributorsHandler = container->get_gameObject()->AddComponent<PinkCore::UI::ContributorHandler*>();
+			//contributorsHandler = container->get_gameObject()->AddComponent<PinkCore::UI::ContributorHandler*>();
 		
 		}
-		else if (requirementsHandler)
+		else if (requirementsList)
 		{
-			UnityEngine::Transform* parent = requirementsHandler->get_transform();
+			UnityEngine::Transform* parent = requirementsList->get_transform();
 			UnityEngine::UI::Button* button = nullptr;
 
 			// GetComponentInParent doesnt work on disabled objects, so lets do it manually 
@@ -242,7 +253,7 @@ namespace UIUtils
 			if (button)
 				button->get_gameObject()->SetActive(showModal);
 
-			parent = requirementsHandler->get_transform();
+			parent = requirementsList->get_transform();
 
 			// update modal value just to be sure
 			HMUI::ModalView* modalView;
@@ -256,15 +267,25 @@ namespace UIUtils
 				modal = modalView;
 		}
 
-		RequirementUtils::UpdateRequirementHandler(requirementsHandler, isNew);
-		ContributorUtils::UpdateContributorHandler(contributorsHandler, isNew);
+		if (requirementsList) 
+			requirementsList->Refresh();
+		//RequirementUtils::UpdateRequirementHandler(requirementsHandler, isNew);
+		//ContributorUtils::UpdateContributorHandler(contributorsHandler, isNew);
+	}
+	
+	UnityEngine::Sprite* FileToSprite(std::u16string_view path) 
+	{
+		INFO("FileToSprite Path: %s", to_utf8(path).c_str());
+		if (!fileexists(to_utf8(path))) return VectorToSprite(std::vector<uint8_t>(_binary_MissingSprite_png_start, _binary_MissingSprite_png_end));
+		std::ifstream instream(path, std::ios::in | std::ios::binary);
+        std::vector<uint8_t> data = std::vector<uint8_t>(std::istreambuf_iterator<char>(instream), std::istreambuf_iterator<char>());
+		return VectorToSprite(data);
 	}
 
 	UnityEngine::Sprite* FileToSprite(std::string_view path)
     {
-		std::string filePath(path);
-		if (!fileexists(filePath)) filePath = missingSpritePath;
-        std::ifstream instream(filePath, std::ios::in | std::ios::binary);
+		if (!fileexists(path)) return VectorToSprite(std::vector<uint8_t>(_binary_MissingSprite_png_start, _binary_MissingSprite_png_end));
+        std::ifstream instream(path, std::ios::in | std::ios::binary);
         std::vector<uint8_t> data((std::istreambuf_iterator<char>(instream)), std::istreambuf_iterator<char>());
         Array<uint8_t>* bytes = il2cpp_utils::vectorToArray(data);
         UnityEngine::Texture2D* texture = UnityEngine::Texture2D::New_ctor(0, 0, UnityEngine::TextureFormat::RGBA32, false, false);
@@ -272,6 +293,6 @@ namespace UIUtils
             texture->set_wrapMode(UnityEngine::TextureWrapMode::Clamp);
             return UnityEngine::Sprite::Create(texture, UnityEngine::Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), UnityEngine::Vector2(0.5f,0.5f), 100.0f, 1u, UnityEngine::SpriteMeshType::FullRect, UnityEngine::Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
         }
-        return nullptr;
+        return VectorToSprite(std::vector<uint8_t>(_binary_MissingSprite_png_start, _binary_MissingSprite_png_end));
     }
 }

@@ -3,7 +3,7 @@ name: NDK build
 on:
   workflow_dispatch:
   push:
-    branches: [master, qpm_rust]
+    branches: [master, update-1.19]
     paths-ignore:
       - '**.yml'
       - '!.github/workflows/build-ndk.yml'
@@ -81,15 +81,11 @@ jobs:
         ls -la ${GITHUB_WORKSPACE}/extern/libs
         echo cache:
         ls -la $HOME/.local/share/QPM-Rust/cache
-        
-    - name: Apply Legacy Fix
-      run: |
-        ./QPM/qpm-rust cache legacy-fix
 
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm-rust qmod build --include_libs lib${module_id}.so libbeatsaber-hook_2_3_2.so
+        ./QPM/qpm-rust qmod build
         pwsh -Command ./build.ps1
 
     - name: Create Qmod
@@ -115,7 +111,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: debug_${{ steps.libname.outputs.NAME }}
-        path: ./build/debug_${{ steps.libname.outputs.NAME }}
+        path: ./build/debug/${{ steps.libname.outputs.NAME }}
         if-no-files-found: error
 
     - name: Upload qmod artifact

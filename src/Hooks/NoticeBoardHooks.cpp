@@ -1,5 +1,6 @@
 #include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
+#include "logging.hpp"
 #include "hooks.hpp"
 #include "UI/Noticeboard.hpp"
 #include "GlobalNamespace/MainFlowCoordinator.hpp"
@@ -13,23 +14,14 @@
 #include "Utils/NoticeBoardText.hpp"
 #include "Utils/DonationText.hpp"
 #include "Polyglot/Localization.hpp"
-
-extern Logger& getLogger();
-
-LoggerContextObject& getNoticeBoardLogger()
-{
-	static LoggerContextObject logger = getLogger().WithContext("NoticeBoard Hooks");
-	return logger;
-}
-
-#define INFO(...) getNoticeBoardLogger().info(__VA_ARGS__);
-#define ERROR(...) getNoticeBoardLogger().error(__VA_ARGS__);
+#include "logging.hpp"
 
 bool firstWarmup = true;
-MAKE_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement::SceneManager::SetActiveScene, bool, UnityEngine::SceneManagement::Scene scene)
+MAKE_AUTO_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement::SceneManager::SetActiveScene, bool, UnityEngine::SceneManagement::Scene scene)
 {
-	Il2CppString* sceneNameCS = scene.get_name();
-	std::string activeSceneName = sceneNameCS ? to_utf8(csstrtostr(sceneNameCS)) : "";
+	StringW sceneNameCS = scene.get_name();
+	std::string activeSceneName("");
+	if (sceneNameCS) activeSceneName = static_cast<std::string>(sceneNameCS);
 	INFO("Found scene %s", activeSceneName.c_str());
 	
 	bool result = SceneManager_SetActiveScene(scene);
@@ -47,7 +39,7 @@ MAKE_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement::Scen
 	return result;
 }
 
-MAKE_HOOK_MATCH(MainFlowCoordinator_DidActivate, &GlobalNamespace::MainFlowCoordinator::DidActivate, void, GlobalNamespace::MainFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+MAKE_AUTO_HOOK_MATCH(MainFlowCoordinator_DidActivate, &GlobalNamespace::MainFlowCoordinator::DidActivate, void, GlobalNamespace::MainFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 {
 	// when activating, we want to provide our own view controller for the right screen, so just take whatever is activated and display ours for right
 	if (firstActivation)
@@ -68,12 +60,4 @@ MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(MenuTransitionsHelper_RestartGame, "", "Men
 	MenuTransitionsHelper_RestartGame(self, finishCallback);
 }
 
-void InstallNoticeBoardHooks(Logger& logger)
-{
-	SIMPLE_INSTALL_HOOK(SceneManager_SetActiveScene);
-	SIMPLE_INSTALL_HOOK(MainFlowCoordinator_DidActivate);
-	SIMPLE_INSTALL_HOOK(MenuTransitionsHelper_RestartGame);
-}
-
-// using a macro to register the method pointer to the class that stores all of the install methods, for automatic execution
-PCInstallHooks(InstallNoticeBoardHooks)
+AUTO_INSTALL(MenuTransitionsHelper_RestartGame);

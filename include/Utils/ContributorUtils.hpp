@@ -19,11 +19,12 @@ namespace ContributorUtils
 	/// @return true for is current, false for not
 	bool GetIsCurrentContributor(PinkCore::Contributor& contributor);
 
+	/*
 	/// @brief handles the updating of the contributorHandler
 	/// @param contributorHandler the handler to update
 	/// @param firstUpdate whether or not this is the first time updating (right after creation)
 	void UpdateContributorHandler(PinkCore::UI::ContributorHandler* contributorHandler, bool firstUpdate);
-
+	*/
 	/// @brief Whether or not there are contributors, true for yes, false for no
 	bool DidAnyoneWorkOnThis();
 }

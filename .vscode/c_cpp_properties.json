@@ -6,15 +6,18 @@
         "VERSION=\"0.0.1\"",
         "__GNUC__",
         "__aarch64__",
-        "ID=\"PinkCore\""
+        "ID=\"PinkCore\"",
+        "USE_CODEGEN_FIELDS"
       ],
       "includePath": [
         "${workspaceFolder}/",
         "${workspaceFolder}/shared",
         "${workspaceFolder}/include",
-        "${workspaceFolder}/extern/includes/",
+        "${workspaceFolder}/extern/includes",
         "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
-        "${workspaceFolder}/extern/includes/codegen/include/"
+        "${workspaceFolder}/extern/includes/codegen/include",
+        "${workspaceFolder}/extern/includes/questui/shared/cppcodec",
+        "${default}"
       ],
       "name": "Quest",
       "cStandard": "c11",
