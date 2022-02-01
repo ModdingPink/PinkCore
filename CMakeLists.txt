@@ -44,6 +44,8 @@ target_link_libraries(${COMPILE_ID} PRIVATE -llog -lz)
 # add extern stuff like libs and other includes
 include(extern.cmake)
 
+# temp while waiting for questui to release
+
 add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
             COMMAND ${CMAKE_STRIP} -g -S -d --strip-all
             "lib${COMPILE_ID}.so" -o "stripped_lib${COMPILE_ID}.so"
