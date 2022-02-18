@@ -37,10 +37,10 @@ void RequirementsAPI(GlobalNamespace::IPreviewBeatmapLevel* level) {
         auto& d = SongUtils::GetCurrentInfoDatPtr();
         if (SongUtils::CustomData::GetInfoJson(level, d))
         {
-            SongUtils::SongInfo::set_currentInfoDatValid(true);
-            RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
-            RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
             INFO("Info.dat read successful!");
+            SongUtils::SongInfo::set_currentInfoDatValid(true);
+            // Requirements and suggestions are called on RequirementUtils::HandleRequirementDetails();
+            // TODO: Move this over there
         }
         else
         {

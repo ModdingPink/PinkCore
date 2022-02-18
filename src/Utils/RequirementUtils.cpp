@@ -78,6 +78,9 @@ namespace RequirementUtils
 					INFO("Extracting Suggestions");
 					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, currentSuggestions);
 				}
+
+                RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
+                RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
 			}
 			else
 			{
@@ -127,7 +130,7 @@ namespace RequirementUtils
 	bool GetRequirementInstalled(std::string requirement)
 	{
 		// find the req in the suggestions list, if found return true, else return false
-		for (auto req : installedRequirements)
+		for (auto const& req : installedRequirements)
 		{
 			if (req.find(requirement) != std::string::npos)
 			{
