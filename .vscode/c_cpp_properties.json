@@ -14,10 +14,13 @@
         "${workspaceFolder}/shared",
         "${workspaceFolder}/include",
         "${workspaceFolder}/extern/includes",
-        "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
         "${workspaceFolder}/extern/includes/codegen/include",
-        "${workspaceFolder}/extern/includes/questui/shared/cppcodec",
-        "${default}"
+        "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
+        "${default}",
+        "C:/Development/Tools/android-ndk-r23b/",
+        "C:/Development/Tools/android-ndk-r23b/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/",
+        "C:/Development/Tools/android-ndk-r23b/sources/cxx-stl/llvm-libc++/include/",
+        "C:/Development/Tools/android-ndk-r23b/sources/cxx-stl/llvm-libc++abi/include/"
       ],
       "name": "Quest",
       "cStandard": "c11",
