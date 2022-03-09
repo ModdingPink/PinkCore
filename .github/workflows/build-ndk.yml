@@ -3,17 +3,8 @@ name: NDK build
 on:
   workflow_dispatch:
   push:
-    branches: [master, update-1.19]
-    paths-ignore:
-      - '**.yml'
-      - '!.github/workflows/build-ndk.yml'
-      - '**.json'
-      - '!qpm.json'
-      - '**.ps1'
-      - '!build.ps1'
-      - '!buildQmod.ps1'
-      - '!CreateQmod.ps1'
-      - '**.md'
+    branches-ignore:
+      - 'version-v*'
       - '.gitignore'
   pull_request:
     branches: master
