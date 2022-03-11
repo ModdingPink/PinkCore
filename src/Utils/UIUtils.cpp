@@ -209,6 +209,7 @@ namespace UIUtils
 			
 
 			UnityEngine::UI::Button* button = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "PlayButton", Vector2(0.0f, 0.0f), Vector2(15.0f, 12.0f), [&](){
+				reinterpret_cast<UnityEngine::RectTransform*>(modal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-15.0f, 0.0f));
 				modal->Show(true, false, nullptr);
 			});
 			
@@ -220,7 +221,7 @@ namespace UIUtils
 
 			
 
-			modal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(55.0f, 70.0f), UnityEngine::Vector2(-15.0f, 0.0f), nullptr);
+			modal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(55.0f, 58.5f), UnityEngine::Vector2(-15.0f, 0.0f), nullptr);
 			//UnityEngine::GameObject* container = QuestUI::BeatSaberUI::CreateScrollableModalContainer(modal);
 
 			
@@ -230,7 +231,7 @@ namespace UIUtils
 			
 			
 			//requirementsHandler = container->get_gameObject()->AddComponent<PinkCore::UI::RequirementHandler*>();
-			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(modal->get_transform(), Vector2(0.0f, -35.0f), Vector2(55.0f, 70.0f), nullptr);
+			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(modal->get_transform(), Vector2(0.0f, -29.25f), Vector2(55.0f, 58.5f), nullptr);
 			/*horizon = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(container->get_transform());
 			layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizon->get_transform());*/
 			
