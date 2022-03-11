@@ -27,54 +27,6 @@
 
 ModInfo modInfo;
 
-MAKE_AUTO_HOOK_MATCH(LevelCollectionNavigationController_HandleLevelCollectionViewControllerDidSelectLevel, &GlobalNamespace::LevelCollectionNavigationController::HandleLevelCollectionViewControllerDidSelectLevel, void, GlobalNamespace::LevelCollectionNavigationController* self, GlobalNamespace::LevelCollectionViewController* viewController, GlobalNamespace::IPreviewBeatmapLevel* level) 
-{
-	if (!level)
-	{
-		LevelCollectionNavigationController_HandleLevelCollectionViewControllerDidSelectLevel(self, viewController, level);
-		return;
-	}
-
-	bool isCustom = SongUtils::SongInfo::isCustom(level);
-	SongUtils::SongInfo::set_currentlySelectedIsCustom(isCustom);
-
-	if (isCustom)
-	{
-		// clear current info dat
-		auto& d = SongUtils::GetCurrentInfoDatPtr();
-		if (SongUtils::CustomData::GetInfoJson(level, d))
-		{
-			SongUtils::SongInfo::set_currentInfoDatValid(true);
-			RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
-			RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
-			INFO("Info.dat read successful!");
-		}
-		else
-		{
-			SongUtils::SongInfo::set_currentInfoDatValid(false);
-			RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
-			RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
-
-			INFO("Info.dat read not successful!");
-		}
-
-		// if the level ID contains `WIP` then the song is a WIP song 
-		std::string levelIDString = level->get_levelID();
-		bool isWIP = levelIDString.find("WIP") != std::string::npos;
-		SongUtils::SongInfo::set_currentlySelectedIsWIP(isWIP);
-	}
-	else
-	{
-		SongUtils::SongInfo::set_currentInfoDatValid(false);
-		RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
-		RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
-	}
-
-	LevelCollectionNavigationController_HandleLevelCollectionViewControllerDidSelectLevel(self, viewController, level);
-}
-
-
-
 extern "C" void setup(ModInfo& info)
 {
 	info.id = ID;
