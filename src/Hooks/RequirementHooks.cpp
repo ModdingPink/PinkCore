@@ -22,7 +22,7 @@
 #include "UnityEngine/UI/Button.hpp"
 #include "logging.hpp"
 
-void RequirementsAPI(GlobalNamespace::IPreviewBeatmapLevel* level) {
+void PreHandleRequirements(GlobalNamespace::IPreviewBeatmapLevel* level) {
     if (!level)
     {
         return;
@@ -75,7 +75,7 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::S
 	SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(serializedName);
 	SongUtils::SongInfo::set_lastPhysicallySelectedDifficulty(SongUtils::GetDiffFromNumber(self->beatmapDifficultySegmentedControlController->selectedDifficulty));
 
-    RequirementsAPI(reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel *>(self->level));
+    PreHandleRequirements(reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel *>(self->level));
 	RequirementUtils::HandleRequirementDetails();
 	ContributorUtils::FetchListOfContributors();
 
