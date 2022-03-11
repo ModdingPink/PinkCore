@@ -49,11 +49,10 @@ namespace RequirementUtils
 	//void HandleRequirementDetails(StandardLevelDetailView* detailView)
 	void HandleRequirementDetails()
 	{
-		if (installedRequirements.size() == 0) FindInstalledRequirements();
+		if (installedRequirements.empty()) FindInstalledRequirements();
 		currentRequirements.clear();
 		currentSuggestions.clear();
-		
-		bool hasNoodle = false;
+
 
 		// if custom
 		if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && SongUtils::SongInfo::get_currentInfoDatValid())
@@ -79,17 +78,6 @@ namespace RequirementUtils
 					INFO("Extracting Suggestions");
 					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, currentSuggestions);
 				}
-
-				for (auto req : currentRequirements)
-				{
-					INFO("ReqName: %s", req.c_str());
-
-					if (req.find("Noodle Extensions") != std::string::npos)
-					{
-						hasNoodle = true;
-						break;
-					}
-				}
 			}
 			else
 			{
@@ -97,9 +85,6 @@ namespace RequirementUtils
 				INFO("There was no custom data!");
 			}
 		}
-
-		SongUtils::SongInfo::set_currentlySelectedIsNoodle(hasNoodle);
-
 
 	}
 
@@ -119,7 +104,7 @@ namespace RequirementUtils
 
 	bool IsAnythingNeeded()
 	{
-		return currentRequirements.size() || currentSuggestions.size();
+		return !currentRequirements.empty() || !currentSuggestions.empty();
 	}
 
 	bool IsAnythingMissing()
@@ -247,16 +232,10 @@ namespace RequirementUtils
                         bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
                         bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
 			INFO("interactable: %d, custom: %d, wip: %d", interactable, isCustom, isWip);
-                        if (isCustom && isWip)
-			{
-				levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
-				levelViews[length - 1]->get_actionButton()->set_interactable(false);
-			}
-			else
-			{
-				levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
-				levelViews[length - 1]->get_actionButton()->set_interactable(interactable);
-			}
+            {
+                levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
+                levelViews[length - 1]->get_actionButton()->set_interactable(!(isCustom && isWip) && interactable);
+            }
 		}
 	}
 	namespace ExternalAPI
