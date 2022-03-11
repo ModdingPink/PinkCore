@@ -28,6 +28,7 @@ namespace PinkCore::UI
         requirementMissingSprite = VectorToSprite(std::vector<uint8_t>(_binary_RequirementMissing_png_start, _binary_RequirementMissing_png_end));
         suggestionFoundSprite = VectorToSprite(std::vector<uint8_t>(_binary_SuggestionFound_png_start, _binary_SuggestionFound_png_end));
         suggestionMissingSprite = VectorToSprite(std::vector<uint8_t>(_binary_SuggestionMissing_png_start, _binary_SuggestionMissing_png_end));
+        infoSprite = VectorToSprite(std::vector<uint8_t>(_binary_Info_png_start, _binary_Info_png_end));
         wipSprite = VectorToSprite(std::vector<uint8_t>(_binary_WIP_png_start, _binary_WIP_png_end));
     }
 
@@ -134,10 +135,16 @@ namespace PinkCore::UI
         auto tableCell = GetTableCell();
         auto& contributor = ContributorUtils::GetContributors()[idx];
 
-        tableCell->dyn__songNameText()->set_text(contributor.name);
-        tableCell->dyn__songAuthorText()->set_text(contributor.role);
-        tableCell->dyn__coverImage()->set_sprite(UIUtils::FileToSprite(SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath));
-
+        if (contributor.iconPath.empty()) {
+            tableCell->dyn__songNameText()->set_text(contributor.name);
+            tableCell->dyn__songAuthorText()->set_text(contributor.role);
+            tableCell->dyn__coverImage()->set_sprite(infoSprite);
+        } else {
+            tableCell->dyn__songNameText()->set_text(contributor.name);
+            tableCell->dyn__songAuthorText()->set_text(contributor.role);
+            tableCell->dyn__coverImage()->set_sprite(UIUtils::FileToSprite(SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath));
+        }
+        
         return tableCell;
     }
 
