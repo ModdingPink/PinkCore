@@ -28,8 +28,9 @@ MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDif
 	return BeatmapDifficultyMethods_Name(difficulty);
 }
 
-MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &GlobalNamespace::BeatmapDifficultySegmentedControlController::SetData, void, GlobalNamespace::BeatmapDifficultySegmentedControlController* self, ::ArrayW<GlobalNamespace::IDifficultyBeatmap*> difficultyBeatmaps, GlobalNamespace::BeatmapDifficulty selectedDifficulty)
+MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &GlobalNamespace::BeatmapDifficultySegmentedControlController::SetData, void, GlobalNamespace::BeatmapDifficultySegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<GlobalNamespace::IDifficultyBeatmap*>* difficultyBeatmapsList, GlobalNamespace::BeatmapDifficulty selectedDifficulty)
 {
+	auto difficultyBeatmaps = ArrayW<GlobalNamespace::IDifficultyBeatmap*>(difficultyBeatmapsList);
 	SongUtils::SongInfo::set_lastPhysicallySelectedDifficulty(SongUtils::GetDiffFromNumber(selectedDifficulty));
 
 	if (SongUtils::SongInfo::get_currentlySelectedIsCustom()) {
@@ -40,5 +41,5 @@ MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &Globa
 			}
 		}
 	}
-	BeatmapDifficultySegmentedControlController_SetData(self, difficultyBeatmaps, selectedDifficulty);
+	BeatmapDifficultySegmentedControlController_SetData(self, difficultyBeatmapsList, selectedDifficulty);
 }
