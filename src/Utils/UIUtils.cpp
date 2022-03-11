@@ -220,7 +220,7 @@ namespace UIUtils
 
 			
 
-			modal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(55.0f, 70.0f), UnityEngine::Vector2(-15.0f, 0.0f), nullptr);
+			modal = QuestUI::BeatSaberUI::CreateModal(self->get_transform()->GetParent(), UnityEngine::Vector2(55.0f, 70.0f), UnityEngine::Vector2(60.0f, -15.0f), nullptr);
 			//UnityEngine::GameObject* container = QuestUI::BeatSaberUI::CreateScrollableModalContainer(modal);
 
 			
