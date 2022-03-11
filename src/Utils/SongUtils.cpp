@@ -47,7 +47,6 @@ namespace SongUtils
 	
 	bool currrentlySelectedIsCustom = false;
 	bool currrentlySelectedIsWIP = false;
-	bool currrentlySelectedIsNoodle = false;
 
 	LoadedInfoEvent& onLoadedInfo()
 	{
@@ -429,16 +428,6 @@ namespace SongUtils
 			currrentlySelectedIsWIP = val;
 		}
 		/*-------------------------------------------------*/
-
-		bool get_currentlySelectedIsNoodle()
-		{
-			return currrentlySelectedIsNoodle;
-		}
-
-		void set_currentlySelectedIsNoodle(bool val)
-		{
-			currrentlySelectedIsNoodle = val;
-		}
 
 		bool get_currentInfoDatValid()
 		{

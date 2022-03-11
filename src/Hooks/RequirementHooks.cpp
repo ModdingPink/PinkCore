@@ -15,10 +15,54 @@
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
+#include "GlobalNamespace/IBeatmapLevel.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSegmentedControlController.hpp"
 
 #include "UnityEngine/UI/Button.hpp"
+#include "logging.hpp"
+
+void PreHandleRequirements(GlobalNamespace::IPreviewBeatmapLevel* level) {
+    if (!level)
+    {
+        return;
+    }
+
+    bool isCustom = SongUtils::SongInfo::isCustom(level);
+    SongUtils::SongInfo::set_currentlySelectedIsCustom(isCustom);
+
+    if (isCustom)
+    {
+        // clear current info dat
+        auto& d = SongUtils::GetCurrentInfoDatPtr();
+        if (SongUtils::CustomData::GetInfoJson(level, d))
+        {
+            INFO("Info.dat read successful!");
+            SongUtils::SongInfo::set_currentInfoDatValid(true);
+            // Requirements and suggestions are called on RequirementUtils::HandleRequirementDetails();
+            // TODO: Move this over there
+        }
+        else
+        {
+            SongUtils::SongInfo::set_currentInfoDatValid(false);
+            RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
+            RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
+
+            INFO("Info.dat read not successful!");
+        }
+
+        // if the level ID contains `WIP` then the song is a WIP song
+        std::string levelIDString = level->get_levelID();
+        bool isWIP = levelIDString.find("WIP") != std::string::npos;
+        SongUtils::SongInfo::set_currentlySelectedIsWIP(isWIP);
+    }
+    else
+    {
+        SongUtils::SongInfo::set_currentInfoDatValid(false);
+        RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
+        RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
+    }
+}
 
 MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::StandardLevelDetailView::RefreshContent, void, GlobalNamespace::StandardLevelDetailView* self)
 {
@@ -31,6 +75,7 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::S
 	SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(serializedName);
 	SongUtils::SongInfo::set_lastPhysicallySelectedDifficulty(SongUtils::GetDiffFromNumber(self->beatmapDifficultySegmentedControlController->selectedDifficulty));
 
+    PreHandleRequirements(reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel *>(self->level));
 	RequirementUtils::HandleRequirementDetails();
 	ContributorUtils::FetchListOfContributors();
 
