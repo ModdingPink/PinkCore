@@ -18,6 +18,8 @@
 #include "GlobalNamespace/IBeatmapLevel.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSegmentedControlController.hpp"
+#include "GlobalNamespace/IBeatmapLevelData.hpp"
+#include "GlobalNamespace/BeatmapLevelDataExtensions.hpp"
 
 #include "UnityEngine/UI/Button.hpp"
 #include "logging.hpp"
@@ -82,6 +84,10 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::S
 	UIUtils::SetupOrUpdateRequirementsModal(self);
 
 	RequirementUtils::UpdatePlayButton();
+
+    if (self->dyn__level() != nullptr && self->dyn__level()->get_beatmapLevelData() != nullptr) {
+        self->dyn__beatmapDifficultySegmentedControlController()->SetData(GlobalNamespace::BeatmapLevelDataExtensions::GetDifficultyBeatmapSet(self->dyn__level()->get_beatmapLevelData(), self->dyn__beatmapCharacteristicSegmentedControlController()->get_selectedBeatmapCharacteristic())->get_difficultyBeatmaps(), self->dyn__beatmapDifficultySegmentedControlController()->get_selectedDifficulty());
+    }
 }
 
 /* HACK: Not sure if this should be gone but I have no real other choice here since this is removed (is what it does still being done ?)
