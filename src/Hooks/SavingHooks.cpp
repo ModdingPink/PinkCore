@@ -20,8 +20,8 @@ std::string GetAlternativeDataPath() {
     return *alternativeDataPath;
 }
 
-std::optional<std::string> ConvertFilePath(std::string dataDirectory, std::string path) {
-    if(((std::string) path).rfind((std::string) dataDirectory, 0) == 0) {
+std::optional<std::string> ConvertFilePath(const std::string& dataDirectory, const std::string& path) {
+    if(path.rfind(dataDirectory, 0) == 0) {
         auto trimmed = path.substr(dataDirectory.length());
         return GetAlternativeDataPath() + trimmed;
     }
