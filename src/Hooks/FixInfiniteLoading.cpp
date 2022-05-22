@@ -13,6 +13,8 @@
 #include "logging.hpp"
 
 
+using namespace GlobalNamespace;
+
 // Port of the ArcGap bug fix on PC 
 // Infinite loop caused by a bug introduced in BS 1.20+
 // CustomJSONData orig hooks/transpiles this method, so we work around it by using a PreFix hook
