@@ -93,6 +93,9 @@ namespace RequirementUtils
 		/// @brief removes from the list of play button disabling mod IDs 
 		/// @param id mod ID
 		void RemoveDisablingModId(std::string id);
+
+		/// @brief returns the currently installed requirements
+		std::set<std::string> GetInstalledRequirments();
 	}
 
 	/// @brief returns a reference to the internal found requirements callback

@@ -39,4 +39,9 @@ namespace PinkCore::RequirementAPI
 	{
 		RequirementUtils::ExternalAPI::RemoveDisablingModId(info.id);
 	}
+
+	std::set<std::string> GetInstalledRequirments() {
+		return RequirementUtils::ExternalAPI::GetInstalledRequirments();
+	}
+
 }

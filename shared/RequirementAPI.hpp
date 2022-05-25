@@ -41,6 +41,9 @@ namespace PinkCore::RequirementAPI
 	/// @brief disables the play button with your mod, allowing the player to play maps again
 	/// @param info your mod info, always pass the same modinfo to the method or we'll get weird behaviour
 	void EnablePlayButton(const ModInfo& info);
+
+	/// @brief returns the currently installed requirements
+	std::set<std::string> GetInstalledRequirments();
 }
 
 #undef pinkcore_id

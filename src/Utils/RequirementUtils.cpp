@@ -321,6 +321,10 @@ namespace RequirementUtils
 			}
 			UpdatePlayButton();
 		}
+
+		std::set<std::string> GetInstalledRequirments() {
+			return std::set<std::string>(installedRequirements.begin(), installedRequirements.end());
+		}
 	}
 
 	FoundRequirementsEvent& onFoundRequirements() {
