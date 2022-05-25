@@ -85,8 +85,8 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::S
 
 	RequirementUtils::UpdatePlayButton();
 
-    if (self->dyn__level() != nullptr && self->dyn__level()->get_beatmapLevelData() != nullptr) {
-        self->dyn__beatmapDifficultySegmentedControlController()->SetData(GlobalNamespace::BeatmapLevelDataExtensions::GetDifficultyBeatmapSet(self->dyn__level()->get_beatmapLevelData(), self->dyn__beatmapCharacteristicSegmentedControlController()->get_selectedBeatmapCharacteristic())->get_difficultyBeatmaps(), self->dyn__beatmapDifficultySegmentedControlController()->get_selectedDifficulty());
+    if (self->level != nullptr && self->level->get_beatmapLevelData() != nullptr) {
+        self->beatmapDifficultySegmentedControlController->SetData(GlobalNamespace::BeatmapLevelDataExtensions::GetDifficultyBeatmapSet(self->level->get_beatmapLevelData(), self->beatmapCharacteristicSegmentedControlController->get_selectedBeatmapCharacteristic())->get_difficultyBeatmaps(), self->beatmapDifficultySegmentedControlController->get_selectedDifficulty());
     }
 }
 

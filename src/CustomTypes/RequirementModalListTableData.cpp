@@ -43,13 +43,13 @@ namespace PinkCore::UI
             tableCell = Instantiate(songListTableCellInstance);
         }
 
-        tableCell->dyn__notOwned() = false;
+        tableCell->notOwned = false;
 
         tableCell->set_reuseIdentifier(reuseIdentifier);
         tableCell->set_interactable(false);
-        tableCell->dyn__songBpmText()->get_gameObject()->SetActive(false);
-        tableCell->dyn__songDurationText()->get_gameObject()->SetActive(false);
-        tableCell->dyn__favoritesBadgeImage()->get_gameObject()->SetActive(false);
+        tableCell->songBpmText->get_gameObject()->SetActive(false);
+        tableCell->songDurationText->get_gameObject()->SetActive(false);
+        tableCell->favoritesBadgeImage->get_gameObject()->SetActive(false);
         static auto BpmIcon = ConstString("BpmIcon");
         tableCell->get_transform()->Find(StringW(BpmIcon))->get_gameObject()->SetActive(false);
 
@@ -62,9 +62,9 @@ namespace PinkCore::UI
 
         static auto WIPLevel = ConstString("WIP Level");
         static auto WorkInProgress = ConstString("Work In Progress");
-        tableCell->dyn__songNameText()->set_text(WIPLevel);
-        tableCell->dyn__songAuthorText()->set_text(WorkInProgress);
-        tableCell->dyn__coverImage()->set_sprite(wipSprite);
+        tableCell->songNameText->set_text(WIPLevel);
+        tableCell->songAuthorText->set_text(WorkInProgress);
+        tableCell->coverImage->set_sprite(wipSprite);
         return tableCell;
     }
     
@@ -113,9 +113,9 @@ namespace PinkCore::UI
             }
         }
 
-        tableCell->dyn__songNameText()->set_text(requirementName);
-        tableCell->dyn__songAuthorText()->set_text(subText);
-        tableCell->dyn__coverImage()->set_sprite(sprite);
+        tableCell->songNameText->set_text(requirementName);
+        tableCell->songAuthorText->set_text(subText);
+        tableCell->coverImage->set_sprite(sprite);
 
         return tableCell;
     }
@@ -136,13 +136,13 @@ namespace PinkCore::UI
         auto& contributor = ContributorUtils::GetContributors()[idx];
 
         if (contributor.iconPath.empty()) {
-            tableCell->dyn__songNameText()->set_text(contributor.name);
-            tableCell->dyn__songAuthorText()->set_text(contributor.role);
-            tableCell->dyn__coverImage()->set_sprite(infoSprite);
+            tableCell->songNameText->set_text(contributor.name);
+            tableCell->songAuthorText->set_text(contributor.role);
+            tableCell->coverImage->set_sprite(infoSprite);
         } else {
-            tableCell->dyn__songNameText()->set_text(contributor.name);
-            tableCell->dyn__songAuthorText()->set_text(contributor.role);
-            tableCell->dyn__coverImage()->set_sprite(UIUtils::FileToSprite(SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath));
+            tableCell->songNameText->set_text(contributor.name);
+            tableCell->songAuthorText->set_text(contributor.role);
+            tableCell->coverImage->set_sprite(UIUtils::FileToSprite(SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath));
         }
         
         return tableCell;
