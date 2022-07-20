@@ -77,6 +77,7 @@ MAKE_AUTO_HOOK_MATCH(MainFlowCoordinator_DidActivate, &GlobalNamespace::MainFlow
 	{
 		auto controller = PinkCore::UI::NoticeBoard::get_instance();
 		self->providedRightScreenViewController = controller;
+		self->providedBottomScreenViewController = controller;
 		MainFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 		self->providedRightScreenViewController = controller;
 		//self->ProvideInitialViewControllers(self->mainMenuViewController, self->leftScreenViewController, controller, self->bottomScreenViewController, self->topScreenViewController);

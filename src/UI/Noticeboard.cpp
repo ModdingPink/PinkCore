@@ -136,7 +136,7 @@ namespace PinkCore::UI
 			else CreateTextLayout(container->get_transform(), NoticeBoardText::get_text(), boardLayout);
 		});
 
-		UIUtils::SwapButtonSprites(noticeBoardButton, VectorToSprite(std::vector<uint8_t>(_binary_Mango_png_start, _binary_Mango_png_end)), VectorToSprite(std::vector<uint8_t>(_binary_MangoActive_png_start, _binary_MangoActive_png_end)));
+		UIUtils::SwapButtonSprites(noticeBoardButton, VectorToSprite(std::vector<uint8_t>(_binary_NewsIcon_png_start, _binary_NewsIcon_png_end)), VectorToSprite(std::vector<uint8_t>(_binary_NewsIconActive_png_start, _binary_NewsIconActive_png_end)));
 
 		donationButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
 			if (state == BoardState::Donation) return;
