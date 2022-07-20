@@ -14,6 +14,8 @@ if ($useDebug.IsPresent) {
 
 & adb shell am force-stop com.beatgames.beatsaber
 & adb shell am start com.beatgames.beatsaber/com.unity3d.player.UnityPlayerActivity
+Start-Sleep -Seconds 1.0
+& adb shell am start com.beatgames.beatsaber/com.unity3d.player.UnityPlayerActivity
 if ($log.IsPresent) {
     & ./log.ps1
 }

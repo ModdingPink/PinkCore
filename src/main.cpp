@@ -52,5 +52,5 @@ extern "C" void load()
 
 	custom_types::Register::AutoRegister();
 
-	QuestUI::Register::RegisterModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({ID, VERSION});
+	QuestUI::Register::RegisterAllModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({ID, VERSION});
 }

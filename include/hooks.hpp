@@ -63,3 +63,16 @@ struct Hook_##name_ { \
 }; \
 AUTO_INSTALL_ORIG(name_) \
 retval Hook_##name_::hook_##name_(__VA_ARGS__)
+
+#define MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(name_, namespaze, klassName, mName, retval, ...) \
+struct Hook_##name_ { \
+    constexpr static const char* name() { return #name_; } \
+    static const MethodInfo* getInfo() { return ::il2cpp_utils::MethodTypeCheck<funcType>::find_unsafe(namespaze, klassName, mName, true); } \
+    using funcType = retval (*)(__VA_ARGS__); \
+    static funcType* trampoline() { return &name_; } \
+    static inline retval (*name_)(__VA_ARGS__) = nullptr; \
+    static funcType hook() { return &::Hooking::HookCatchWrapper<&hook_##name_, funcType>::wrapper; } \
+    static retval hook_##name_(__VA_ARGS__); \
+}; \
+AUTO_INSTALL_ORIG(name_) \
+retval Hook_##name_::hook_##name_(__VA_ARGS__)

@@ -4,7 +4,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "pwsh.exe ./build.ps1",
+            "command": "pwsh.exe ./copy.ps1",
             "group": {
                 "kind": "build",
                 "isDefault": true

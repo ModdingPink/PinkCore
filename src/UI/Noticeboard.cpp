@@ -6,6 +6,7 @@
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
 #include "VRUIControls/VRGraphicRaycaster.hpp"
 #include "UnityEngine/UI/Button.hpp"
@@ -48,7 +49,10 @@ namespace PinkCore::UI
 		// if this is the first time this viewcontroller was activated
 		if (firstActivation)
 		{
+			
+			//parentViewController->
 			INFO("NoticeBoard activated!");
+			
 			title = UIUtils::AddHeader(get_transform(), titles[state], Color(0.94f, 0.11f, 0.5f, 1.0f));
 			CreateSwitchingButtons();
 
@@ -56,7 +60,7 @@ namespace PinkCore::UI
 			ExternalComponents* components = container->GetComponent<ExternalComponents*>();
 			RectTransform* rect = components->Get<RectTransform*>();
 			rect->set_sizeDelta({0.0f, 0.0f});
-
+			rect->set_anchoredPosition({0.0f,3.0f});
 			// backgroundable for the text, gives it some borders
 			auto* backgroundable = container->GetComponent<Backgroundable*>();
 			if (!backgroundable)
@@ -70,6 +74,7 @@ namespace PinkCore::UI
 			layoutgroup->set_padding(offset);
 
 			CreateTextLayout(container->get_transform(), NoticeBoardText::get_text(), boardLayout);
+			ToggleVisibility();
 		}
 	}
 	
@@ -89,13 +94,14 @@ namespace PinkCore::UI
 
 	void NoticeBoard::CreateSwitchingButtons()
 	{
+		
 		GameObject* canvas = CreateCanvas();
 		auto* canvas_T = canvas->get_transform();
 
 		canvas_T->SetParent(get_transform(), true);
 		VerticalLayoutGroup* layout = CreateVerticalLayoutGroup(canvas_T);
 		HorizontalLayoutGroup* horizon = CreateHorizontalLayoutGroup(layout->get_transform());
-	   
+		
 		/*
 		// Adds a Background to the buttons, but I didn't like the look of it, but kept the code
 		auto* backgroundable = horizon->get_gameObject()->GetComponent<Backgroundable*>();
@@ -107,7 +113,7 @@ namespace PinkCore::UI
 		RectOffset* offset = RectOffset::New_ctor(2, 2, 2, 2);
 		horizon->set_padding(offset);
 		*/
-
+		
 		canvas_T->set_localPosition(Vector3::get_zero());
 		canvas_T->GetComponent<RectTransform*>()->set_anchoredPosition({-30.0f, 45.0f});
 
@@ -120,7 +126,7 @@ namespace PinkCore::UI
 
 		canvas_T->set_localScale(Vector3::get_one() * 0.25f);
 
-		Button* noticeBoardButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
+		noticeBoardButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
 			if (state == BoardState::Board) return;
 			state = BoardState::Board;
 			title->set_text(il2cpp_utils::newcsstr(titles[state]));
@@ -132,7 +138,7 @@ namespace PinkCore::UI
 
 		UIUtils::SwapButtonSprites(noticeBoardButton, VectorToSprite(std::vector<uint8_t>(_binary_Mango_png_start, _binary_Mango_png_end)), VectorToSprite(std::vector<uint8_t>(_binary_MangoActive_png_start, _binary_MangoActive_png_end)));
 
-		Button* donationButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
+		donationButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
 			if (state == BoardState::Donation) return;
 			state = BoardState::Donation;
 			title->set_text(il2cpp_utils::newcsstr(titles[state]));
@@ -146,11 +152,12 @@ namespace PinkCore::UI
 		
 		LayoutElement* layoutelem = horizon->get_gameObject()->AddComponent<LayoutElement*>();
 		layoutelem->set_preferredHeight(30.0f);
-		layoutelem->set_preferredWidth(90.0f);
+		layoutelem->set_preferredWidth(85.0f);
 	}
 
 	void NoticeBoard::CreateTextLayout(Transform* parent, const std::string& text, GameObject*& output)
 	{
+		
 		HorizontalLayoutGroup* horizon = CreateHorizontalLayoutGroup(parent);
 		VerticalLayoutGroup* layout = CreateVerticalLayoutGroup(horizon->get_transform());
 
@@ -166,9 +173,20 @@ namespace PinkCore::UI
 		layout->set_childForceExpandWidth(true);
 		horizon->set_childControlWidth(true);
 		horizon->set_childForceExpandWidth(true);
-		noticelayout->set_preferredWidth(80.f);
+		noticelayout->set_preferredWidth(85.f);
 
 		output = horizon->get_gameObject();
+	}
+
+	void NoticeBoard::ToggleVisibility()
+	{
+		if(container == nullptr) return;
+		bool activity = !container->get_active();
+		container->SetActive(activity);
+		title->get_transform()->get_parent()->get_gameObject()->SetActive(activity);
+		noticeBoardButton->get_gameObject()->SetActive(activity);
+		donationButton->get_gameObject()->SetActive(activity);
+
 	}
 
 }
