@@ -18,6 +18,7 @@
 #include "UnityEngine/UI/Button.hpp"
 #include "UnityEngine/Events/UnityAction.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "custom-types/shared/delegate.hpp"
 
 #include "Utils/NoticeBoardText.hpp"
 #include "Utils/DonationText.hpp"
@@ -26,7 +27,7 @@
 
 bool firstWarmup = true;
 bool setIcons = false;
-#define MakeDelegate(DelegateType, varName) (il2cpp_utils::MakeDelegate<DelegateType>(classof(DelegateType), varName))
+#define MakeDelegate(DelegateType, varName) (custom_types::MakeDelegate<DelegateType>(classof(DelegateType), varName))
 
 MAKE_AUTO_HOOK_MATCH(MainMenuViewController_DidActivate, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 {
