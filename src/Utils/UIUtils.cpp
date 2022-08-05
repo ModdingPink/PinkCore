@@ -35,6 +35,7 @@
 
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "GlobalNamespace/AnnotatedBeatmapLevelCollectionsViewController.hpp"
+#include "GlobalNamespace/ColorSchemeView.hpp"
 //#include "CustomTypes/RequirementHandler.hpp"
 //#include "CustomTypes/ContributorHandler.hpp"
 #include "CustomTypes/RequirementModalListTableData.hpp"
@@ -45,6 +46,7 @@
 
 #include "questui/shared/ArrayUtil.hpp"
 #include "System/Action.hpp"
+#include "custom-types/shared/delegate.hpp"
 
 #include "TMPro/TextMeshProUGUI.hpp"
 
@@ -69,6 +71,7 @@ namespace UIUtils
 {
 	HMUI::ModalView* requirementsModal;
 	HMUI::ModalView* coloursModal;
+	GlobalNamespace::ColorSchemeView* colourSchemeView;
 
 	TextMeshProUGUI* AddHeader(Transform* parent, std::string title)
 	{
@@ -194,6 +197,46 @@ namespace UIUtils
 
 	static ConstString contentName("Content");
 
+	void SetupOrShowColorsModal(Transform* parent)
+	{
+		static ConstString modalName("PinkCoreColoursModal");
+		auto coloursModalTranform = parent->Find(modalName);
+
+		if (!coloursModalTranform) {
+			INFO("Colours modal did not exist, making it");
+			coloursModal = CreateModal(parent, {85, 25}, {0, 0}, nullptr);
+			coloursModal->set_name(modalName);
+
+			auto layout = CreateVerticalLayoutGroup(coloursModal);
+			layout->GetComponent<LayoutElement*>()->set_preferredWidth(80);
+			// replace with functionality
+			bool coloursEnabled = true;
+			auto colourToggle = CreateToggle(layout, "Use Custom Song Colors", coloursEnabled, [](bool enabled) {
+				// set colors enabled or not
+			});
+			
+			AddHoverHint(colourToggle, "Allow Custom Songs to override note/light colors");
+			
+			auto horizontal = CreateHorizontalLayoutGroup(layout);
+			horizontal->set_spacing(-24);
+
+			CreateText(horizontal, "Selected Custom Song's Colors");
+
+			colourSchemeView = Object::Instantiate(Resources::FindObjectsOfTypeAll<GlobalNamespace::ColorSchemeView*>().Last(), horizontal->get_transform(), false);
+
+			// doesn't work? basically copied from songcore though
+			AddHoverHint(colourSchemeView->saberAColorImage, "Left Saber Color");
+			AddHoverHint(colourSchemeView->saberBColorImage, "Right Saber Color");
+			AddHoverHint(colourSchemeView->environment0ColorImage, "Primary Light Color");
+			AddHoverHint(colourSchemeView->environment1ColorImage, "Secondary Light Color");
+			AddHoverHint(colourSchemeView->obstacleColorImage, "Wall Color");
+			AddHoverHint(colourSchemeView->environmentColor0BoostImage, "Primary Light Boost Color");
+			AddHoverHint(colourSchemeView->environmentColor1BoostImage, "Secondary Light Boost Color");
+		}
+
+		coloursModal->Show(true, false, nullptr);
+		// colourSchemeView->SetColors(); replace with custom song colors
+	}
 
 	void SetupOrUpdateRequirementsModal(GlobalNamespace::StandardLevelDetailView* self)
 	{
@@ -227,7 +270,7 @@ namespace UIUtils
 			VerticalLayoutGroup* layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(self->get_transform());
 			HorizontalLayoutGroup* horizon = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(layout->get_transform());
 
-			auto button = BeatSaberUI::CreateUIButton(horizon->get_transform(), "?", "PlayButton", {0, 0}, {9.0f, 7.2f}, [&] {
+			auto button = BeatSaberUI::CreateUIButton(horizon->get_transform(), "?", "PlayButton", {0, 0}, {9.0f, 7.2f}, [] {
 				reinterpret_cast<UnityEngine::RectTransform*>(requirementsModal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-27.0f, -15.0f));
 				requirementsModal->Show(true, false, nullptr);
 			});
@@ -241,10 +284,16 @@ namespace UIUtils
 
 			layout->GetComponent<RectTransform*>()->set_anchoredPosition(pos);
 
-			requirementsModal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), [&](auto modal){  });
+			requirementsModal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), nullptr);
 		
-			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(requirementsModal->get_transform(), Vector2(0.0f, -32.25f), Vector2(55.0f, 63.5f), [&](int cell){
-				
+			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(requirementsModal->get_transform(), Vector2(0.0f, -32.25f), Vector2(55.0f, 63.5f), [self](int cell) {
+				// add condition for showing
+				if (true) {
+					// modals seem to be buggy when stacked
+					requirementsModal->Hide(true, custom_types::MakeDelegate<System::Action*>((std::function<void()>) [self] {
+						SetupOrShowColorsModal(self->get_transform());
+					}));
+				}
 			});
 			//
 		
