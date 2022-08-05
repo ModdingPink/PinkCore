@@ -19,7 +19,8 @@
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "HMUI/ImageView.hpp"
-
+#include "HMUI/SelectableCell.hpp"
+#include "System/Action_3.hpp"
 #include "hooks.hpp"
 #include "logging.hpp"
 
@@ -47,10 +48,17 @@ extern "C" void load()
 	// if config load fails, save the config so it will work next time
 	if (!LoadConfig())
 		SaveConfig();
-  
+
+	StringW test = "a";
+    std::function<void(HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*)> fun = [test](HMUI::SelectableCell* a, HMUI::SelectableCell::TransitionType b, Il2CppObject* c){
+         
+	};
+	auto delegate = il2cpp_utils::MakeDelegate<System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*>(classof(System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*), fun);        
+
+
 	Hooks::InstallHooks(logger);
 
 	custom_types::Register::AutoRegister();
 
-	QuestUI::Register::RegisterAllModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({ID, VERSION});
+	QuestUI::Register::RegisterModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({ID, VERSION});
 }

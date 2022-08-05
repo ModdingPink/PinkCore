@@ -3,12 +3,16 @@
 #include "Utils/SongUtils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
-#include "GlobalNamespace/CustomPreviewBeatmapLevel.hpp"
+#include "GlobalNamespace/CustomBeatmapLevel.hpp"
+#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/ColorScheme.hpp"
+#include "GlobalNamespace/FilteredBeatmapLevel.hpp"
 #include "logging.hpp"
+#include "config.hpp"
 
 #include "songloader/shared/CustomTypes/CustomLevelInfoSaveData.hpp"
-
+#include "sombrero/shared/FastColor.hpp"
+#include "Utils/UIUtils.hpp"
 #include <fstream>
 static std::string toLower(std::string in)
 {
@@ -116,24 +120,11 @@ namespace SongUtils
 		else return GlobalNamespace::BeatmapDifficulty::ExpertPlus;
 		return stringToDiff[difficulty];		
 		*/
-		if (difficulty == u"Easy") {
-			return GlobalNamespace::BeatmapDifficulty::Easy;
-		}
-		else if (difficulty == u"Normal") {
-			return GlobalNamespace::BeatmapDifficulty::Normal;
-		}
-		else if (difficulty == u"Hard") {
-			return GlobalNamespace::BeatmapDifficulty::Hard;
-		}
-		else if (difficulty == u"Expert") {
-			return GlobalNamespace::BeatmapDifficulty::Expert;
-		}
-		else if (difficulty == u"ExpertPlus") {
-			return GlobalNamespace::BeatmapDifficulty::ExpertPlus;
-		}
-		else {
-			return GlobalNamespace::BeatmapDifficulty::ExpertPlus;
-		}
+		if (difficulty == u"Easy") return GlobalNamespace::BeatmapDifficulty::Easy;
+		else if (difficulty == u"Normal") return GlobalNamespace::BeatmapDifficulty::Normal;
+		else if (difficulty == u"Hard") return GlobalNamespace::BeatmapDifficulty::Hard;
+		else if (difficulty == u"Expert") return GlobalNamespace::BeatmapDifficulty::Expert;
+		else return GlobalNamespace::BeatmapDifficulty::ExpertPlus;
 	}
 
 	namespace CustomData
@@ -145,8 +136,12 @@ namespace SongUtils
 			if (!level || !SongInfo::isCustom(level)) return false;
 
 			// cast to custom level
-			GlobalNamespace::CustomPreviewBeatmapLevel* customLevel = reinterpret_cast<GlobalNamespace::CustomPreviewBeatmapLevel*>(level);
-
+			GlobalNamespace::CustomBeatmapLevel* customLevel;
+			if (auto filter = il2cpp_utils::try_cast<GlobalNamespace::FilteredBeatmapLevel>(level)) {
+				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomBeatmapLevel>(filter.value()->beatmapLevel);
+			} else {
+				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomBeatmapLevel>(level);
+			}			
 			std::u16string songPath(customLevel->get_customLevelPath());
 			currentLevelPath = songPath;
 
@@ -275,134 +270,155 @@ namespace SongUtils
 			return hasCustomData;
 		}
 
-		GlobalNamespace::ColorScheme* getCustomSongColour(GlobalNamespace::ColorScheme* defaultColorScheme, bool hasOverride) {
 
+
+		void GetCustomCharacteristicItems(StringW characteristic, UnityEngine::Sprite*& sprite, StringW& hoverText){
 			auto& d = SongUtils::GetCurrentInfoDat();
-			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
-			if (SongUtils::CustomData::GetCurrentCustomData(d, customData)) {
+			bool hasCustomData = false;
 
-				bool mapHasCustomColours = false;
-
-				Il2CppString* colorSchemeId = il2cpp_utils::newcsstr("PinkCoreMapColorScheme");
-				Il2CppString* colorSchemeNameLocalizationKey = il2cpp_utils::newcsstr("PinkCore Map Color Scheme");
-				bool useNonLocalizedName = true;
-				Il2CppString* nonLocalizedName = colorSchemeNameLocalizationKey;
-				bool isEditable = false;
-				UnityEngine::Color colorLeft = defaultColorScheme->saberAColor;
-				UnityEngine::Color colorRight = defaultColorScheme->saberBColor;
-				UnityEngine::Color envColorLeft = defaultColorScheme->environmentColor0;
-				UnityEngine::Color envColorRight = defaultColorScheme->environmentColor1;
-				bool supportsEnvironmentColorBoost = defaultColorScheme->supportsEnvironmentColorBoost;
-				UnityEngine::Color envColorLeftBoost = defaultColorScheme->environmentColor0Boost;
-				UnityEngine::Color envColorRightBoost = defaultColorScheme->environmentColor1Boost;
-				UnityEngine::Color obstacleColor = defaultColorScheme->obstaclesColor;
-
-				bool customBoostColours = false;
-
-				auto colorLeftItr = customData.FindMember(u"_colorLeft");
-				if (colorLeftItr != customData.MemberEnd()) {
-					colorLeft = { colorLeftItr->value[u"r"].GetFloat() , colorLeftItr->value[u"g"].GetFloat() , colorLeftItr->value[u"b"].GetFloat(), 1.0f };
-					mapHasCustomColours = true;
-				}
-
-				auto colorRightItr = customData.FindMember(u"_colorRight");
-				if (colorRightItr != customData.MemberEnd()) {
-					colorRight = { colorRightItr->value[u"r"].GetFloat() , colorRightItr->value[u"g"].GetFloat() , colorRightItr->value[u"b"].GetFloat(), 1.0f };
-					mapHasCustomColours = true;
-				}
-
-				auto envColorLeftItr = customData.FindMember(u"_envColorLeft");
-				if (envColorLeftItr != customData.MemberEnd()) {
-					envColorLeft = { envColorLeftItr->value[u"r"].GetFloat() , envColorLeftItr->value[u"g"].GetFloat() , envColorLeftItr->value[u"b"].GetFloat(), 1.0f };
-					mapHasCustomColours = true;
-				}
-
-				auto envColorRightItr = customData.FindMember(u"_envColorRight");
-				if (envColorRightItr != customData.MemberEnd()) {
-					envColorRight = { envColorRightItr->value[u"r"].GetFloat() , envColorRightItr->value[u"g"].GetFloat() , envColorRightItr->value[u"b"].GetFloat(), 1.0f };
-					mapHasCustomColours = true;
-				}
-
-				auto envColorLeftBoostItr = customData.FindMember(u"_envColorLeftBoost");
-				if (envColorLeftBoostItr != customData.MemberEnd()) {
-					envColorLeftBoost = { envColorLeftBoostItr->value[u"r"].GetFloat() , envColorLeftBoostItr->value[u"g"].GetFloat() , envColorLeftBoostItr->value[u"b"].GetFloat(), 1.0f };
-					mapHasCustomColours = true;
-					customBoostColours = true;
-				}
-
-				auto envColorRightBoostItr = customData.FindMember(u"_envColorRightBoost");
-				if (envColorRightBoostItr != customData.MemberEnd()) {
-					envColorRightBoost = { envColorRightBoostItr->value[u"r"].GetFloat() , envColorRightBoostItr->value[u"g"].GetFloat() , envColorRightBoostItr->value[u"b"].GetFloat(), 1.0f };
-					mapHasCustomColours = true;
-					customBoostColours = true;
-				}
-
-				auto obstacleColorItr = customData.FindMember(u"_obstacleColor");
-				if (obstacleColorItr != customData.MemberEnd()) {
-					obstacleColor = { obstacleColorItr->value[u"r"].GetFloat() , obstacleColorItr->value[u"g"].GetFloat() , obstacleColorItr->value[u"b"].GetFloat(), 1.0f };
-					mapHasCustomColours = true;
-				}
-
-				if (mapHasCustomColours) {
-					//if an override is not set then this is null
-					if (hasOverride) {
-						colorLeft = defaultColorScheme->saberAColor;
-						colorRight = defaultColorScheme->saberBColor;
+			auto difficultyBeatmapSetsitr = d.FindMember(u"_difficultyBeatmapSets");
+			// if we find the sets iterator
+			if (difficultyBeatmapSetsitr != d.MemberEnd())
+			{
+				auto setArr = difficultyBeatmapSetsitr->value.GetArray();
+				for (auto& beatmapCharacteristicItr : setArr)
+				{
+					std::u16string beatmapCharacteristicName = beatmapCharacteristicItr.FindMember(u"_beatmapCharacteristicName")->value.GetString();
+					INFO("Found CharacteristicName: %s", (char*)beatmapCharacteristicName.c_str());
+					// if the last selected beatmap characteristic is this specific one
+					if (beatmapCharacteristicName == characteristic)
+					{
+						auto customDataItr = beatmapCharacteristicItr.GetObject().FindMember(u"_customData");
+						if(customDataItr != beatmapCharacteristicItr.MemberEnd()){		
+							auto characteristicLabel = customDataItr->value.GetObject().FindMember(u"_characteristicLabel");
+							auto characteristicIconFilePath = customDataItr->value.FindMember(u"_characteristicIconImageFilename");
+							if(characteristicLabel != customDataItr->value.GetObject().MemberEnd()){
+								hoverText = characteristicLabel->value.GetString();
+							}
+							if(characteristicIconFilePath != customDataItr->value.GetObject().MemberEnd()){
+								StringW path = currentLevelPath;
+								path = path + "/" + characteristicIconFilePath->value.GetString();
+								sprite = UIUtils::FileToSprite(path);
+							}
+						}
 					}
-
-					if (!customBoostColours && !supportsEnvironmentColorBoost) {
-						envColorLeftBoost = envColorLeft;
-						envColorRightBoost = envColorRight;
-					}
-
-					auto newColorScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*>(colorSchemeId, colorSchemeNameLocalizationKey, useNonLocalizedName, nonLocalizedName, isEditable, colorLeft, colorRight, envColorLeft, envColorRight, supportsEnvironmentColorBoost, envColorLeftBoost, envColorRightBoost, obstacleColor);
-
-					return newColorScheme;
-
 				}
-				else {
-					return nullptr;
+			}
+		}
+
+	void SetCharacteristicAndDifficulty(GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic){
+		auto serializedNameCS = beatmapCharacteristic ? beatmapCharacteristic->get_serializedName() : nullptr;
+		std::u16string serializedName(serializedNameCS ? serializedNameCS : u"");
+		SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(serializedName);
+		SongUtils::SongInfo::set_lastPhysicallySelectedDifficulty(SongUtils::GetDiffFromNumber(beatmapDifficulty));
+	}
+
+	bool SetColourFromIteratorString(const char16_t *name, Sombrero::FastColor& mapColour, CustomJSONData::ValueUTF16& customData){
+		auto colorItr = customData.GetObject().FindMember(name);
+		if (colorItr != customData.MemberEnd()) {
+			if(colorItr->value.FindMember(u"r") == colorItr->value.MemberEnd()) return false;
+			if(colorItr->value.FindMember(u"g") == colorItr->value.MemberEnd()) return false;
+			if(colorItr->value.FindMember(u"b") == colorItr->value.MemberEnd()) return false;
+			mapColour = { colorItr->value[u"r"].GetFloat() , colorItr->value[u"g"].GetFloat() , colorItr->value[u"b"].GetFloat(), 1.0f };
+			return true;
+		}
+		return false;
+	}
+
+	GlobalNamespace::ColorScheme* GetCustomSongColour(GlobalNamespace::ColorScheme* defaultColorScheme, bool hasOverride) {
+
+		auto& d = SongUtils::GetCurrentInfoDat();
+		rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
+		if (SongUtils::CustomData::GetCurrentCustomData(d, customData)) {
+			
+			Sombrero::FastColor colorLeft = defaultColorScheme->saberAColor;
+			Sombrero::FastColor colorRight = defaultColorScheme->saberBColor;
+			Sombrero::FastColor envColorLeft = defaultColorScheme->environmentColor0;
+			Sombrero::FastColor envColorRight = defaultColorScheme->environmentColor1;
+			Sombrero::FastColor envColorLeftBoost = defaultColorScheme->environmentColor0Boost;
+			Sombrero::FastColor envColorRightBoost = defaultColorScheme->environmentColor1Boost;
+			Sombrero::FastColor obstacleColor = defaultColorScheme->obstaclesColor;
+			
+			bool hasBoostColours = false;
+			bool hasSaberColours = false;
+			bool hasLightColours = false;
+			bool hasObstacleColours = false;
+			if(SetColourFromIteratorString(u"_colorLeft", colorLeft, customData)) hasSaberColours = true;
+			if(SetColourFromIteratorString(u"_colorRight", colorRight, customData)) hasSaberColours = true;
+			if(SetColourFromIteratorString(u"_envColorLeft", envColorLeft, customData)) hasLightColours = true;
+			if(SetColourFromIteratorString(u"_envColorRight", envColorRight, customData)) hasLightColours = true;
+			if(SetColourFromIteratorString(u"_envColorLeftBoost", envColorLeftBoost, customData)) hasBoostColours = true; 
+			if(SetColourFromIteratorString(u"_envColorRightBoost", envColorRightBoost, customData)) hasBoostColours = true; 
+			if(SetColourFromIteratorString(u"_obstacleColor", obstacleColor, customData)) hasObstacleColours = true;
+
+			if (hasSaberColours || hasLightColours || hasBoostColours || hasObstacleColours) {
+				if(hasSaberColours && !hasLightColours){
+					envColorLeft = colorLeft;
+					envColorRight = colorRight;
+					hasLightColours = true;
 				}
+				if(hasLightColours && !hasBoostColours){
+					envColorLeftBoost = envColorLeft;
+					envColorRightBoost = envColorRight;
+				}
+
+				if(config.forceNoteColours && hasOverride){
+					colorLeft = defaultColorScheme->saberAColor;
+					colorRight = defaultColorScheme->saberBColor;
+				}
+				StringW colorSchemeId = "PinkCoreMapColorScheme";
+				StringW colorSchemeNameLocalizationKey = "PinkCore Map Color Scheme";
+				auto newColorScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false, colorLeft, colorRight, envColorLeft, envColorRight, defaultColorScheme->supportsEnvironmentColorBoost, envColorLeftBoost, envColorRightBoost, obstacleColor);
+
+
+				return newColorScheme;
+
 			}
 			else {
 				return nullptr;
 			}
 		}
-
-		void ExtractRequirements(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& requirementsArray, std::vector<std::string>& output)
-		{
-			auto actualArray = requirementsArray.GetArray();
-			for (auto& requirement : actualArray)
-			{
-				std::string requirementName = to_utf8(requirement.GetString());
-				std::string requirementNameWithoutSpaces = removeSpaces(requirementName);
-
-				auto it = std::find(output.begin(), output.end(), requirementName);
-
-				if (it == output.end())
-					output.push_back(requirementName);
-			}
-
-			std::sort(output.begin(), output.end());
+		else {
+			return nullptr;
 		}
 	}
+
+	void ExtractRequirements(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& requirementsArray, std::vector<std::string>& output)
+	{
+		auto actualArray = requirementsArray.GetArray();
+		for (auto& requirement : actualArray)
+		{
+			std::string requirementName = to_utf8(requirement.GetString());
+			std::string requirementNameWithoutSpaces = removeSpaces(requirementName);
+
+			auto it = std::find(output.begin(), output.end(), requirementName);
+
+			if (it == output.end())
+				output.push_back(requirementName);
+		}
+
+		std::sort(output.begin(), output.end());
+	}
+}
 
 	namespace SongInfo
 	{
 		bool isCustom(GlobalNamespace::IPreviewBeatmapLevel* level)
 		{
 			if (!level) return false;
-			return il2cpp_functions::class_is_assignable_from(classof(GlobalNamespace::CustomPreviewBeatmapLevel*), il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(level)));
+			//had to resort to the code below again, multi for some reason shits itself here
+			//return il2cpp_functions::class_is_assignable_from(classof(GlobalNamespace::CustomPreviewBeatmapLevel*), il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(level)));
 			// the above check should suffice, but this code will remain as backup
-			/*
-			Il2CppString* levelidCS = level->get_levelID();
-			static Il2CppString* custom_level_ = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("custom_level_");
-			// does level ID contain custom_level_ ?
-			if (levelidCS->Contains(custom_level_)) return true;
-			// fallback to _ on pos 45
-			else if (static_cast<char>(levelidCS->get_Chars(45)) == '_') return true;
+			
+
+			//the above did not suffice.
+			//broke in multi
+			//now the RSL makes this consistent, resorting back to this
+			StringW levelidCS = level->get_levelID();
+			if (levelidCS->Contains("custom_level_")) return true;
+
 			return false;
-			*/
+			
 		}
 
 		/*-------------------------------------------------*/
@@ -413,6 +429,18 @@ namespace SongUtils
 		}
 
 		void set_currentlySelectedIsCustom(bool val)
+		{
+			currrentlySelectedIsCustom = val;
+		}
+		/*-------------------------------------------------*/
+
+
+		bool get_currentlySelectedHasColours()
+		{
+			return currrentlySelectedIsCustom;
+		}
+
+		void set_currentlySelectedHasColours(bool val)
 		{
 			currrentlySelectedIsCustom = val;
 		}

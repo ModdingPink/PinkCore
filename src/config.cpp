@@ -29,6 +29,7 @@ void SaveConfig()
 	
 	SAVE(enableExtraSongDetails);
 	SAVE(enableCustomSongColours);
+	SAVE(forceNoteColours);
 	SAVE(enableCustomDiffNames);
 	SAVE(enableBurnMarks);
 	SAVE(openToCustomLevels);
@@ -46,6 +47,7 @@ bool LoadConfig()
 	LOAD(enableExtraSongDetails, GetBool());
 	LOAD(enableCustomSongColours, GetBool());
 	LOAD(enableCustomDiffNames, GetBool());
+	LOAD(forceNoteColours, GetBool());
 	LOAD(enableBurnMarks, GetBool());
 	LOAD(openToCustomLevels, GetBool());
 

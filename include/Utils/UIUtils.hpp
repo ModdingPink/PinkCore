@@ -2,28 +2,17 @@
 
 #include "UnityEngine/Color.hpp"
 #include "UnityEngine/Vector2.hpp"
+#include "GlobalNamespace/StandardLevelDetailView.hpp"
+#include "GlobalNamespace/LevelListTableCell.hpp"
+#include "TMPro/TextMeshProUGUI.hpp"
+#include "HMUI/ViewController.hpp"
+#include "HMUI/TitleViewController.hpp"
+#include "UnityEngine/Transform.hpp"
+#include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/Sprite.hpp"
+#include "UnityEngine/UI/Button.hpp"
 #include <string>
 
-namespace TMPro {
-	class TextMeshProUGUI;
-}
-namespace UnityEngine {
-	class Transform;
-	class GameObject;
-	class Sprite;
-	namespace UI {
-		class Button;
-	}
-}
-
-namespace HMUI {
-	class ViewController;
-	class TitleViewController;
-}
-
-namespace GlobalNamespace {
-	class StandardLevelDetailView;
-}
 
 namespace UIUtils
 {
@@ -89,4 +78,9 @@ namespace UIUtils
 
 	/// @brief loads sprite at given u16 path
 	UnityEngine::Sprite* FileToSprite(std::u16string_view path); 
+
+	//static auto WIPLevelString = ConstString("WIP Level");
+    //static auto WorkInProgressString = ConstString("Please Play in Practice Mode");
+    //static auto colourAvailableString = ConstString("Custom Colours Available");
+    //static auto previewColourString = ConstString("Click here to preview & enable them.");
 }

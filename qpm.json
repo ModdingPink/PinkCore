@@ -72,6 +72,11 @@
       "additionalData": {
         "private": true
       }
+    },
+    {
+      "id": "sombrero",
+      "versionRange": "^0.1.33",
+      "additionalData": {}
     }
   ],
   "additionalData": {}

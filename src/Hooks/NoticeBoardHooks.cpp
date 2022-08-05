@@ -22,6 +22,7 @@
 #include "Utils/NoticeBoardText.hpp"
 #include "Utils/DonationText.hpp"
 #include "Polyglot/Localization.hpp"
+#include "questui/shared/BeatSaberUI.hpp"
 
 bool firstWarmup = true;
 bool setIcons = false;

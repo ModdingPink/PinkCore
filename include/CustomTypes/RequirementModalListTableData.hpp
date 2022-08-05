@@ -17,6 +17,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(PinkCore::UI, RequirementModalListTableData, Un
         DECLARE_INSTANCE_FIELD(StringW, reuseIdentifier);
         DECLARE_INSTANCE_FIELD(float, cellSize);
         DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, wipSprite);
+        DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, coloursSprite);
         DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, requirementFoundSprite);
         DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, requirementMissingSprite);
         DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, suggestionFoundSprite);
@@ -33,6 +34,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(PinkCore::UI, RequirementModalListTableData, Un
     private:
         GlobalNamespace::LevelListTableCell* GetTableCell();
         GlobalNamespace::LevelListTableCell* GetWipCell();
+        GlobalNamespace::LevelListTableCell* GetCustomColoursCell();
         GlobalNamespace::LevelListTableCell* GetRequirementCell(int idx);
         GlobalNamespace::LevelListTableCell* GetSuggestionCell(int idx);
         GlobalNamespace::LevelListTableCell* GetContributorCell(int idx);

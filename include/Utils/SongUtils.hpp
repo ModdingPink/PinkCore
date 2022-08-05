@@ -7,6 +7,7 @@
 #include "beatsaber-hook/shared/utils/typedefs-wrappers.hpp"
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/ColorScheme.hpp"
+#include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 
 namespace SongUtils
 {
@@ -62,8 +63,10 @@ namespace SongUtils
 		/// @param output the output to put the requirements into
 		void ExtractRequirements(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& requirementsArray, std::vector<std::string>& output);
 
-		GlobalNamespace::ColorScheme* getCustomSongColour(GlobalNamespace::ColorScheme* defaultColorScheme, bool hasOverride);
+		GlobalNamespace::ColorScheme* GetCustomSongColour(GlobalNamespace::ColorScheme* defaultColorScheme, bool hasOverride);
 
+		void GetCustomCharacteristicItems(StringW characteristic, UnityEngine::Sprite*& sprite, StringW& hoverText);
+		void SetCharacteristicAndDifficulty(GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic);
 	}
 
 	namespace SongInfo
@@ -88,6 +91,14 @@ namespace SongUtils
 
 		/// @brief setter for whether the current song is WIP
 		void set_currentlySelectedIsWIP(bool val);
+		/*--------------------------------------------------------------*/	
+
+		/// @brief getter for whether the current song has custom colours
+		/// @return true for if the level has custom colorus
+		bool get_currentlySelectedHasColours();
+
+		/// @brief setter for whether the current song has custom colours
+		void set_currentlySelectedHasColours(bool val);
 		/*--------------------------------------------------------------*/		
 		
 		/// @brief getter for whether the current song is a Noodle Extension Map

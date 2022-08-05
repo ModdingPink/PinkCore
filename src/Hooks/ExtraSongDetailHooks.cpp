@@ -15,9 +15,12 @@
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSegmentedControlController.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
-
+#include "UnityEngine/Transform.hpp"
 #include "UnityEngine/UI/Button.hpp"
-
+#include "UnityEngine/Vector3.hpp"
+#include "sombrero/shared/ColorUtils.hpp"
+#include "sombrero/shared/FastVector3.hpp"
+#include "UnityEngine/UI/Image.hpp"
 #include <cstdlib>
 #include <string>
 
@@ -30,6 +33,8 @@ std::u16string ReplaceAll(std::u16string str, const std::u16string& from, const 
 	return str;
 }
 
+const Sombrero::FastVector3 favouriteSize = Sombrero::FastVector3(1.4,1.4,1.4);
+
 MAKE_AUTO_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace::LevelListTableCell::SetDataFromLevelAsync, void, GlobalNamespace::LevelListTableCell* self, GlobalNamespace::IPreviewBeatmapLevel* level, bool isFavorite)
 {
 	LevelListTableCell_SetDataFromLevelAsync(self, level, isFavorite);
@@ -40,11 +45,10 @@ MAKE_AUTO_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace:
 	}
 
 	// Rounding BPM display for all maps, including official ones
-	std::string BPMString = std::to_string((int)level->get_beatsPerMinute());
-	StringW BPMIl2cppString(BPMString);
+	StringW BPMIl2cppString(std::to_string((int)level->get_beatsPerMinute()));
 	self->songBpmText->set_text(BPMIl2cppString);
-	
-	if (SongUtils::SongInfo::isCustom(level) && config.enableExtraSongDetails)
+	bool isCustom = SongUtils::SongInfo::isCustom(level);
+	if (isCustom && config.enableExtraSongDetails)
 	{
 		self->songAuthorText->set_richText(true);
 		if (!level->get_levelAuthorName()->IsNullOrWhiteSpace(level->get_levelAuthorName())) {
@@ -65,6 +69,12 @@ MAKE_AUTO_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace:
 			StringW newAuthorIl2cppString(u"<size=80%>" + songAuthorName + u"</size> <size=90%>[<color=#" + colourToUse + u">" + levelAuthorName + u"</color>]</size>");
 			self->songAuthorText->set_text(newAuthorIl2cppString);
 		}
+		
 	}
-
+	if(isFavorite) {
+		Sombrero::FastColor newColour = Sombrero::FastColor(1,1,1,1);
+		if(isCustom) newColour = {1, 0.41, 0.71, 0.7};
+		self->favoritesBadgeImage->set_color(newColour);
+		self->favoritesBadgeImage->get_transform()->set_localScale(favouriteSize);
+	}
 }

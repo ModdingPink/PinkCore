@@ -46,6 +46,46 @@ namespace RequirementUtils
 	FoundRequirementsEvent onFoundRequirementsEvent;
 	FoundSuggestionsEvent onFoundSuggestionsEvent;
 	
+
+	void PreHandleRequirements(GlobalNamespace::IPreviewBeatmapLevel* level) {
+		if (!level) return;
+		bool isCustom = SongUtils::SongInfo::isCustom(level);
+		SongUtils::SongInfo::set_currentlySelectedIsCustom(isCustom);
+		if(isCustom) INFO("is custom");
+		else INFO("is not custom");
+		if (isCustom)
+		{
+			// clear current info dat
+			auto& d = SongUtils::GetCurrentInfoDatPtr();
+			if (SongUtils::CustomData::GetInfoJson(level, d))
+			{
+				INFO("Info.dat read successful!");
+				SongUtils::SongInfo::set_currentInfoDatValid(true);
+				// Requirements and suggestions are called on RequirementUtils::HandleRequirementDetails();
+				// TODO: Move this over there
+			}
+			else
+			{
+				SongUtils::SongInfo::set_currentInfoDatValid(false);
+				RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
+				RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
+
+				INFO("Info.dat read not successful!");
+			}
+
+			// if the level ID contains `WIP` then the song is a WIP song
+			std::string levelIDString = level->get_levelID();
+			bool isWIP = levelIDString.find("WIP") != std::string::npos;
+			SongUtils::SongInfo::set_currentlySelectedIsWIP(isWIP);
+		}
+		else
+		{
+			SongUtils::SongInfo::set_currentlySelectedIsWIP(false);
+			SongUtils::SongInfo::set_currentInfoDatValid(false);
+			RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
+			RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
+		}
+	}
 	//void HandleRequirementDetails(StandardLevelDetailView* detailView)
 	void HandleRequirementDetails()
 	{
@@ -227,17 +267,15 @@ namespace RequirementUtils
 	*/
 	void UpdatePlayButton()
 	{
-		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
-		int length = levelViews.Length();
-		if (length > 0)
-		{
+		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>().LastOrDefault();
+		if (levelViews) {
 			bool interactable = AllowPlayerToStart();
-                        bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
-                        bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
+            bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
+            bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
 			INFO("interactable: %d, custom: %d, wip: %d", interactable, isCustom, isWip);
             {
-                levelViews[length - 1]->get_practiceButton()->set_interactable(interactable);
-                levelViews[length - 1]->get_actionButton()->set_interactable(!(isCustom && isWip) && interactable);
+                levelViews->get_practiceButton()->set_interactable(interactable);
+                levelViews->get_actionButton()->set_interactable(!(isCustom && isWip) && interactable);
             }
 		}
 	}

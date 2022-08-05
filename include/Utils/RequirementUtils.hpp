@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
+#include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "beatsaber-hook/shared/rapidjson/include/rapidjson/document.h"
 
 namespace PinkCore::UI {
@@ -12,6 +13,9 @@ namespace RequirementUtils
 {
 	using FoundRequirementsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
 	using FoundSuggestionsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
+
+	void PreHandleRequirements(GlobalNamespace::IPreviewBeatmapLevel* level);
+
 
 	/// @brief handle hte requirement details so all backing information is up to date
 	//void HandleRequirementDetails(GlobalNamespace::StandardLevelDetailView* detailView);

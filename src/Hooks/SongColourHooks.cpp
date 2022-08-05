@@ -24,13 +24,12 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Init, &GlobalNames
 		StandardLevelScenesTransitionSetupDataSO_Init(self, gameMode, difficultyBeatmap, previewBeatmapLevel, overrideEnvironmentSettings, overrideColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, backButtonText, useTestNoteCutSoundEffects, startPaused);
 		return;
 	}
-
 	GlobalNamespace::ColorScheme* colourScheme;
 	if (overrideColorScheme == nullptr) {
-		colourScheme = SongUtils::CustomData::getCustomSongColour(previewBeatmapLevel->get_environmentInfo()->colorScheme->colorScheme, false);
+		colourScheme = SongUtils::CustomData::GetCustomSongColour(previewBeatmapLevel->get_environmentInfo()->colorScheme->colorScheme, false);
 	}
 	else {
-		colourScheme = SongUtils::CustomData::getCustomSongColour(overrideColorScheme, true);
+		colourScheme = SongUtils::CustomData::GetCustomSongColour(overrideColorScheme, true);
 	}
 
 	if (colourScheme == nullptr) {

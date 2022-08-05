@@ -21,6 +21,7 @@
 #include "UnityEngine/AdditionalCanvasShaderChannels.hpp"
 #include "UnityEngine/RenderMode.hpp"
 #include "UnityEngine/UI/Button.hpp"
+#include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/UI/LayoutRebuilder.hpp"
 
 #include "HMUI/TitleViewController.hpp"
@@ -33,6 +34,7 @@
 #include "HMUI/ButtonSpriteSwap.hpp"
 
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
+#include "GlobalNamespace/AnnotatedBeatmapLevelCollectionsViewController.hpp"
 //#include "CustomTypes/RequirementHandler.hpp"
 //#include "CustomTypes/ContributorHandler.hpp"
 #include "CustomTypes/RequirementModalListTableData.hpp"
@@ -51,6 +53,7 @@
 #include "logging.hpp"
 
 #include "assets.hpp"
+#include "config.hpp"
 
 using namespace VRUIControls;
 using namespace HMUI;
@@ -64,7 +67,8 @@ using namespace TMPro;
 
 namespace UIUtils
 {
-	HMUI::ModalView* modal;
+	HMUI::ModalView* requirementsModal;
+	HMUI::ModalView* coloursModal;
 
 	TextMeshProUGUI* AddHeader(Transform* parent, std::string title)
 	{
@@ -182,7 +186,15 @@ namespace UIUtils
 		if (imageView) imageView->skew = 0.18f; 
 	}
 
-	
+
+	void SetPlaylistViewState(bool state){
+		auto levelPackView = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::AnnotatedBeatmapLevelCollectionsViewController*>().LastOrDefault();
+		if (levelPackView) levelPackView->get_transform()->get_parent()->get_gameObject()->SetActive(state);
+	}
+
+	static ConstString contentName("Content");
+
+
 	void SetupOrUpdateRequirementsModal(GlobalNamespace::StandardLevelDetailView* self)
 	{
 		auto requirementsList = self->get_gameObject()->GetComponentInChildren<PinkCore::UI::RequirementModalListTableData*>(true);
@@ -192,8 +204,18 @@ namespace UIUtils
 		bool isNew = false;
 
 		// if anything is needed, anyone worked on it, or the song is WIP, show the modal
-		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_currentlySelectedIsWIP());
+		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_currentlySelectedIsWIP() || SongUtils::SongInfo::get_currentlySelectedHasColours());
 		
+		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
+		int length = levelViews.Length();
+		UnityEngine::RectTransform* heartRectTrans; 
+		if (length > 0)
+		{
+			heartRectTrans = reinterpret_cast<UnityEngine::RectTransform*>(levelViews[length - 1]->favoriteToggle->get_transform());
+			if(showModal) heartRectTrans->set_anchoredPosition({3, -2});
+			else heartRectTrans->set_anchoredPosition({3, 0});
+		}
+
 		if (!requirementsList && showModal)
 		{
 			isNew = true;
@@ -205,37 +227,26 @@ namespace UIUtils
 			VerticalLayoutGroup* layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(self->get_transform());
 			HorizontalLayoutGroup* horizon = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(layout->get_transform());
 
-
-			
-
-			UnityEngine::UI::Button* button = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "PlayButton", Vector2(0.0f, 0.0f), Vector2(15.0f, 12.0f), [&](){
-				reinterpret_cast<UnityEngine::RectTransform*>(modal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-15.0f, 0.0f));
-				modal->Show(true, false, nullptr);
+			auto button = BeatSaberUI::CreateUIButton(horizon->get_transform(), "?", "PlayButton", {0, 0}, {9.0f, 7.2f}, [&] {
+				reinterpret_cast<UnityEngine::RectTransform*>(requirementsModal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-27.0f, -15.0f));
+				requirementsModal->Show(true, false, nullptr);
 			});
-			
-			auto text = QuestUI::BeatSaberUI::CreateText(button->get_transform(), "?");
-			text->set_alignment(TMPro::TextAlignmentOptions::Center);
+			//haha YOINK, THANKS FOR THE BUTTON CODE METALIT WOOOOOOOOOOOOOOOOOO, WE LOVE GPL-3.0
+			auto text = button->GetComponentInChildren<TMPro::TextMeshProUGUI*>();
+			UnityEngine::Object::Destroy(button->get_transform()->Find(contentName)->GetComponent<UnityEngine::UI::LayoutElement*>());
+			auto sizeFitter = button->get_gameObject()->AddComponent<UnityEngine::UI::ContentSizeFitter*>();
+			sizeFitter->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::PreferredSize);
+			sizeFitter->set_verticalFit(UnityEngine::UI::ContentSizeFitter::FitMode::PreferredSize);
+			text->set_fontSize(3);
 
-			layout->get_transform()->set_localScale(Vector3::get_one() * 0.5f);
 			layout->GetComponent<RectTransform*>()->set_anchoredPosition(pos);
 
-			
-
-			modal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(55.0f, 58.5f), UnityEngine::Vector2(-15.0f, 0.0f), nullptr);
-			//UnityEngine::GameObject* container = QuestUI::BeatSaberUI::CreateScrollableModalContainer(modal);
-
-			
-
-			/*horizon = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(container->get_transform());
-			layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizon->get_transform());*/
-			
-			
-			//requirementsHandler = container->get_gameObject()->AddComponent<PinkCore::UI::RequirementHandler*>();
-			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(modal->get_transform(), Vector2(0.0f, -29.25f), Vector2(55.0f, 58.5f), nullptr);
-			/*horizon = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(container->get_transform());
-			layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(horizon->get_transform());*/
-			
-			//contributorsHandler = container->get_gameObject()->AddComponent<PinkCore::UI::ContributorHandler*>();
+			requirementsModal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), [&](auto modal){  });
+		
+			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(requirementsModal->get_transform(), Vector2(0.0f, -32.25f), Vector2(55.0f, 63.5f), [&](int cell){
+				
+			});
+			//
 		
 		}
 		else if (requirementsList)
@@ -265,7 +276,9 @@ namespace UIUtils
 				parent = parent->get_parent();
 			}
 			if (modalView)
-				modal = modalView;
+				requirementsModal = modalView;
+			
+
 		}
 
 		if (requirementsList) 
