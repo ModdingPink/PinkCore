@@ -17,14 +17,15 @@
         "${workspaceFolder}/extern/includes/codegen/include",
         "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
         "${default}",
-        "C:/Development/Tools/android-ndk-r23b/",
-        "C:/Development/Tools/android-ndk-r23b/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/",
-        "C:/Development/Tools/android-ndk-r23b/sources/cxx-stl/llvm-libc++/include/",
-        "C:/Development/Tools/android-ndk-r23b/sources/cxx-stl/llvm-libc++abi/include/"
+        "${ANDROID_NDK_HOME}/",
+        "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/",
+        "${ANDROID_NDK_HOME}/sources/cxx-stl/llvm-libc++/include/",
+        "${ANDROID_NDK_HOME}/sources/cxx-stl/llvm-libc++abi/include/"
       ],
       "name": "Quest",
       "cStandard": "c11",
       "cppStandard": "c++20",
+      "compileCommands": "${workspaceFolder}/build/compile_commands.json",
       "intelliSenseMode": "linux-clang-arm64"
     }
   ],
