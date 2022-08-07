@@ -3,7 +3,7 @@
 #include "Utils/SongUtils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
-#include "GlobalNamespace/CustomBeatmapLevel.hpp"
+#include "GlobalNamespace/CustomPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/ColorScheme.hpp"
 #include "GlobalNamespace/FilteredBeatmapLevel.hpp"
@@ -136,11 +136,11 @@ namespace SongUtils
 			if (!level || !SongInfo::isCustom(level)) return false;
 
 			// cast to custom level
-			GlobalNamespace::CustomBeatmapLevel* customLevel;
+			GlobalNamespace::CustomPreviewBeatmapLevel* customLevel;
 			if (auto filter = il2cpp_utils::try_cast<GlobalNamespace::FilteredBeatmapLevel>(level)) {
-				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomBeatmapLevel>(filter.value()->beatmapLevel);
+				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomPreviewBeatmapLevel>(filter.value()->beatmapLevel);
 			} else {
-				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomBeatmapLevel>(level);
+				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomPreviewBeatmapLevel>(level);
 			}			
 			std::u16string songPath(customLevel->get_customLevelPath());
 			currentLevelPath = songPath;
