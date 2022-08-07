@@ -58,7 +58,9 @@ namespace PinkCore::UI
         tableCell->songDurationText->get_gameObject()->SetActive(false);
         tableCell->favoritesBadgeImage->get_gameObject()->SetActive(false);
         static auto BpmIcon = ConstString("BpmIcon");
-        tableCell->get_transform()->Find(StringW(BpmIcon))->get_gameObject()->SetActive(false);
+        tableCell->get_transform()->Find(BpmIcon)->get_gameObject()->SetActive(false);
+        reinterpret_cast<RectTransform*>(tableCell->songNameText->get_transform())->set_anchorMax({2, 0.5});
+        reinterpret_cast<RectTransform*>(tableCell->songAuthorText->get_transform())->set_anchorMax({2, 0.5});
         tableCell->selectedBackgroundColor = tableCell->highlightBackgroundColor;
         tableCell->selectedAndHighlightedBackgroundColor = tableCell->highlightBackgroundColor;
         /*
