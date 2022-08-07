@@ -298,13 +298,13 @@ namespace UIUtils
 			requirementsModal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), nullptr);
 		
 			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(requirementsModal->get_transform(), Vector2(0.0f, -32.25f), Vector2(55.0f, 63.5f), [self](int cell) {
+				// can't capture requirementsList when it hasn't been set yet, and this is better than making it a global variable imo
+				requirementsModal->get_gameObject()->GetComponentInChildren<PinkCore::UI::RequirementModalListTableData*>()->tableView->ClearSelection();
 				// check if color cell
 				if (cell == 0 && SongUtils::SongInfo::get_currentlySelectedHasColours()) {
 					// modals seem to be buggy when stacked
 					requirementsModal->Hide(true, custom_types::MakeDelegate<System::Action*>((std::function<void()>) [self] {
 						SetupOrShowColorsModal(self->get_transform());
-						// can't capture requirementsList when it hasn't been set yet, and this is better than making it a global variable imo
-						self->get_gameObject()->GetComponentInChildren<PinkCore::UI::RequirementModalListTableData*>(true)->tableView->ClearSelection();
 					}));
 				}
 			});

@@ -437,6 +437,9 @@ namespace SongUtils
 
 		bool get_currentlySelectedHasColours()
 		{
+			if (!get_currentlySelectedIsCustom())
+				return false;
+			
 			auto& d = SongUtils::GetCurrentInfoDat();
 			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
 			if (SongUtils::CustomData::GetCurrentCustomData(d, customData)) {

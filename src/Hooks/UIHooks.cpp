@@ -22,8 +22,6 @@
 #include "GlobalNamespace/IBeatmapLevelData.hpp"
 #include "GlobalNamespace/BeatmapLevelDataExtensions.hpp"
 
-#include "GlobalNamespace/BeatmapCharacteristicSegmentedControlController.hpp"
-
 #include "UnityEngine/UI/Button.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Transform.hpp"
@@ -35,12 +33,18 @@
 #include "Polyglot/Localization.hpp"
 #include "sombrero/shared/linq.hpp"
 #include "sombrero/shared/linq_functional.hpp"
+
 MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_SetContent, &GlobalNamespace::StandardLevelDetailView::SetContent, void, GlobalNamespace::StandardLevelDetailView* self, ::GlobalNamespace::IBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty defaultDifficulty, GlobalNamespace::BeatmapCharacteristicSO* defaultBeatmapCharacteristic, GlobalNamespace::PlayerData* playerData)
 {
+	auto currentSelectedLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(level);
+	RequirementUtils::PreHandleRequirements(currentSelectedLevel);
 
-	auto currentSelectedLevel = il2cpp_utils::cast<GlobalNamespace::IPreviewBeatmapLevel>(level);
-	RequirementUtils::PreHandleRequirements(currentSelectedLevel);    
 	StandardLevelDetailView_SetContent(self, level, defaultDifficulty, defaultBeatmapCharacteristic, playerData);
+}
+
+MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::StandardLevelDetailView::RefreshContent, void, GlobalNamespace::StandardLevelDetailView* self)
+{
+	StandardLevelDetailView_RefreshContent(self);
 	auto beatmapCharacteristicSegmentedControlController = self->beatmapCharacteristicSegmentedControlController;
 	auto selectedBeatmapCharacteristic = beatmapCharacteristicSegmentedControlController ? beatmapCharacteristicSegmentedControlController->selectedBeatmapCharacteristic : nullptr;
     SongUtils::CustomData::SetCharacteristicAndDifficulty(self->beatmapDifficultySegmentedControlController->selectedDifficulty, selectedBeatmapCharacteristic);
@@ -49,11 +53,11 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_SetContent, &GlobalNamespace::Stand
 	UIUtils::SetupOrUpdateRequirementsModal(self);
 	RequirementUtils::UpdatePlayButton();
 
-	//was this ever needed?
-    //if (self->level != nullptr && self->level->get_beatmapLevelData() != nullptr) {
-       // self->beatmapDifficultySegmentedControlController->SetData(GlobalNamespace::BeatmapLevelDataExtensions::GetDifficultyBeatmapSet(self->level->get_beatmapLevelData(), self->beatmapCharacteristicSegmentedControlController->get_selectedBeatmapCharacteristic())->get_difficultyBeatmaps(), self->beatmapDifficultySegmentedControlController->get_selectedDifficulty());
-    //}
-
+	// set data for segmented controllers so they update with the selected level
+    // if (self->level != nullptr && self->level->get_beatmapLevelData() != nullptr) {
+	// 	self->beatmapCharacteristicSegmentedControlController->SetData(self->level->get_beatmapLevelData()->get_difficultyBeatmapSets(), self->beatmapCharacteristicSegmentedControlController->get_selectedBeatmapCharacteristic());
+	// 	self->beatmapDifficultySegmentedControlController->SetData(GlobalNamespace::BeatmapLevelDataExtensions::GetDifficultyBeatmapSet(self->level->get_beatmapLevelData(), self->beatmapCharacteristicSegmentedControlController->get_selectedBeatmapCharacteristic())->get_difficultyBeatmaps(), self->beatmapDifficultySegmentedControlController->get_selectedDifficulty());
+    // }
 }
 
 MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &GlobalNamespace::BeatmapCharacteristicSegmentedControlController::SetData, void, GlobalNamespace::BeatmapCharacteristicSegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<::GlobalNamespace::IDifficultyBeatmapSet*>* difficultyBeatmapSets, GlobalNamespace::BeatmapCharacteristicSO* selectedBeatmapCharacteristic)
@@ -64,15 +68,17 @@ MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &G
     ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(self->segmentedControl->dataItems->Length());
 
     for(auto dataItem : self->segmentedControl->dataItems){
-        UnityEngine::Sprite* charactaristicSprite = nullptr;
-        StringW charactaristicText = "";
-        SongUtils::CustomData::GetCustomCharacteristicItems(self->beatmapCharacteristics->get_Item(i)->serializedName, charactaristicSprite, charactaristicText);
-        if(charactaristicText == "") charactaristicText = Polyglot::Localization::Get(self->beatmapCharacteristics->get_Item(i)->characteristicNameLocalizationKey);
-        if(charactaristicSprite == nullptr) charactaristicSprite = self->beatmapCharacteristics->get_Item(i)->get_icon();
-        dataItemArray[i] = HMUI::IconSegmentedControl::DataItem::New_ctor(charactaristicSprite, charactaristicText);
+        UnityEngine::Sprite* characteristicSprite = nullptr;
+        StringW characteristicText = "";
+        SongUtils::CustomData::GetCustomCharacteristicItems(self->beatmapCharacteristics->get_Item(i)->serializedName, characteristicSprite, characteristicText);
+        if(characteristicText == "") characteristicText = Polyglot::Localization::Get(self->beatmapCharacteristics->get_Item(i)->characteristicNameLocalizationKey);
+        if(characteristicSprite == nullptr) characteristicSprite = self->beatmapCharacteristics->get_Item(i)->get_icon();
+        dataItemArray[i] = HMUI::IconSegmentedControl::DataItem::New_ctor(characteristicSprite, characteristicText);
         i++;
     }
+	int selectedCell = self->segmentedControl->selectedCellNumber;
     self->segmentedControl->SetData(dataItemArray);
+    self->segmentedControl->SelectCellWithNumber(selectedCell);
 }
 
 MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDifficultyMethods::Name, StringW, GlobalNamespace::BeatmapDifficulty difficulty) {
@@ -101,7 +107,6 @@ MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &Globa
 	}
 	BeatmapDifficultySegmentedControlController_SetData(self, difficultyBeatmapsList, selectedDifficulty);
 }
-
 
 MAKE_AUTO_HOOK_MATCH(ModalView_Show, &HMUI::ModalView::Show, void, HMUI::ModalView* self, bool animated, bool moveToCenter, System::Action* finishedCallback)
 {
