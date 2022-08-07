@@ -28,10 +28,13 @@ namespace PinkCore::UI
 			GameObject* container = CreateScrollableSettingsContainer(get_transform());
 			
 			TOGGLE(enableExtraSongDetails, "Enable Extra Song Details");
-			TOGGLE(enableCustomSongColours, "Enable Custom Song Colors");
+			customColourToggle = TOGGLE(enableCustomSongColours, "Enable Custom Song Colors");
+			TOGGLE(enableCustomSongColours, "Never Use Custom Song Note Colors");
 			TOGGLE(enableCustomDiffNames, "Enable Custom Difficulty Names");
 			TOGGLE(enableBurnMarks, "Enable Burn Marks");
 			TOGGLE(openToCustomLevels, "Open To Custom Levels");
 		}
+		if (customColourToggle)
+			customColourToggle->set_isOn(config.enableCustomSongColours);
 	}
 }

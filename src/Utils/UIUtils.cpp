@@ -209,10 +209,10 @@ namespace UIUtils
 
 			auto layout = CreateVerticalLayoutGroup(coloursModal);
 			layout->GetComponent<LayoutElement*>()->set_preferredWidth(80);
-			// replace with functionality
-			bool coloursEnabled = true;
-			auto colourToggle = CreateToggle(layout, "Use Custom Song Colors", coloursEnabled, [](bool enabled) {
-				// set colors enabled or not
+
+			auto colourToggle = CreateToggle(layout, "Use Custom Song Colors", config.enableCustomSongColours, [](bool enabled) {
+				config.enableCustomSongColours = enabled;
+				SaveConfig();
 			});
 			
 			AddHoverHint(colourToggle, "Allow Custom Songs to override note/light colors");
@@ -234,8 +234,19 @@ namespace UIUtils
 			AddHoverHint(colourSchemeView->environmentColor1BoostImage, "Secondary Light Boost Color");
 		}
 
-		coloursModal->Show(true, false, nullptr);
-		// colourSchemeView->SetColors(); replace with custom song colors
+		coloursModal->get_gameObject()->GetComponentInChildren<Toggle*>()->set_isOn(config.enableCustomSongColours);
+
+		static auto colorSchemeId = (StringW) ConstString("PinkCoreVoidColorScheme");
+		static auto colorSchemeNameLocalizationKey = (StringW) ConstString("PinkCore Void Color Scheme");
+		static Color voidColour(0.5, 0.5, 0.5, 0.25);
+		static auto voidColourScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*, il2cpp_utils::CreationType::Manual>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false,
+			voidColour, voidColour, voidColour, voidColour, false, voidColour, voidColour, voidColour);
+
+		if (auto scheme = SongUtils::CustomData::GetCustomSongColour(voidColourScheme, false))
+		{
+			coloursModal->Show(true, false, nullptr);
+			colourSchemeView->SetColors(scheme->saberAColor, scheme->saberBColor, scheme->environmentColor0, scheme->environmentColor1, scheme->environmentColor0Boost, scheme->environmentColor1Boost, scheme->obstaclesColor);
+		}
 	}
 
 	void SetupOrUpdateRequirementsModal(GlobalNamespace::StandardLevelDetailView* self)
@@ -287,11 +298,13 @@ namespace UIUtils
 			requirementsModal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), nullptr);
 		
 			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(requirementsModal->get_transform(), Vector2(0.0f, -32.25f), Vector2(55.0f, 63.5f), [self](int cell) {
-				// add condition for showing
-				if (true) {
+				// check if color cell
+				if (cell == 0 && SongUtils::SongInfo::get_currentlySelectedHasColours()) {
 					// modals seem to be buggy when stacked
 					requirementsModal->Hide(true, custom_types::MakeDelegate<System::Action*>((std::function<void()>) [self] {
 						SetupOrShowColorsModal(self->get_transform());
+						// can't capture requirementsList when it hasn't been set yet, and this is better than making it a global variable imo
+						self->get_gameObject()->GetComponentInChildren<PinkCore::UI::RequirementModalListTableData*>(true)->tableView->ClearSelection();
 					}));
 				}
 			});
