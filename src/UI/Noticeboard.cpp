@@ -74,7 +74,7 @@ namespace PinkCore::UI
 			layoutgroup->set_padding(offset);
 
 			CreateTextLayout(container->get_transform(), NoticeBoardText::get_text(), boardLayout);
-			ToggleVisibility();
+			// ToggleVisibility();
 		}
 	}
 	

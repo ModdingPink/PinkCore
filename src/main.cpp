@@ -49,11 +49,11 @@ extern "C" void load()
 	if (!LoadConfig())
 		SaveConfig();
 
-	StringW test = "a";
-    std::function<void(HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*)> fun = [test](HMUI::SelectableCell* a, HMUI::SelectableCell::TransitionType b, Il2CppObject* c){
+	// StringW test = "a";
+    // std::function<void(HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*)> fun = [test](HMUI::SelectableCell* a, HMUI::SelectableCell::TransitionType b, Il2CppObject* c){
          
-	};
-	auto delegate = il2cpp_utils::MakeDelegate<System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*>(classof(System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*), fun);        
+	// };
+	// auto delegate = il2cpp_utils::MakeDelegate<System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*>(classof(System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*), fun);        
 
 
 	Hooks::InstallHooks(logger);

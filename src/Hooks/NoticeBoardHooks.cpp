@@ -29,26 +29,27 @@ bool firstWarmup = true;
 bool setIcons = false;
 #define MakeDelegate(DelegateType, varName) (custom_types::MakeDelegate<DelegateType>(classof(DelegateType), varName))
 
-MAKE_AUTO_HOOK_MATCH(MainMenuViewController_DidActivate, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
-{
-    MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling); 
-    if(setIcons) return; 
-    //reusing the editor button
-    auto newsButton = UnityEngine::GameObject::Instantiate(self->beatmapEditorButton->get_gameObject(), self->beatmapEditorButton->get_transform()->get_parent(), false);
-	newsButton->get_gameObject()->set_active(true);
-	QuestUI::BeatSaberUI::AddHoverHint(newsButton, "Beat Saber Modding News");
-    //swap the default button icons to our own button images
-    HMUI::ButtonSpriteSwap* spriteSwap = newsButton->get_gameObject()->GetComponent<HMUI::ButtonSpriteSwap*>();
-    auto highlightedImage = QuestUI::BeatSaberUI::VectorToSprite(std::vector<uint8_t>(_binary_MainMenuIconHighlight_png_start,_binary_MainMenuIconHighlight_png_end));
-    auto defaultImage = QuestUI::BeatSaberUI::VectorToSprite(std::vector<uint8_t>(_binary_MainMenuIcon_png_start,_binary_MainMenuIcon_png_end));
-    spriteSwap->normalStateSprite = defaultImage;
-    spriteSwap->highlightStateSprite = highlightedImage;
-    spriteSwap->pressedStateSprite = highlightedImage;
-    spriteSwap->disabledStateSprite = defaultImage;
-    setIcons = true;
-	newsButton->GetComponent<UnityEngine::UI::Button*>()->get_onClick()->AddListener(MakeDelegate(UnityEngine::Events::UnityAction*, (std::function<void()>)[](){ PinkCore::UI::NoticeBoard::get_instance()->ToggleVisibility(); }));
-	newsButton->get_transform()->SetSiblingIndex(newsButton->get_transform()->GetSiblingIndex()-1);
-}
+// pink told me to comment this out idk
+// MAKE_AUTO_HOOK_MATCH(MainMenuViewController_DidActivate, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+// {
+//     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling); 
+//     if(setIcons) return; 
+//     //reusing the editor button
+//     auto newsButton = UnityEngine::GameObject::Instantiate(self->beatmapEditorButton->get_gameObject(), self->beatmapEditorButton->get_transform()->get_parent(), false);
+// 	newsButton->get_gameObject()->set_active(true);
+// 	QuestUI::BeatSaberUI::AddHoverHint(newsButton, "Beat Saber Modding News");
+//     //swap the default button icons to our own button images
+//     HMUI::ButtonSpriteSwap* spriteSwap = newsButton->get_gameObject()->GetComponent<HMUI::ButtonSpriteSwap*>();
+//     auto highlightedImage = QuestUI::BeatSaberUI::VectorToSprite(std::vector<uint8_t>(_binary_MainMenuIconHighlight_png_start,_binary_MainMenuIconHighlight_png_end));
+//     auto defaultImage = QuestUI::BeatSaberUI::VectorToSprite(std::vector<uint8_t>(_binary_MainMenuIcon_png_start,_binary_MainMenuIcon_png_end));
+//     spriteSwap->normalStateSprite = defaultImage;
+//     spriteSwap->highlightStateSprite = highlightedImage;
+//     spriteSwap->pressedStateSprite = highlightedImage;
+//     spriteSwap->disabledStateSprite = defaultImage;
+//     setIcons = true;
+// 	newsButton->GetComponent<UnityEngine::UI::Button*>()->get_onClick()->AddListener(MakeDelegate(UnityEngine::Events::UnityAction*, (std::function<void()>)[](){ PinkCore::UI::NoticeBoard::get_instance()->ToggleVisibility(); }));
+// 	newsButton->get_transform()->SetSiblingIndex(newsButton->get_transform()->GetSiblingIndex()-1);
+// }
 
 MAKE_AUTO_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement::SceneManager::SetActiveScene, bool, UnityEngine::SceneManagement::Scene scene)
 {
