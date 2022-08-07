@@ -437,13 +437,29 @@ namespace SongUtils
 
 		bool get_currentlySelectedHasColours()
 		{
-			return currrentlySelectedIsCustom;
+			auto& d = SongUtils::GetCurrentInfoDat();
+			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
+			if (SongUtils::CustomData::GetCurrentCustomData(d, customData)) {
+				static const char16_t* colours[] = {u"_colorLeft", u"_colorRight",u"_envColorLeft", u"_envColorRight", u"_envColorLeftBoost", u"_envColorRightBoost", u"_obstacleColor"};
+
+				for (auto name : colours) {
+					auto itr = customData.GetObject().FindMember(name);
+					if (itr != customData.MemberEnd()) {
+						auto end = itr->value.MemberEnd();
+						if(itr->value.FindMember(u"r") == end) continue;
+						if(itr->value.FindMember(u"g") == end) continue;
+						if(itr->value.FindMember(u"b") == end) continue;
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
-		void set_currentlySelectedHasColours(bool val)
-		{
-			currrentlySelectedIsCustom = val;
-		}
+		// void set_currentlySelectedHasColours(bool val)
+		// {
+		// 	currentlySelectedHasColours = val;
+		// }
 		/*-------------------------------------------------*/
 
 		bool get_currentlySelectedIsWIP()

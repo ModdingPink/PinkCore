@@ -94,11 +94,11 @@ namespace SongUtils
 		/*--------------------------------------------------------------*/	
 
 		/// @brief getter for whether the current song has custom colours
-		/// @return true for if the level has custom colorus
+		/// @return true for if the level has custom colours
 		bool get_currentlySelectedHasColours();
 
 		/// @brief setter for whether the current song has custom colours
-		void set_currentlySelectedHasColours(bool val);
+		// void set_currentlySelectedHasColours(bool val);
 		/*--------------------------------------------------------------*/		
 		
 		/// @brief getter for whether the current song is a Noodle Extension Map
