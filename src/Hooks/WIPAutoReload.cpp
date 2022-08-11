@@ -67,6 +67,6 @@ MAKE_AUTO_HOOK_MATCH(LevelCollectionViewController_DidActivate, &GlobalNamespace
 
 
     if (firstActivation) {
-        self->StartCoroutine(custom_types::Helpers::new_coro(wipPathReloader));
+        //self->StartCoroutine(custom_types::Helpers::new_coro(wipPathReloader));
     }
 }
