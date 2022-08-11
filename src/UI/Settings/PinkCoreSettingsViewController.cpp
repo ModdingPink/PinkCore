@@ -31,6 +31,7 @@ namespace PinkCore::UI
 			customColourToggle = TOGGLE(enableCustomSongColours, "Enable Custom Song Colors");
 			TOGGLE(enableCustomSongColours, "Never Use Custom Song Note Colors");
 			TOGGLE(enableCustomDiffNames, "Enable Custom Difficulty Names");
+			TOGGLE(enableCustomCharacteristics, "Enable Custom Characteristic Cosmetics");
 			TOGGLE(enableBurnMarks, "Enable Burn Marks");
 			TOGGLE(openToCustomLevels, "Open To Custom Levels");
 		}

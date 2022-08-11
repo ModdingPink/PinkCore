@@ -33,6 +33,7 @@ void SaveConfig()
 	SAVE(enableCustomDiffNames);
 	SAVE(enableBurnMarks);
 	SAVE(openToCustomLevels);
+	SAVE(enableCustomCharacteristics);
 
 	getConfig().Write();
 	INFO("Saved Configuration!");
@@ -47,7 +48,8 @@ bool LoadConfig()
 	LOAD(enableExtraSongDetails, GetBool());
 	LOAD(enableCustomSongColours, GetBool());
 	LOAD(enableCustomDiffNames, GetBool());
-	LOAD(forceNoteColours, GetBool());
+	LOAD(forceNoteColours, GetBool());	
+	LOAD(enableCustomCharacteristics, GetBool());
 	LOAD(enableBurnMarks, GetBool());
 	LOAD(openToCustomLevels, GetBool());
 

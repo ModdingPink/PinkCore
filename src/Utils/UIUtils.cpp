@@ -204,7 +204,7 @@ namespace UIUtils
 
 		if (!coloursModalTranform) {
 			INFO("Colours modal did not exist, making it");
-			coloursModal = CreateModal(parent, {85, 25}, {0, 0}, nullptr);
+			coloursModal = CreateModal(parent, {85, 35}, {-7.5, 8}, nullptr);
 			coloursModal->set_name(modalName);
 
 			auto layout = CreateVerticalLayoutGroup(coloursModal);
@@ -217,6 +217,12 @@ namespace UIUtils
 			
 			AddHoverHint(colourToggle, "Allow Custom Songs to override note/light colors");
 			
+			auto playerNoteToggle = CreateToggle(layout, "Override Player Set Note Colors", config.forceNoteColours, [](bool enabled) {
+				config.forceNoteColours = enabled;
+				SaveConfig();
+			});
+			AddHoverHint(playerNoteToggle, "Force apply your own set note colours, selected from the left 'Colors' menu");
+
 			auto horizontal = CreateHorizontalLayoutGroup(layout);
 			horizontal->set_spacing(-24);
 
@@ -232,6 +238,9 @@ namespace UIUtils
 			AddHoverHint(colourSchemeView->obstacleColorImage, "Wall Color");
 			AddHoverHint(colourSchemeView->environmentColor0BoostImage, "Primary Light Boost Color");
 			AddHoverHint(colourSchemeView->environmentColor1BoostImage, "Secondary Light Boost Color");
+
+
+
 		}
 
 		coloursModal->get_gameObject()->GetComponentInChildren<Toggle*>()->set_isOn(config.enableCustomSongColours);
@@ -244,7 +253,9 @@ namespace UIUtils
 
 		if (auto scheme = SongUtils::CustomData::GetCustomSongColour(voidColourScheme, false))
 		{
+			reinterpret_cast<UnityEngine::RectTransform*>(coloursModal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-7.5, 8));
 			coloursModal->Show(true, false, nullptr);
+
 			colourSchemeView->SetColors(scheme->saberAColor, scheme->saberBColor, scheme->environmentColor0, scheme->environmentColor1, scheme->environmentColor0Boost, scheme->environmentColor1Boost, scheme->obstaclesColor);
 		}
 	}

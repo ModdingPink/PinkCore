@@ -35,9 +35,7 @@ namespace PinkCore::UI
         wipSprite = VectorToSprite(std::vector<uint8_t>(_binary_WIP_png_start, _binary_WIP_png_end));
         coloursSprite = VectorToSprite(std::vector<uint8_t>(_binary_Colors_png_start, _binary_Colors_png_end));
     }
-
-    bool canInteract = false;
-
+    
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetTableCell()
     {
         auto tableCell = reinterpret_cast<GlobalNamespace::LevelListTableCell*>(tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
@@ -79,7 +77,7 @@ namespace PinkCore::UI
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetWipCell()
     {
         auto tableCell = GetTableCell();
-
+        tableCell->set_interactable(false);
         static auto WIPLevel = ConstString("WIP Level");
         static auto WorkInProgress = ConstString("Please Play in Practice Mode");
         tableCell->songNameText->set_text(WIPLevel);
@@ -92,7 +90,7 @@ namespace PinkCore::UI
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetCustomColoursCell()
     {
         auto tableCell = GetTableCell();
-
+        tableCell->set_interactable(true);
         static auto colourAvailable = ConstString("Custom Colours Available");
         static auto previewColour = ConstString("Click here to preview & enable them.");
         tableCell->songNameText->set_text(colourAvailable);
@@ -104,6 +102,7 @@ namespace PinkCore::UI
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetRequirementOrSuggestionCell(std::string requirementName)
     {
         auto tableCell = GetTableCell();
+        tableCell->set_interactable(false);
 
         static auto RequirementFound = ConstString("Requirement Found");
         static auto RequirementMissing = ConstString("Requirement Missing");
@@ -167,7 +166,7 @@ namespace PinkCore::UI
     {
         auto tableCell = GetTableCell();
         auto& contributor = ContributorUtils::GetContributors()[idx];
-
+        tableCell->set_interactable(false);
         if (contributor.iconPath.empty()) {
             tableCell->songNameText->set_text(contributor.name);
             tableCell->songAuthorText->set_text(contributor.role);
@@ -183,11 +182,9 @@ namespace PinkCore::UI
 
     void RequirementModalListTableData::Refresh()
     {
-        canInteract = false;
         tableView->ReloadData();
         tableView->RefreshCells(true, true);
         tableView->ScrollToCellWithIdx(0, HMUI::TableView::ScrollPositionType::Beginning, true);
-        canInteract = true;
     }
 
     HMUI::TableCell* RequirementModalListTableData::CellForIdx(HMUI::TableView* tableView, int idx)
