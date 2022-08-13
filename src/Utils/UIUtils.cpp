@@ -217,11 +217,11 @@ namespace UIUtils
 			
 			AddHoverHint(colourToggle, "Allow Custom Songs to override note/light colors");
 			
-			auto playerNoteToggle = CreateToggle(layout, "Override Player Set Note Colors", config.forceNoteColours, [](bool enabled) {
+			auto playerNoteToggle = CreateToggle(layout, "Ignore Custom Song Note Colors", config.forceNoteColours, [](bool enabled) {
 				config.forceNoteColours = enabled;
 				SaveConfig();
 			});
-			AddHoverHint(playerNoteToggle, "Force apply your own set note colours, selected from the left 'Colors' menu");
+			AddHoverHint(playerNoteToggle, "Force your own note colours, selected from the left 'Colors' menu");
 
 			auto horizontal = CreateHorizontalLayoutGroup(layout);
 			horizontal->set_spacing(-24);
