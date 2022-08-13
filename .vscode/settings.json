@@ -88,6 +88,5 @@
         "complex": "cpp",
         "shared_mutex": "cpp",
         "thread": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "Enabled"
+    }
 }

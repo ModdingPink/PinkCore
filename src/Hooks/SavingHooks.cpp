@@ -6,7 +6,7 @@
 
 #include "GlobalNamespace/FileHelpers.hpp"
 #include "UnityEngine/Application.hpp"
-
+/*
 using namespace GlobalNamespace;
 
 static std::optional<std::string> alternativeDataPath = std::nullopt;
@@ -77,4 +77,4 @@ MAKE_AUTO_HOOK_MATCH(FileHelpers_LoadJSONFile, &FileHelpers::LoadJSONFile, Strin
     }
 
     return originalResult;
-}
+}*/
