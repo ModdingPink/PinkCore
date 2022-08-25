@@ -10,22 +10,19 @@
         "USE_CODEGEN_FIELDS"
       ],
       "includePath": [
-        "${workspaceFolder}/",
-        "${workspaceFolder}/shared",
-        "${workspaceFolder}/include",
-        "${workspaceFolder}/extern/includes",
-        "${workspaceFolder}/extern/includes/codegen/include",
         "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
-        "${default}",
-        "${ANDROID_NDK_HOME}/",
-        "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/",
-        "${ANDROID_NDK_HOME}/sources/cxx-stl/llvm-libc++/include/",
-        "${ANDROID_NDK_HOME}/sources/cxx-stl/llvm-libc++abi/include/"
+        "${workspaceFolder}/extern/includes/questui/shared/cppcodec",
+        "${workspaceFolder}/extern/includes/codegen/include",
+        "${workspaceFolder}/extern/includes/fmt/fmt/include",
+        "${workspaceFolder}/extern/includes",
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/shared",
+        "${workspaceFolder}",
+        "${default}"
       ],
       "name": "Quest",
       "cStandard": "c11",
       "cppStandard": "c++20",
-      "compileCommands": "${workspaceFolder}/build/compile_commands.json",
       "intelliSenseMode": "linux-clang-arm64"
     }
   ],
