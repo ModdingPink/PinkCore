@@ -13,7 +13,7 @@ namespace ContributorUtils
 	{
 		currentContributors.clear();
 		// if current info is not valid, there is no use in trying to read it
-		if (SongUtils::SongInfo::get_currentInfoDatValid())
+		if (SongUtils::CustomData::get_currentInfoDatValid())
 		{   
 			auto& doc = SongUtils::GetCurrentInfoDat();
 			// try to find the custom data, which has the contributors

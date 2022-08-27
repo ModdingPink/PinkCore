@@ -13,7 +13,7 @@ namespace DifficultyNameUtils
 	std::u16string expertCache = u"";
 	std::u16string expertPlusCache = u"";
 
-	void setDifficultyNameCacheFromDifficulty(GlobalNamespace::BeatmapDifficulty difficulty, std::u16string_view name){
+	void SetDifficultyNameCacheFromDifficulty(GlobalNamespace::BeatmapDifficulty difficulty, std::u16string_view name){
 		switch (difficulty) {
 		case GlobalNamespace::BeatmapDifficulty::Easy:
 			easyCache = name;
@@ -33,11 +33,11 @@ namespace DifficultyNameUtils
 		}
 	}
 
-	std::u16string GetDifficultyNameFromDoc(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& d, GlobalNamespace::BeatmapDifficulty difficulty)
+	std::u16string GetDifficultyNameFromDoc(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& d, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
 	{
 		std::u16string customDifficultyName = u"";
 		rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
-		if (SongUtils::CustomData::GetCurrentCustomData(d, customData, difficulty)) {
+		if (SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(d, customData, difficulty, characteristic)) {
 			auto customDiffItr = customData.FindMember(u"_difficultyLabel");
 			if (customDiffItr != customData.MemberEnd()) {
 				customDifficultyName = std::u16string(customDiffItr->value.GetString(), customDiffItr->value.GetStringLength());
@@ -69,15 +69,15 @@ namespace DifficultyNameUtils
 				diffLabel = u"";
 				break;
 		}
-		setDifficultyNameCacheFromDifficulty(difficulty, u"");
+		SetDifficultyNameCacheFromDifficulty(difficulty, u"");
 		return diffLabel;
 	}
 
-	void SetDifficultyNameCacheFromArray(::ArrayW<GlobalNamespace::IDifficultyBeatmap*>& difficultyArray) {
+	void SetDifficultyNameCacheFromArray(::ArrayW<GlobalNamespace::IDifficultyBeatmap*>& difficultyArray, GlobalNamespace::BeatmapCharacteristicSO* characteristic) {
 		auto& doc = SongUtils::GetCurrentInfoDat();
 		for (int i = 0; i < difficultyArray.Length(); i++) {
 			GlobalNamespace::BeatmapDifficulty difficulty = difficultyArray[i]->get_difficulty();
-			setDifficultyNameCacheFromDifficulty(difficulty, GetDifficultyNameFromDoc(doc, difficulty));
+			SetDifficultyNameCacheFromDifficulty(difficulty, GetDifficultyNameFromDoc(doc, difficulty, characteristic));
 		}
 	}
 

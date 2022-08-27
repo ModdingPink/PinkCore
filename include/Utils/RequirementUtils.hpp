@@ -14,10 +14,10 @@ namespace RequirementUtils
 	using FoundRequirementsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
 	using FoundSuggestionsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
 
-	void PreHandleRequirements(GlobalNamespace::IPreviewBeatmapLevel* level);
+	/// @brief empties the requirements, used if the infodat fails or the map is not custom
+	void EmptyRequirements();
 
-
-	/// @brief handle hte requirement details so all backing information is up to date
+	/// @brief handle the requirement details so all backing information is up to date
 	//void HandleRequirementDetails(GlobalNamespace::StandardLevelDetailView* detailView);
 	void HandleRequirementDetails();
 

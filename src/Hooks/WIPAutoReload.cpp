@@ -1,4 +1,5 @@
-#include "beatsaber-hook/shared/utils/logging.hpp"
+/*#include "beatsaber-hook/shared/utils/logging.hpp"
+
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "hooks.hpp"
 #include "config.hpp"
@@ -69,4 +70,4 @@ MAKE_AUTO_HOOK_MATCH(LevelCollectionViewController_DidActivate, &GlobalNamespace
     if (firstActivation) {
         //self->StartCoroutine(custom_types::Helpers::new_coro(wipPathReloader));
     }
-}
+}*/
