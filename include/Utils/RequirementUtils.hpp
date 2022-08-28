@@ -5,6 +5,7 @@
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "beatsaber-hook/shared/rapidjson/include/rapidjson/document.h"
+#include "LevelDetailAPI.hpp"
 
 namespace PinkCore::UI {
 	class RequirementHandler;
@@ -19,7 +20,7 @@ namespace RequirementUtils
 
 	/// @brief handle the requirement details so all backing information is up to date
 	//void HandleRequirementDetails(GlobalNamespace::StandardLevelDetailView* detailView);
-	void HandleRequirementDetails();
+	void HandleRequirementDetails(PinkCore::API::LevelDetails& levelDetail);
 
 	/// @brief checks if passed requirement string is installed
 	/// @param requirement the requirement to check

@@ -38,6 +38,7 @@
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/BeatLineManager.hpp"
+#include "GlobalNamespace/EnvironmentInfoSO.hpp"
 #include "Zenject/MonoInstaller.hpp"
 
 MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &GlobalNamespace::BeatmapCharacteristicSegmentedControlController::SetData, void, GlobalNamespace::BeatmapCharacteristicSegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<::GlobalNamespace::IDifficultyBeatmapSet*>* difficultyBeatmapSets, GlobalNamespace::BeatmapCharacteristicSO* selectedBeatmapCharacteristic)
@@ -50,7 +51,7 @@ MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &G
     for(auto dataItem : self->segmentedControl->dataItems){
         UnityEngine::Sprite* characteristicSprite = nullptr;
         StringW characteristicText = "";
-        SongUtils::CustomData::GetCustomCharacteristicItems(self->beatmapCharacteristics->get_Item(i)->serializedName, characteristicSprite, characteristicText);
+        SongUtils::CustomData::GetCustomCharacteristicItems(self->beatmapCharacteristics->get_Item(i), characteristicSprite, characteristicText);
         if(characteristicText == "") characteristicText = Polyglot::Localization::Get(self->beatmapCharacteristics->get_Item(i)->characteristicNameLocalizationKey);
         if(characteristicSprite == nullptr) characteristicSprite = self->beatmapCharacteristics->get_Item(i)->get_icon();
         dataItemArray[i] = HMUI::IconSegmentedControl::DataItem::New_ctor(characteristicSprite, characteristicText);

@@ -21,24 +21,27 @@
 #include "GlobalNamespace/IBeatmapLevel.hpp"
 #include "GlobalNamespace/IBeatmapLevelData.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
+#include "GlobalNamespace/BeatmapEnvironmentHelper.hpp"
 
 #include "UnityEngine/UI/Button.hpp"
 
 using namespace GlobalNamespace;
 
+
+
 MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Init, &StandardLevelScenesTransitionSetupDataSO::Init, void, StandardLevelScenesTransitionSetupDataSO* self, StringW gameMode, IDifficultyBeatmap* difficultyBeatmap, IPreviewBeatmapLevel* previewBeatmapLevel, OverrideEnvironmentSettings* overrideEnvironmentSettings, ColorScheme* overrideColorScheme, GameplayModifiers* gameplayModifiers, PlayerSpecificSettings* playerSpecificSettings, PracticeSettings* practiceSettings, StringW backButtonText, bool useTestNoteCutSoundEffects, bool startPaused)
 {
 	GlobalNamespace::ColorScheme* newColourScheme = nullptr;
-	SongUtils::CustomData::HandleGetMapInfoData(previewBeatmapLevel, difficultyBeatmap->get_difficulty(), difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic());
-	//gets the data again.. ya know.. just in case?
-	if (SongUtils::SongInfo::get_mapData().isCustom && SongUtils::SongInfo::get_mapData().hasCustomColours && config.enableCustomSongColours) {
+	SongUtils::CustomData::HandleGetMapInfoData(previewBeatmapLevel);
+	//, difficultyBeatmap->get_difficulty(), difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()
+	if (config.enableCustomSongColours && SongUtils::SongInfo::get_mapData().hasCustomColours) {
 		if (overrideColorScheme == nullptr)
 			newColourScheme = SongUtils::CustomData::GetCustomSongColour(previewBeatmapLevel->get_environmentInfo()->colorScheme->colorScheme, false);
 		else
 			newColourScheme = SongUtils::CustomData::GetCustomSongColour(overrideColorScheme, true);
 	}
 	if(newColourScheme) overrideColorScheme = newColourScheme;
-
+	difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents = true;
 	StandardLevelScenesTransitionSetupDataSO_Init(self, gameMode, difficultyBeatmap, previewBeatmapLevel, overrideEnvironmentSettings, overrideColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, backButtonText, useTestNoteCutSoundEffects, startPaused);
 }
 
@@ -48,7 +51,7 @@ MAKE_AUTO_HOOK_MATCH(MultiplayerLevelScenesTransitionSetupDataSO_Init, &Multipla
 {
 	GlobalNamespace::ColorScheme* newColourScheme = nullptr;
 	if(SongUtils::CustomData::GetInfoJson(previewBeatmapLevel, multiJSON)){
-		SongUtils::SongInfo::UpdateMapData(*multiJSON, beatmapDifficulty, beatmapCharacteristic);
+		SongUtils::SongInfo::UpdateMapData(previewBeatmapLevel, *multiJSON, beatmapDifficulty, beatmapCharacteristic);
 
 		rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
 

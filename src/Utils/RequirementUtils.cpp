@@ -6,8 +6,7 @@
 
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/UI/Button.hpp"
-
-using StandardLevelDetailView = GlobalNamespace::StandardLevelDetailView;
+#include "LevelDetailAPI.hpp"
 
 #include <algorithm>
 
@@ -48,11 +47,13 @@ namespace RequirementUtils
 	
 
 	void EmptyRequirements() {
-		RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
-		RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
+		currentRequirements.clear();
+		currentSuggestions.clear();
+		RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
+        RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
 	}
-	//void HandleRequirementDetails(StandardLevelDetailView* detailView)
-	void HandleRequirementDetails()
+
+	void HandleRequirementDetails(PinkCore::API::LevelDetails& levelDetail)
 	{
 		if (installedRequirements.empty()) FindInstalledRequirements();
 		currentRequirements.clear();
@@ -84,6 +85,8 @@ namespace RequirementUtils
 					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, currentSuggestions);
 				}
 
+				levelDetail.currentRequirements = currentRequirements;
+				levelDetail.currentSuggestions = currentSuggestions;
                 RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
                 RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
 			}

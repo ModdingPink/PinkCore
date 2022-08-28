@@ -73,7 +73,8 @@ namespace DifficultyNameUtils
 		return diffLabel;
 	}
 
-	void SetDifficultyNameCacheFromArray(::ArrayW<GlobalNamespace::IDifficultyBeatmap*>& difficultyArray, GlobalNamespace::BeatmapCharacteristicSO* characteristic) {
+	void SetDifficultyNameCacheFromArray(ArrayW<GlobalNamespace::IDifficultyBeatmap*>& difficultyArray, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
+		if(!characteristic) return;
 		auto& doc = SongUtils::GetCurrentInfoDat();
 		for (int i = 0; i < difficultyArray.Length(); i++) {
 			GlobalNamespace::BeatmapDifficulty difficulty = difficultyArray[i]->get_difficulty();

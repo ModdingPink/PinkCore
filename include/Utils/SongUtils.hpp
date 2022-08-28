@@ -46,7 +46,7 @@ namespace SongUtils
 		/// @param level the preview level
 		/// @param difficulty the current maps difficulty
 		/// @param characteristic the current maps characteristic
-		void HandleGetMapInfoData(GlobalNamespace::IPreviewBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
+		void HandleGetMapInfoData(GlobalNamespace::IPreviewBeatmapLevel* level);
 
 		/// @brief gets the info json and loads it into a rapidjson doc if available
 		/// @param level the preview level
@@ -93,7 +93,7 @@ namespace SongUtils
 
 		GlobalNamespace::ColorScheme* GetCustomSongColour(GlobalNamespace::ColorScheme* colorScheme, bool hasOverride);
 		
-		void GetCustomCharacteristicItems(StringW characteristic, UnityEngine::Sprite*& sprite, StringW& hoverText);
+		void GetCustomCharacteristicItems(GlobalNamespace::BeatmapCharacteristicSO* characteristic, UnityEngine::Sprite*& sprite, StringW& hoverText);
 
 		int MapSaberCountChecker(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
 		
@@ -111,7 +111,7 @@ namespace SongUtils
 
 		
 		void ResetMapData();
-		void UpdateMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
+		void UpdateMapData(GlobalNamespace::IPreviewBeatmapLevel* level, rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
 
 		/// @brief checks if the levelid is custom
 		/// @return true for custom, false for not custom

@@ -9,7 +9,11 @@ namespace ContributorUtils
 {
 	std::vector<Contributor> currentContributors;
 
-	void FetchListOfContributors()
+	void EmptyContributors() {
+		currentContributors.clear();
+	}
+
+	void FetchListOfContributors(PinkCore::API::LevelDetails& levelDetail)
 	{
 		currentContributors.clear();
 		// if current info is not valid, there is no use in trying to read it

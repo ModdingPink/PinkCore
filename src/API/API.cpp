@@ -11,7 +11,6 @@ namespace PinkCore::API
 		return SongUtils::onLoadedInfo();
 	}
 
-
 	RequirementUtils::FoundRequirementsEvent& GetFoundRequirementCallbackSafe()
 	{
 		return RequirementUtils::onFoundRequirements();

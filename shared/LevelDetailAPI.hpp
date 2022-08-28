@@ -19,15 +19,22 @@ namespace PinkCore::API
 		const char16_t* environmentType;
 		int saberCount;
 		bool hasCustomColours;
+        std::vector<std::string> currentRequirements = {};
+	    std::vector<std::string> currentSuggestions = {};
 	};
 
-	/// @brief returns whether the currently selected song is custom or not
-	/// @return true for custom, false for not custom, nullopt for not installed
-	bool get_currentlySelectedIsCustom();
+	/// @brief returns the current loaded maps level details
+	/// @return level detail struct
+	LevelDetails GetCurrrentMapData();
 
-	/// @brief returns whether the currently selected song is wip or not
-	/// @return true for wip, false for not wip, nullopt for not installed
-	bool get_currentlySelectedIsWIP();
-    }
+	/// @brief returns a new leveldetails struct that of the provided info
+	/// @return new level detail struct that isnt saved
+    /// @param in the infodat json of the new map
+    /// @param difficulty the difficulty of the new beatmap
+    /// @param characteristic the characteristic of the new beatmap
+    /// @param level ipreviewbeatmap level of the new beatmap
+    LevelDetails GetNewMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic, GlobalNamespace::IPreviewBeatmapLevel* level);
 
+
+}
 #undef pinkcore_id

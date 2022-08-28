@@ -38,19 +38,27 @@
 MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_SetContent, &GlobalNamespace::StandardLevelDetailView::SetContent, void, GlobalNamespace::StandardLevelDetailView* self, ::GlobalNamespace::IBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty defaultDifficulty, GlobalNamespace::BeatmapCharacteristicSO* defaultBeatmapCharacteristic, GlobalNamespace::PlayerData* playerData)
 {
 	auto currentSelectedLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(level);
-	SongUtils::CustomData::HandleGetMapInfoData(currentSelectedLevel, defaultDifficulty, defaultBeatmapCharacteristic);
+	
+	//this will only work on a post fix, which we cant do because refresh is in the method which we need to do shit on anyway so AAAAAAAAAAAAAAAAAAA 3:<
+	//GlobalNamespace::BeatmapDifficulty difficulty = defaultDifficulty;
+	//if(!difficulty) difficulty = self->beatmapDifficultySegmentedControlController->selectedDifficulty;
+	//GlobalNamespace::BeatmapCharacteristicSO* characteristic = defaultBeatmapCharacteristic;
+	//if(!characteristic) characteristic = self->beatmapCharacteristicSegmentedControlController->selectedBeatmapCharacteristic;
+	
+	SongUtils::CustomData::HandleGetMapInfoData(currentSelectedLevel);
+
 	//this ensures we get the info dat at the earliest point
 
 	StandardLevelDetailView_SetContent(self, level, defaultDifficulty, defaultBeatmapCharacteristic, playerData);
 }
 
+
 MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::StandardLevelDetailView::RefreshContent, void, GlobalNamespace::StandardLevelDetailView* self)
 {
 	StandardLevelDetailView_RefreshContent(self);
-	auto beatmapCharacteristicSegmentedControlController = self->beatmapCharacteristicSegmentedControlController;
-	auto selectedBeatmapCharacteristic = beatmapCharacteristicSegmentedControlController ? beatmapCharacteristicSegmentedControlController->selectedBeatmapCharacteristic : nullptr;
-    auto& doc = SongUtils::GetCurrentInfoDat();
-	SongUtils::SongInfo::UpdateMapData(doc, self->beatmapDifficultySegmentedControlController->selectedDifficulty, selectedBeatmapCharacteristic);
+	auto currentSelectedLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(self->level);
+	
+	SongUtils::SongInfo::UpdateMapData(currentSelectedLevel, SongUtils::GetCurrentInfoDat(), self->selectedDifficultyBeatmap->get_difficulty(), self->selectedDifficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic());
 
 	UIUtils::SetupOrUpdateRequirementsModal(self);
 	RequirementUtils::UpdatePlayButton();
@@ -74,13 +82,14 @@ MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDif
 }
 
 MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &GlobalNamespace::BeatmapDifficultySegmentedControlController::SetData, void, GlobalNamespace::BeatmapDifficultySegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<GlobalNamespace::IDifficultyBeatmap*>* difficultyBeatmapsList, GlobalNamespace::BeatmapDifficulty selectedDifficulty)
-{
+{	
+
 	auto difficultyBeatmaps = ArrayW<GlobalNamespace::IDifficultyBeatmap*>(difficultyBeatmapsList);
 
 	if (SongUtils::SongInfo::get_mapData().isCustom) {
 		if (difficultyBeatmaps[0] != nullptr) {
 			if (config.enableCustomDiffNames) {
-				DifficultyNameUtils::SetDifficultyNameCacheFromArray(difficultyBeatmaps);
+				DifficultyNameUtils::SetDifficultyNameCacheFromArray(difficultyBeatmaps, difficultyBeatmaps[0]->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic());
 			}
 		}
 	}

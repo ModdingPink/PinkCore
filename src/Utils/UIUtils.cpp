@@ -251,7 +251,11 @@ namespace UIUtils
 		static auto voidColourScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*, il2cpp_utils::CreationType::Manual>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false,
 			voidColour, voidColour, voidColour, voidColour, false, voidColour, voidColour, voidColour);
 
-		if (auto scheme = SongUtils::CustomData::GetCustomSongColour(voidColourScheme, false))
+		rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
+
+		SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(SongUtils::GetCurrentInfoDat(), customData, SongUtils::SongInfo::get_mapData().difficulty, SongUtils::SongInfo::get_mapData().characteristic);
+
+		if (auto scheme = SongUtils::CustomData::GetCustomSongColourFromCustomData(voidColourScheme, false, customData))
 		{
 			reinterpret_cast<UnityEngine::RectTransform*>(coloursModal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-7.5, 8));
 			coloursModal->Show(true, false, nullptr);
