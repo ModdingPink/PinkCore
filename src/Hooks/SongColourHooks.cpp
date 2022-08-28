@@ -31,7 +31,7 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Init, &StandardLev
 	GlobalNamespace::ColorScheme* newColourScheme = nullptr;
 	SongUtils::CustomData::HandleGetMapInfoData(previewBeatmapLevel, difficultyBeatmap->get_difficulty(), difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic());
 	//gets the data again.. ya know.. just in case?
-	if (SongUtils::SongInfo::get_mapIsCustom() && SongUtils::SongInfo::get_mapHasColours() && config.enableCustomSongColours) {
+	if (SongUtils::SongInfo::get_mapData().isCustom && SongUtils::SongInfo::get_mapData().hasCustomColours && config.enableCustomSongColours) {
 		if (overrideColorScheme == nullptr)
 			newColourScheme = SongUtils::CustomData::GetCustomSongColour(previewBeatmapLevel->get_environmentInfo()->colorScheme->colorScheme, false);
 		else
@@ -54,7 +54,7 @@ MAKE_AUTO_HOOK_MATCH(MultiplayerLevelScenesTransitionSetupDataSO_Init, &Multipla
 
 		SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(*multiJSON, customData, beatmapDifficulty, beatmapCharacteristic);
 
-		if (config.enableCustomSongColours && SongUtils::SongInfo::get_mapHasColours()) {
+		if (config.enableCustomSongColours && SongUtils::SongInfo::get_mapData().hasCustomColours) {
 			if (overrideColorScheme == nullptr)
 				newColourScheme = SongUtils::CustomData::GetCustomSongColourFromCustomData(previewBeatmapLevel->get_environmentInfo()->colorScheme->colorScheme, false, customData);
 			else

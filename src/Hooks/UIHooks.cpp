@@ -64,7 +64,7 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::S
 
 MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDifficultyMethods::Name, StringW, GlobalNamespace::BeatmapDifficulty difficulty) {
 	
-	if (SongUtils::SongInfo::get_mapIsCustom() && config.enableCustomDiffNames) {
+	if (SongUtils::SongInfo::get_mapData().isCustom && config.enableCustomDiffNames) {
 		StringW newDifficultyLabel = DifficultyNameUtils::GetDifficultyNameFromCache(difficulty);
 		if (newDifficultyLabel->get_Length() != 0) {
 			return newDifficultyLabel;
@@ -77,7 +77,7 @@ MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &Globa
 {
 	auto difficultyBeatmaps = ArrayW<GlobalNamespace::IDifficultyBeatmap*>(difficultyBeatmapsList);
 
-	if (SongUtils::SongInfo::get_mapIsCustom()) {
+	if (SongUtils::SongInfo::get_mapData().isCustom) {
 		if (difficultyBeatmaps[0] != nullptr) {
 			if (config.enableCustomDiffNames) {
 				DifficultyNameUtils::SetDifficultyNameCacheFromArray(difficultyBeatmaps);

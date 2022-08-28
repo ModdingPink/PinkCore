@@ -60,7 +60,7 @@ namespace RequirementUtils
 
 
 		// if custom
-		if (SongUtils::SongInfo::get_mapIsCustom() && SongUtils::CustomData::get_currentInfoDatValid())
+		if (SongUtils::SongInfo::get_mapData().isCustom && SongUtils::CustomData::get_currentInfoDatValid())
 		{
 			auto& doc = SongUtils::GetCurrentInfoDat();
 			//INFO("handling requirements for %s", doc["_songName"].GetString());
@@ -99,7 +99,7 @@ namespace RequirementUtils
 	bool AllowPlayerToStart()
 	{
 		if (disablingModIds.size() > 0) return false;
-		if (!SongUtils::SongInfo::get_mapIsCustom()) return true;
+		if (!SongUtils::SongInfo::get_mapData().isCustom) return true;
 		// for every required requirement
 		for (auto req : currentRequirements)
 		{
@@ -235,8 +235,8 @@ namespace RequirementUtils
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>().LastOrDefault();
 		if (levelViews) {
 			bool interactable = AllowPlayerToStart();
-            bool isCustom = SongUtils::SongInfo::get_mapIsCustom();
-            bool isWip = SongUtils::SongInfo::get_mapIsWIP();
+            bool isCustom = SongUtils::SongInfo::get_mapData().isCustom;
+            bool isWip = SongUtils::SongInfo::get_mapData().isWIP;
 			INFO("interactable: %d, custom: %d, wip: %d", interactable, isCustom, isWip);
             {
                 levelViews->get_practiceButton()->set_interactable(interactable);

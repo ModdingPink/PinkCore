@@ -43,7 +43,7 @@
 MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &GlobalNamespace::BeatmapCharacteristicSegmentedControlController::SetData, void, GlobalNamespace::BeatmapCharacteristicSegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<::GlobalNamespace::IDifficultyBeatmapSet*>* difficultyBeatmapSets, GlobalNamespace::BeatmapCharacteristicSO* selectedBeatmapCharacteristic)
 {	
     BeatmapCharacteristicSegmentedControlController_SetData(self, difficultyBeatmapSets,selectedBeatmapCharacteristic);
-	if (!SongUtils::SongInfo::get_mapIsCustom() || !config.enableCustomCharacteristics) return;
+	if (!SongUtils::SongInfo::get_mapData().isCustom || !config.enableCustomCharacteristics) return;
     int i = 0;
     ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(self->segmentedControl->dataItems->Length());
 
@@ -63,9 +63,9 @@ MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &G
 
 MAKE_AUTO_HOOK_MATCH(GameplayCoreInstaller_InstallBindings, &GlobalNamespace::GameplayCoreInstaller::InstallBindings, void, GlobalNamespace::GameplayCoreInstaller* self)
 {
-    if (!SongUtils::SongInfo::get_mapIsCustom()) { GameplayCoreInstaller_InstallBindings(self); return; }
+    if (!SongUtils::SongInfo::get_mapData().isCustom) { GameplayCoreInstaller_InstallBindings(self); return; }
 
-    int newSaberNum = SongUtils::SongInfo::get_mapSaberCount();
+    int newSaberNum = SongUtils::SongInfo::get_mapData().saberCount;
     if(newSaberNum == -1) { GameplayCoreInstaller_InstallBindings(self); return; }
 
 	int colourNum = self->sceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->numberOfColors;
@@ -78,7 +78,7 @@ MAKE_AUTO_HOOK_MATCH(GameplayCoreInstaller_InstallBindings, &GlobalNamespace::Ga
 
 MAKE_AUTO_HOOK_MATCH(BeatLineManager_HandleNoteWasSpawned, &GlobalNamespace::BeatLineManager::HandleNoteWasSpawned, void, GlobalNamespace::BeatLineManager* self, GlobalNamespace::NoteController* noteController)
 {
-    if (!SongUtils::SongInfo::get_mapIsCustom()) { BeatLineManager_HandleNoteWasSpawned(self, noteController); return; }
+    if (!SongUtils::SongInfo::get_mapData().isCustom) { BeatLineManager_HandleNoteWasSpawned(self, noteController); return; }
 
-    if(SongUtils::SongInfo::get_mapShowsRotationLines()) BeatLineManager_HandleNoteWasSpawned(self, noteController);
+    if(SongUtils::SongInfo::get_mapData().showRotationSpwanLines) BeatLineManager_HandleNoteWasSpawned(self, noteController);
 }

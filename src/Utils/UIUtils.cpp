@@ -269,7 +269,7 @@ namespace UIUtils
 		bool isNew = false;
 
 		// if anything is needed, anyone worked on it, or the song is WIP, show the modal
-		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_mapIsWIP() || SongUtils::SongInfo::get_mapHasColours());
+		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_mapData().isWIP || SongUtils::SongInfo::get_mapData().hasCustomColours);
 		
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
 		int length = levelViews.Length();
@@ -312,7 +312,7 @@ namespace UIUtils
 				// can't capture requirementsList when it hasn't been set yet, and this is better than making it a global variable imo
 				requirementsModal->get_gameObject()->GetComponentInChildren<PinkCore::UI::RequirementModalListTableData*>()->tableView->ClearSelection();
 				// check if color cell
-				if (cell == 0 && SongUtils::SongInfo::get_mapHasColours()) {
+				if (cell == 0 && SongUtils::SongInfo::get_mapData().hasCustomColours) {
 					// modals seem to be buggy when stacked
 					requirementsModal->Hide(true, custom_types::MakeDelegate<System::Action*>((std::function<void()>) [self] {
 						SetupOrShowColorsModal(self->get_transform());

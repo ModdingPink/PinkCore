@@ -190,7 +190,7 @@ namespace PinkCore::UI
     HMUI::TableCell* RequirementModalListTableData::CellForIdx(HMUI::TableView* tableView, int idx)
     {
 
-        if (SongUtils::SongInfo::get_mapHasColours())
+        if (SongUtils::SongInfo::get_mapData().hasCustomColours)
         {
             if (idx == 0) return GetCustomColoursCell();
             else idx--;
@@ -214,7 +214,7 @@ namespace PinkCore::UI
             idx -= RequirementUtils::GetCurrentSuggestions().size();
         }
 
-        if (SongUtils::SongInfo::get_mapIsWIP())
+        if (SongUtils::SongInfo::get_mapData().isWIP)
         {
             if (idx == 0) return GetWipCell();
             else idx--;
@@ -232,6 +232,6 @@ namespace PinkCore::UI
     int RequirementModalListTableData::NumberOfCells()
     {
         // iswip is 0 or 1, requirements size, suggestions size, contributor size
-        return SongUtils::SongInfo::get_mapIsWIP() + SongUtils::SongInfo::get_mapHasColours() + RequirementUtils::GetCurrentRequirements().size() + RequirementUtils::GetCurrentSuggestions().size() + ContributorUtils::GetContributors().size();
+        return SongUtils::SongInfo::get_mapData().isWIP + SongUtils::SongInfo::get_mapData().hasCustomColours + RequirementUtils::GetCurrentRequirements().size() + RequirementUtils::GetCurrentSuggestions().size() + ContributorUtils::GetContributors().size();
     }
 }

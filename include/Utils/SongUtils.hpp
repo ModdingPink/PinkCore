@@ -8,7 +8,7 @@
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
 #include "GlobalNamespace/ColorScheme.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
-#include "songloader/shared/CustomTypes/CustomLevelInfoSaveData.hpp"
+#include "LevelDetailAPI.hpp"
 
 namespace SongUtils
 {
@@ -88,20 +88,21 @@ namespace SongUtils
 		/// @param value what to set
 		void set_currentInfoDatValid(bool value);
 
-		const char16_t* MapEnvironmentTypeChecker(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
+
+		GlobalNamespace::ColorScheme* GetCustomSongColourFromCustomData(GlobalNamespace::ColorScheme* colorScheme, bool hasOverride, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData);
+
+		GlobalNamespace::ColorScheme* GetCustomSongColour(GlobalNamespace::ColorScheme* colorScheme, bool hasOverride);
 		
+		void GetCustomCharacteristicItems(StringW characteristic, UnityEngine::Sprite*& sprite, StringW& hoverText);
+
 		int MapSaberCountChecker(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
 		
 		bool MapHasColoursChecker(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
 		
 		bool MapShouldShowRotationSpawnLines(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
 		
-		GlobalNamespace::ColorScheme* GetCustomSongColourFromCustomData(GlobalNamespace::ColorScheme* colorScheme, bool hasOverride, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData);
+		const char16_t* MapEnvironmentTypeChecker(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
 		
-		GlobalNamespace::ColorScheme* GetCustomSongColour(GlobalNamespace::ColorScheme* colorScheme, bool hasOverride);
-		
-		void GetCustomCharacteristicItems(StringW characteristic, UnityEngine::Sprite*& sprite, StringW& hoverText);
-	
 
 	}
 
@@ -110,8 +111,7 @@ namespace SongUtils
 
 		
 		void ResetMapData();
-		void UpdateMapData(CustomJSONData::DocumentUTF16& currentInfoDat, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
-
+		void UpdateMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
 
 		/// @brief checks if the levelid is custom
 		/// @return true for custom, false for not custom
@@ -125,52 +125,13 @@ namespace SongUtils
 
 		/// @brief getter for whether the current song is custom
 		/// @return true for custom
-		bool get_mapIsCustom();
+		PinkCore::API::LevelDetails get_mapData();
 
 		void set_mapIsCustom(bool val);
 		/*--------------------------------------------------------------*/
 
-		/// @brief getter for whether the current song is WIP
-		/// @return true for WIP
-		bool get_mapIsWIP();
-
 		void set_mapIsWIP(bool val);
 		/*--------------------------------------------------------------*/	
 
-		/// @brief getter for whether the current song has custom colours
-		/// @return true for if the level has custom colours
-		bool get_mapHasColours();
-
-		void set_mapHasColours(bool val);
-		/*--------------------------------------------------------------*/		
-		
-		/// @brief getter for whether the current song is an overridden OneSaber Map
-		/// @return true for OneSaber
-		int get_mapSaberCount();
-
-		void set_mapSaberCount(int val);
-		/*--------------------------------------------------------------*/
-
-		/// @brief getter for whether the current song shows rotation lines when rotation events are present
-		/// @return true for Rotation
-		bool get_mapShowsRotationLines();
-
-		void set_mapShowsRotationLines(bool val);
-		/*--------------------------------------------------------------*/
-
-		/// @brief getter for the current environment Type string (used to override 360 maps)
-		/// @return environment type string
-		const char16_t* get_mapEnvironmentTypeString();
-
-		void set_mapEnvironmentTypeString(const char16_t* val);
-		/*--------------------------------------------------------------*/
-
-		/// @brief gets the last selected difficulty
-		GlobalNamespace::BeatmapDifficulty get_mapDifficulty();
-		/*--------------------------------------------------------------*/
-
-		/// @brief gets the latest cached characteristic
-		GlobalNamespace::BeatmapCharacteristicSO* get_mapCharacteristic();
-		/*--------------------------------------------------------------*/
 	}
 }

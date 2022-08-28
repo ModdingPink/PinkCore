@@ -223,12 +223,12 @@ namespace SongUtils
 		}
 		
 
-		bool GetCurrentCustomDataJson(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& out)
+		bool GetCurrentCustomDataJson(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, CustomJSONData::ValueUTF16& out)
 		{
-			return GetCustomDataJsonFromDifficultyAndCharacteristic(in, out, SongInfo::get_mapDifficulty(), SongInfo::get_mapCharacteristic());
+			return GetCustomDataJsonFromDifficultyAndCharacteristic(in, out, SongInfo::get_mapData().difficulty, SongInfo::get_mapData().characteristic);
 		}
 
-		bool GetCustomDataJsonFromCharacteristic(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& out, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+		bool GetCustomDataJsonFromCharacteristic(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, CustomJSONData::ValueUTF16& out, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
 		{
 			bool hasCustomData = false;
 			INFO("Looking for characteristic: %s", to_utf8(characteristic->serializedName).c_str());
@@ -254,10 +254,10 @@ namespace SongUtils
 		}
 
 
-		bool GetCustomDataJsonFromDifficultyAndCharacteristic(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& out, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+		bool GetCustomDataJsonFromDifficultyAndCharacteristic(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, CustomJSONData::ValueUTF16& out, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
 		{
 			bool hasCustomData = false;
-			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
+			CustomJSONData::ValueUTF16 customData;
 			std::u16string difficultyToFind = SongUtils::GetDiffFromEnum(difficulty);
 			GetCustomDataJsonFromCharacteristic(in, customData, characteristic);
 			auto difficultyBeatmaps = customData.GetObject().FindMember(u"_difficultyBeatmaps");	
@@ -287,7 +287,7 @@ namespace SongUtils
 		void GetCustomCharacteristicItems(GlobalNamespace::BeatmapCharacteristicSO* characteristic, UnityEngine::Sprite*& sprite, StringW& hoverText){
 			auto& d = SongUtils::GetCurrentInfoDat();
 			bool hasCustomData = false;
-			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
+			CustomJSONData::ValueUTF16 customData;
 			GetCustomDataJsonFromCharacteristic(d, customData, characteristic);
 			auto customDataItr = customData.GetObject().FindMember(u"_customData");
 			if(customDataItr != customData.MemberEnd()){		
@@ -319,9 +319,9 @@ namespace SongUtils
 
 	GlobalNamespace::ColorScheme* GetCustomSongColour(GlobalNamespace::ColorScheme* colorScheme, bool hasOverride) {
 		auto& doc = SongUtils::GetCurrentInfoDat();
-		rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
-		CustomData::GetCurrentCustomDataJson(doc, customData);
-		return CustomData::GetCustomSongColourFromCustomData(colorScheme, hasOverride, customData);
+		CustomJSONData::ValueUTF16 customData;
+		SongUtils::CustomData::GetCurrentCustomDataJson(doc, customData);
+		return SongUtils::CustomData::GetCustomSongColourFromCustomData(colorScheme, hasOverride, customData);
 	}
 
 
@@ -375,7 +375,7 @@ namespace SongUtils
 		
 	}
 
-	void ExtractRequirements(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& requirementsArray, std::vector<std::string>& output)
+	void ExtractRequirements(const CustomJSONData::ValueUTF16& requirementsArray, std::vector<std::string>& output)
 	{
 		auto actualArray = requirementsArray.GetArray();
 		for (auto& requirement : actualArray)
@@ -392,7 +392,7 @@ namespace SongUtils
 		std::sort(output.begin(), output.end());
 	}
 
-	bool MapHasColoursChecker(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+	bool MapHasColoursChecker(CustomJSONData::ValueUTF16& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
 	{
 		static const char16_t* colours[] = {u"_colorLeft", u"_colorRight",u"_envColorLeft", u"_envColorRight", u"_envColorLeftBoost", u"_envColorRightBoost", u"_obstacleColor"};
 		for (auto name : colours) {
@@ -408,7 +408,7 @@ namespace SongUtils
 		return false;
 	}
 
-	int MapSaberCountChecker(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+	int MapSaberCountChecker(CustomJSONData::ValueUTF16& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
 	{
 		auto itr = customData.GetObject().FindMember(u"_oneSaber");
 		if (itr != customData.MemberEnd()) {
@@ -421,7 +421,7 @@ namespace SongUtils
 		return -1; //if the object doesnt exist, then we use -1 to specify that this option shouldnt be used
 	}
 
-	const char16_t* MapEnvironmentTypeChecker(rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+	const char16_t* MapEnvironmentTypeChecker(CustomJSONData::ValueUTF16 customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
 	{
 
 		auto itr = customData.GetObject().FindMember(u"_environmentType");
@@ -431,7 +431,7 @@ namespace SongUtils
 		return u"Default"; //if the object doesnt exist, then we use Default to specify that this option shouldnt be used
 	}
 
-	bool MapShouldShowRotationSpawnLines(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+	bool MapShouldShowRotationSpawnLines(CustomJSONData::ValueUTF16& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
 	{
 		auto itr = customData.GetObject().FindMember(u"_showRotationNoteSpawnLines");
 		if (itr != customData.MemberEnd()) {
@@ -454,40 +454,17 @@ namespace SongUtils
 		}
 
 		/*
-		PinkCore::API::LevelDetails GetNewMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic, GlobalNamespace::IPreviewBeatmapLevel* level){
-			PinkCore::API::LevelDetails newLevelDetail;
-			newLevelDetail.difficulty = difficulty;
-			newLevelDetail.characteristic = characteristic;
-			if(isCustom(level)){
-				rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
-				CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(in, customData, difficulty, characteristic);
-				newLevelDetail.environmentType = CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
-				newLevelDetail.hasCustomColours = CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
-				newLevelDetail.saberCount = CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
-				currentMapLevelDetails.showRotationSpwanLines = CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
-				newLevelDetail.isCustom = true;
-				newLevelDetail.isWIP = isWIP(level);
-			}else{
-				currentMapLevelDetails.environmentType = u"Default";
-				currentMapLevelDetails.hasCustomColours = false;
-				currentMapLevelDetails.isCustom = false;
-				currentMapLevelDetails.saberCount = -1; //-1 = No Data, dont do anything
-				currentMapLevelDetails.isWIP = false;
-				currentMapLevelDetails.showRotationSpwanLines = true;
-			}
-			
-			
-		}*/
+		*/
 
-		void UpdateMapData(CustomJSONData::DocumentUTF16& currentInfoDat, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
+		void UpdateMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
 			currentMapLevelDetails.difficulty = difficulty;
 			currentMapLevelDetails.characteristic = characteristic;
-			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
-			CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(currentInfoDat, customData, difficulty, characteristic);
-			currentMapLevelDetails.environmentType = CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
-			currentMapLevelDetails.hasCustomColours = CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
-			currentMapLevelDetails.showRotationSpwanLines = CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
-			currentMapLevelDetails.saberCount = CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
+			CustomJSONData::ValueUTF16 customData;
+			SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(currentInfoDat, customData, difficulty, characteristic);
+			currentMapLevelDetails.environmentType = SongUtils::CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
+			currentMapLevelDetails.hasCustomColours = SongUtils::CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
+			currentMapLevelDetails.showRotationSpwanLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
+			currentMapLevelDetails.saberCount = SongUtils::CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
 		}
 
 		bool isCustom(GlobalNamespace::IPreviewBeatmapLevel* level)
@@ -508,75 +485,15 @@ namespace SongUtils
 		bool isWIP(GlobalNamespace::IPreviewBeatmapLevel* level)
 		{
 			if (!level) return false;
-			//had to resort to the code below again, multi for some reason shits itself here
-			//return il2cpp_functions::class_is_assignable_from(classof(GlobalNamespace::CustomPreviewBeatmapLevel*), il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(level)));
-			// the above check should suffice, but this code will remain as backup
-			
-
-			//the above did not suffice.
-			//broke in multi
-			//now the RSL makes this consistent, resorting back to this
 			StringW levelidCS = level->get_levelID();
 		    // if the level ID contains `WIP` then the song is a WIP song
-			return levelidCS.ends_with(" WIP");
-			
+			return levelidCS.ends_with(u" WIP");
 		}
 
 
-
-		
-
-		int get_mapSaberCount()
+		PinkCore::API::LevelDetails get_mapData()
 		{
-			return currentMapLevelDetails.saberCount;
-		}
-
-		bool get_mapShowsRotationLines()
-		{
-			return currentMapLevelDetails.showRotationSpwanLines;
-		}
-
-		
-		const char16_t* get_mapEnvironmentTypeString()
-		{
-			return currentMapLevelDetails.environmentType;
-		}
-
-		bool get_mapHasColours()
-		{
-			return currentMapLevelDetails.hasCustomColours;
-		}
-
-
-		void set_mapSaberCount(int val)
-		{
-			currentMapLevelDetails.saberCount = val;
-		}
-
-		void set_mapShowsRotationLines(bool val)
-		{
-			currentMapLevelDetails.showRotationSpwanLines = val;
-		}
-
-		
-		void set_mapEnvironmentTypeString(const char16_t* val)
-		{
-			currentMapLevelDetails.environmentType = val;
-		}
-
-		void set_mapHasColours(bool val)
-		{
-			currentMapLevelDetails.hasCustomColours = val;
-		}
-
-		bool get_mapIsCustom()
-		{
-			return currentMapLevelDetails.isCustom;
-		}
-
-		bool get_mapIsWIP()
-		{
-			return currentMapLevelDetails.isWIP;
+			return currentMapLevelDetails;
 		}
 
 		void set_mapIsCustom(bool val)
@@ -589,14 +506,5 @@ namespace SongUtils
 			currentMapLevelDetails.isWIP = val;
 		}
 		
-		GlobalNamespace::BeatmapCharacteristicSO* get_mapCharacteristic()
-		{
-			return currentMapLevelDetails.characteristic;
-		}
-
-		GlobalNamespace::BeatmapDifficulty get_mapDifficulty()
-		{
-			return currentMapLevelDetails.difficulty;
-		}
 	}
 }
