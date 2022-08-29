@@ -1,21 +1,20 @@
 #include "Utils/ContributorUtils.hpp"
 #include "Utils/SongUtils.hpp"
 #include "logging.hpp"
-
+#include "LevelDetailAPI.hpp"
 //#include "CustomTypes/ContributorHandler.hpp"
 
 using Contributor = PinkCore::Contributor;
 namespace ContributorUtils
 {
-	std::vector<Contributor> currentContributors;
 
 	void EmptyContributors() {
-		currentContributors.clear();
+		SongUtils::SongInfo::get_mapData().currentContributors.clear();
 	}
 
 	void FetchListOfContributors(PinkCore::API::LevelDetails& levelDetail)
 	{
-		currentContributors.clear();
+		levelDetail.currentContributors.clear();
 		// if current info is not valid, there is no use in trying to read it
 		if (SongUtils::CustomData::get_currentInfoDatValid())
 		{   
@@ -35,21 +34,16 @@ namespace ContributorUtils
 					// add every contributor
 					for (auto& contributor : contributors)
 					{
-						currentContributors.push_back(Contributor(contributor));
+						levelDetail.currentContributors.push_back(Contributor(contributor));
 					}
 				}
 			}
 		}
 	}
 
-	const std::vector<Contributor>& GetContributors()
-	{
-		return currentContributors;
-	}
-
 	bool GetIsCurrentContributor(Contributor& contributor)
 	{
-		for (auto& cont : currentContributors)
+		for (auto& cont : SongUtils::SongInfo::get_mapData().currentContributors)
 		{
 			// if we find a match, return true
 			if (cont == contributor) return true;
@@ -59,7 +53,7 @@ namespace ContributorUtils
 
 	bool DidAnyoneWorkOnThis()
 	{
-		return currentContributors.size() != 0;
+		return SongUtils::SongInfo::get_mapData().currentContributors.size() != 0;
 	}
 	
 	/*

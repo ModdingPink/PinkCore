@@ -64,11 +64,6 @@ namespace RequirementUtils
 	/// @brief updates the play button based on if the player is allowed to start
 	void UpdatePlayButton();
 
-	/// @brief gets a const reference to the current requirement vector
-	const std::vector<std::string>& GetCurrentRequirements();
-
-	/// @brief gets a const reference to the current suggestion vector
-	const std::vector<std::string>& GetCurrentSuggestions();
 	namespace ExternalAPI
 	{
 		/// @brief

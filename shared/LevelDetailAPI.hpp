@@ -3,6 +3,8 @@
 #include "beatsaber-hook/shared/rapidjson/include/rapidjson/document.h"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
+#include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
+#include "Contributor.hpp"
 #include <optional>
 #include <functional>
 #include <utility>
@@ -21,6 +23,7 @@ namespace PinkCore::API
 		bool hasCustomColours;
         std::vector<std::string> currentRequirements = {};
 	    std::vector<std::string> currentSuggestions = {};
+        std::vector<Contributor> currentContributors = {};
 	};
 
 	/// @brief returns the current loaded maps level details

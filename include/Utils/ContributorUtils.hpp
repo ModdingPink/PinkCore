@@ -14,9 +14,6 @@ namespace ContributorUtils
 	/// @brief clears the contributor list
 	void EmptyContributors();
 
-	/// @brief gets the reference to the internal list of contributors
-	const std::vector<PinkCore::Contributor>& GetContributors();
-	
 	/// @brief Gets whether the passed contributor is a contributor for the current song
 	/// @param contributor the contributor to check against
 	/// @return true for is current, false for not

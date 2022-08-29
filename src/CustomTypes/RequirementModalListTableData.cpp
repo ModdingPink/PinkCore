@@ -154,18 +154,18 @@ namespace PinkCore::UI
 
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetRequirementCell(int idx)
     {
-        return GetRequirementOrSuggestionCell(RequirementUtils::GetCurrentRequirements()[idx]);
+        return GetRequirementOrSuggestionCell(SongUtils::SongInfo::get_mapData().currentRequirements[idx]);
     }
 
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetSuggestionCell(int idx)
     {
-        return GetRequirementOrSuggestionCell(RequirementUtils::GetCurrentSuggestions()[idx]);
+        return GetRequirementOrSuggestionCell(SongUtils::SongInfo::get_mapData().currentSuggestions[idx]);
     }
 
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetContributorCell(int idx)
     {
         auto tableCell = GetTableCell();
-        auto& contributor = ContributorUtils::GetContributors()[idx];
+        auto& contributor = SongUtils::SongInfo::get_mapData().currentContributors[idx];
         tableCell->set_interactable(false);
         if (contributor.iconPath.empty()) {
             tableCell->songNameText->set_text(contributor.name);
@@ -189,29 +189,29 @@ namespace PinkCore::UI
 
     HMUI::TableCell* RequirementModalListTableData::CellForIdx(HMUI::TableView* tableView, int idx)
     {
-
-        if (SongUtils::SongInfo::get_mapData().hasCustomColours)
+        auto mapData = SongUtils::SongInfo::get_mapData();
+        if (mapData.hasCustomColours)
         {
             if (idx == 0) return GetCustomColoursCell();
             else idx--;
         }
 
-        if (idx < RequirementUtils::GetCurrentRequirements().size())
+        if (idx < mapData.currentRequirements.size())
         {
             return GetRequirementCell(idx);
         }
         else
         {
-            idx -= RequirementUtils::GetCurrentRequirements().size();
+            idx -= mapData.currentRequirements.size();
         }
 
-        if (idx < RequirementUtils::GetCurrentSuggestions().size())
+        if (idx < mapData.currentSuggestions.size())
         {
             return GetSuggestionCell(idx);
         }
         else
         {
-            idx -= RequirementUtils::GetCurrentSuggestions().size();
+            idx -= mapData.currentSuggestions.size();
         }
 
         if (SongUtils::SongInfo::get_mapData().isWIP)
@@ -232,6 +232,7 @@ namespace PinkCore::UI
     int RequirementModalListTableData::NumberOfCells()
     {
         // iswip is 0 or 1, requirements size, suggestions size, contributor size
-        return SongUtils::SongInfo::get_mapData().isWIP + SongUtils::SongInfo::get_mapData().hasCustomColours + RequirementUtils::GetCurrentRequirements().size() + RequirementUtils::GetCurrentSuggestions().size() + ContributorUtils::GetContributors().size();
+        auto mapData = SongUtils::SongInfo::get_mapData();
+        return mapData.isWIP + mapData.hasCustomColours + mapData.currentRequirements.size() + mapData.currentSuggestions.size() + mapData.currentContributors.size();
     }
 }

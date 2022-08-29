@@ -37,8 +37,6 @@ namespace RequirementUtils
 
 	std::vector<std::string> installedRequirements = {};
 	std::vector<std::string> forcedSuggestions = {};
-	std::vector<std::string> currentRequirements = {};
-	std::vector<std::string> currentSuggestions = {};
 
 	std::vector<std::string> disablingModIds = {};
 	
@@ -47,17 +45,18 @@ namespace RequirementUtils
 	
 
 	void EmptyRequirements() {
-		currentRequirements.clear();
-		currentSuggestions.clear();
-		RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
-        RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
+		auto mapData = SongUtils::SongInfo::get_mapData();
+		mapData.currentRequirements.clear();
+		mapData.currentSuggestions.clear();
+		RequirementUtils::onFoundRequirements().invoke(mapData.currentRequirements);
+        RequirementUtils::onFoundSuggestions().invoke(mapData.currentSuggestions);
 	}
 
 	void HandleRequirementDetails(PinkCore::API::LevelDetails& levelDetail)
 	{
 		if (installedRequirements.empty()) FindInstalledRequirements();
-		currentRequirements.clear();
-		currentSuggestions.clear();
+		levelDetail.currentRequirements.clear();
+		levelDetail.currentSuggestions.clear();
 
 
 		// if custom
@@ -75,20 +74,18 @@ namespace RequirementUtils
 				if (requirementsArray != customData.MemberEnd())
 				{
 					INFO("Extracting Requirements");
-					SongUtils::CustomData::ExtractRequirements(requirementsArray->value, currentRequirements);
+					SongUtils::CustomData::ExtractRequirements(requirementsArray->value, levelDetail.currentRequirements);
 				}
 
 				auto suggestionsArray = customData.FindMember(u"_suggestions");
 				if (suggestionsArray != customData.MemberEnd())
 				{
 					INFO("Extracting Suggestions");
-					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, currentSuggestions);
+					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, levelDetail.currentSuggestions);
 				}
 
-				levelDetail.currentRequirements = currentRequirements;
-				levelDetail.currentSuggestions = currentSuggestions;
-                RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
-                RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
+                RequirementUtils::onFoundRequirements().invoke(levelDetail.currentRequirements);
+                RequirementUtils::onFoundSuggestions().invoke(levelDetail.currentSuggestions);
 			}
 			else
 			{
@@ -102,9 +99,10 @@ namespace RequirementUtils
 	bool AllowPlayerToStart()
 	{
 		if (disablingModIds.size() > 0) return false;
-		if (!SongUtils::SongInfo::get_mapData().isCustom) return true;
+		auto mapData = SongUtils::SongInfo::get_mapData();
+		if (!mapData.isCustom) return true;
 		// for every required requirement
-		for (auto req : currentRequirements)
+		for (auto req : mapData.currentRequirements)
 		{
 			// if any is not installed, return false
 			if (!GetRequirementInstalled(req) && !GetIsForcedSuggestion(req)) return false;
@@ -115,7 +113,8 @@ namespace RequirementUtils
 
 	bool IsAnythingNeeded()
 	{
-		return !currentRequirements.empty() || !currentSuggestions.empty();
+		auto mapData = SongUtils::SongInfo::get_mapData();
+		return !mapData.currentRequirements.empty() || !mapData.currentSuggestions.empty();
 	}
 
 	bool IsAnythingMissing()
@@ -125,7 +124,7 @@ namespace RequirementUtils
 		if (!AllowPlayerToStart()) return true;
 
 		// for every suggested suggestion
-		for (auto sug : currentSuggestions)
+		for (auto sug : SongUtils::SongInfo::get_mapData().currentSuggestions)
 		{
 			// if any is not installed, return false
 			if (!GetRequirementInstalled(sug)) return true;
@@ -166,7 +165,7 @@ namespace RequirementUtils
 	bool GetSongHasRequirement(std::string requirement)
 	{
 		// find the req in the suggestions list, if found return true, else return false
-		for (auto req : currentRequirements)
+		for (auto req : SongUtils::SongInfo::get_mapData().currentRequirements)
 		{
 			if (req.find(requirement) != std::string::npos)
 			{
@@ -180,7 +179,7 @@ namespace RequirementUtils
 	bool GetSongHasSuggestion(std::string requirement)
 	{
 		// find the req in the suggestions list, if found return true, else return false
-		for (auto sug : currentSuggestions)
+		for (auto sug : SongUtils::SongInfo::get_mapData().currentSuggestions)
 		{
 			if (sug.find(requirement) != std::string::npos)
 			{
@@ -203,16 +202,6 @@ namespace RequirementUtils
 				INFO("Found loaded id: %s", mod.second.info.id.c_str());
 			}
 		}
-	}
-
-	const std::vector<std::string>& GetCurrentRequirements()
-	{
-		return currentRequirements;
-	}
-
-	const std::vector<std::string>& GetCurrentSuggestions()
-	{
-		return currentSuggestions;
 	}
 
 	/*
