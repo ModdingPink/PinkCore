@@ -11,23 +11,29 @@ namespace PinkCore::API
         newLevelDetail.difficulty = difficulty;
         newLevelDetail.characteristic = characteristic;
         if(SongUtils::SongInfo::isCustom(level)){
-            RequirementUtils::HandleRequirementDetails(newLevelDetail);
-			ContributorUtils::FetchListOfContributors(newLevelDetail);
             rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
-            SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(in, customData, difficulty, characteristic);
-            newLevelDetail.environmentType = SongUtils::CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
-            newLevelDetail.hasCustomColours = SongUtils::CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
-            newLevelDetail.saberCount = SongUtils::CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
-            newLevelDetail.showRotationSpwanLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
+            if(SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(in, customData, difficulty, characteristic)){
+                RequirementUtils::HandleRequirementDetails(newLevelDetail);
+                ContributorUtils::FetchListOfContributors(newLevelDetail);
+                newLevelDetail.environmentType = SongUtils::CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
+                newLevelDetail.hasCustomColours = SongUtils::CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
+                newLevelDetail.saberCount = SongUtils::CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
+                newLevelDetail.showRotationSpwanLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
+            }else{
+                newLevelDetail.environmentType = u"Default";
+                newLevelDetail.hasCustomColours = false;
+                newLevelDetail.showRotationSpwanLines = true;
+                newLevelDetail.saberCount = -1; //-1 = No Data, dont do anything
+            }
             newLevelDetail.isCustom = true;
             newLevelDetail.isWIP = SongUtils::SongInfo::isWIP(level);
         }else{
 			newLevelDetail.environmentType = u"Default";
 			newLevelDetail.hasCustomColours = false;
-			newLevelDetail.isCustom = false;
-			newLevelDetail.saberCount = -1; //-1 = No Data, dont do anything
-			newLevelDetail.isWIP = false;
 			newLevelDetail.showRotationSpwanLines = true;
+			newLevelDetail.saberCount = -1; //-1 = No Data, dont do anything
+			newLevelDetail.isCustom = false;
+			newLevelDetail.isWIP = false;
         }	
         return newLevelDetail;
 	}
