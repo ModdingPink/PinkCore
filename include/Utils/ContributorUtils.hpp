@@ -12,7 +12,7 @@ namespace ContributorUtils
 	void FetchListOfContributors(PinkCore::API::LevelDetails& levelDetail);
 
 	/// @brief clears the contributor list
-	void EmptyContributors();
+	void EmptyContributors(PinkCore::API::LevelDetails& levelDetail);
 
 	/// @brief Gets whether the passed contributor is a contributor for the current song
 	/// @param contributor the contributor to check against

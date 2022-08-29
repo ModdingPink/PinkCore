@@ -16,7 +16,7 @@ namespace RequirementUtils
 	using FoundSuggestionsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
 
 	/// @brief empties the requirements, used if the infodat fails or the map is not custom
-	void EmptyRequirements();
+	void EmptyRequirements(PinkCore::API::LevelDetails& levelDetail);
 
 	/// @brief handle the requirement details so all backing information is up to date
 	//void HandleRequirementDetails(GlobalNamespace::StandardLevelDetailView* detailView);

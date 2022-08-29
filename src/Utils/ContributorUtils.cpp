@@ -8,8 +8,8 @@ using Contributor = PinkCore::Contributor;
 namespace ContributorUtils
 {
 
-	void EmptyContributors() {
-		SongUtils::SongInfo::get_mapData().currentContributors.clear();
+	void EmptyContributors(PinkCore::API::LevelDetails& levelDetail) {
+		levelDetail.currentContributors.clear();
 	}
 
 	void FetchListOfContributors(PinkCore::API::LevelDetails& levelDetail)

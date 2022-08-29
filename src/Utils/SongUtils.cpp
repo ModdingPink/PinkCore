@@ -254,26 +254,26 @@ namespace SongUtils
 			bool hasCustomData = false;
 			CustomJSONData::ValueUTF16 customData;
 			std::u16string difficultyToFind = SongUtils::GetDiffFromEnum(difficulty);
-			GetCustomDataJsonFromCharacteristic(in, customData, characteristic);
-			auto difficultyBeatmaps = customData.GetObject().FindMember(u"_difficultyBeatmaps");	
-			auto beatmaps = difficultyBeatmaps->value.GetArray();
-			for (auto& beatmap : beatmaps)
-			{
-				auto beatmapDiffNameItr = beatmap.GetObject().FindMember(u"_difficulty");
-				std::u16string diffString = beatmapDiffNameItr->value.GetString();
-				INFO("Found diffstring: %s", (char*)diffString.c_str());
-				// if the last selected difficulty is this specific one
-				if (difficultyToFind == diffString)
+			if(GetCustomDataJsonFromCharacteristic(in, customData, characteristic)){
+				auto difficultyBeatmaps = customData.GetObject().FindMember(u"_difficultyBeatmaps");	
+				auto beatmaps = difficultyBeatmaps->value.GetArray();
+				for (auto& beatmap : beatmaps)
 				{
-					auto specificCustomData = beatmap.GetObject().FindMember(u"_customData");
-					if (specificCustomData != beatmap.MemberEnd())
+					auto beatmapDiffNameItr = beatmap.GetObject().FindMember(u"_difficulty");
+					std::u16string diffString = beatmapDiffNameItr->value.GetString();
+					INFO("Found diffstring: %s", (char*)diffString.c_str());
+					// if the last selected difficulty is this specific one
+					if (difficultyToFind == diffString)
 					{
-						hasCustomData = true;
-						out.CopyFrom(specificCustomData->value, in.GetAllocator());
+						auto specificCustomData = beatmap.GetObject().FindMember(u"_customData");
+						if (specificCustomData != beatmap.MemberEnd())
+						{
+							hasCustomData = true;
+							out.CopyFrom(specificCustomData->value, in.GetAllocator());
+						}
 					}
 				}
 			}
-		
 			return hasCustomData;
 
 			/*
@@ -355,8 +355,10 @@ namespace SongUtils
 
 		GlobalNamespace::ColorScheme* GetCustomSongColour(GlobalNamespace::ColorScheme* colorScheme, bool hasOverride) {
 			CustomJSONData::ValueUTF16 customData;
-			SongUtils::CustomData::GetCurrentCustomDataJson(SongUtils::GetCurrentInfoDat(), customData);
-			return SongUtils::CustomData::GetCustomSongColourFromCustomData(colorScheme, hasOverride, customData);
+			if(SongUtils::CustomData::GetCurrentCustomDataJson(SongUtils::GetCurrentInfoDat(), customData)){
+				return SongUtils::CustomData::GetCustomSongColourFromCustomData(colorScheme, hasOverride, customData);
+			}
+			return nullptr;
 		}
 
 
@@ -487,8 +489,8 @@ namespace SongUtils
 			currentMapLevelDetails.saberCount = -1; //-1 = No Data, dont do anything
 			currentMapLevelDetails.isWIP = false;
 			currentMapLevelDetails.showRotationSpwanLines = true;
-			RequirementUtils::EmptyRequirements();
-			ContributorUtils::EmptyContributors();
+			RequirementUtils::EmptyRequirements(currentMapLevelDetails);
+			ContributorUtils::EmptyContributors(currentMapLevelDetails);
 		}
 
 		/*
@@ -502,14 +504,18 @@ namespace SongUtils
 			if(isCustomLevel){
 				currentMapLevelDetails.difficulty = difficulty;
 				currentMapLevelDetails.characteristic = characteristic;
-				RequirementUtils::HandleRequirementDetails(currentMapLevelDetails);
-				ContributorUtils::FetchListOfContributors(currentMapLevelDetails);
 				CustomJSONData::ValueUTF16 customData;
-				SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(currentInfoDat, customData, difficulty, characteristic);
-				currentMapLevelDetails.environmentType = SongUtils::CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
-				currentMapLevelDetails.hasCustomColours = SongUtils::CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
-				currentMapLevelDetails.showRotationSpwanLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
-				currentMapLevelDetails.saberCount = SongUtils::CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
+				if(SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(currentInfoDat, customData, difficulty, characteristic)){
+					RequirementUtils::HandleRequirementDetails(currentMapLevelDetails);
+					ContributorUtils::FetchListOfContributors(currentMapLevelDetails);
+					currentMapLevelDetails.environmentType = SongUtils::CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
+					currentMapLevelDetails.hasCustomColours = SongUtils::CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
+					currentMapLevelDetails.showRotationSpwanLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
+					currentMapLevelDetails.saberCount = SongUtils::CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
+				}else{
+					SongInfo::ResetMapData();
+				}
+				
 			}else{
 				SongInfo::ResetMapData();
 			}
@@ -527,7 +533,7 @@ namespace SongUtils
 			//broke in multi
 			//now the RSL makes this consistent, resorting back to this
 			StringW levelidCS = level->get_levelID();
-			return levelidCS.starts_with(u"custom_level_");			
+			return levelidCS->Contains("custom_level_");
 		}
 
 		bool isWIP(GlobalNamespace::IPreviewBeatmapLevel* level)

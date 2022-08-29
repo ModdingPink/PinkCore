@@ -44,12 +44,11 @@ namespace RequirementUtils
 	FoundSuggestionsEvent onFoundSuggestionsEvent;
 	
 
-	void EmptyRequirements() {
-		auto mapData = SongUtils::SongInfo::get_mapData();
-		mapData.currentRequirements.clear();
-		mapData.currentSuggestions.clear();
-		RequirementUtils::onFoundRequirements().invoke(mapData.currentRequirements);
-        RequirementUtils::onFoundSuggestions().invoke(mapData.currentSuggestions);
+	void EmptyRequirements(PinkCore::API::LevelDetails& levelDetail) {
+		levelDetail.currentRequirements.clear();
+		levelDetail.currentSuggestions.clear();
+		RequirementUtils::onFoundRequirements().invoke(levelDetail.currentRequirements);
+        RequirementUtils::onFoundSuggestions().invoke(levelDetail.currentSuggestions);
 	}
 
 	void HandleRequirementDetails(PinkCore::API::LevelDetails& levelDetail)

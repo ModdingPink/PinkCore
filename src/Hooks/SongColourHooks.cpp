@@ -34,15 +34,27 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Init, &StandardLev
 	GlobalNamespace::ColorScheme* newColourScheme = nullptr;
 	SongUtils::CustomData::HandleGetMapInfoData(previewBeatmapLevel);
 	//, difficultyBeatmap->get_difficulty(), difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()
-	if (config.enableCustomSongColours && SongUtils::SongInfo::get_mapData().hasCustomColours) {
+	auto mapData = SongUtils::SongInfo::get_mapData();
+	if (config.enableCustomSongColours && mapData.hasCustomColours) {
 		if (overrideColorScheme == nullptr)
 			newColourScheme = SongUtils::CustomData::GetCustomSongColour(previewBeatmapLevel->get_environmentInfo()->colorScheme->colorScheme, false);
 		else
 			newColourScheme = SongUtils::CustomData::GetCustomSongColour(overrideColorScheme, true);
 	}
 	if(newColourScheme) overrideColorScheme = newColourScheme;
-	difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents = true;
+	
+	bool containRotEvent = difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents;
+
+	StringW envType = mapData.environmentType;
+	if(envType == "allDirections"){
+		difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents = true;
+	}else if(envType == "default"){
+		difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents = false;
+	}
+	
 	StandardLevelScenesTransitionSetupDataSO_Init(self, gameMode, difficultyBeatmap, previewBeatmapLevel, overrideEnvironmentSettings, overrideColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, backButtonText, useTestNoteCutSoundEffects, startPaused);
+	
+	difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents = containRotEvent;
 }
 
 std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>> multiJSON;
