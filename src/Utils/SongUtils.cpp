@@ -8,6 +8,8 @@
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/ColorScheme.hpp"
 #include "GlobalNamespace/FilteredBeatmapLevel.hpp"
+#include "GlobalNamespace/IDifficultyBeatmap.hpp"
+#include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "logging.hpp"
 #include "config.hpp"
 #include "LevelDetailAPI.hpp"
@@ -482,44 +484,67 @@ namespace SongUtils
 	{
 		PinkCore::API::LevelDetails currentMapLevelDetails;
 
+		void ResetMapData(PinkCore::API::LevelDetails& mapData){
+			mapData.environmentType = u"Default";
+			mapData.hasCustomColours = false;
+			mapData.isCustom = false;
+			mapData.saberCount = -1; //-1 = No Data, dont do anything
+			mapData.isWIP = false;
+			mapData.showRotationSpwanLines = true;
+			mapData.dataIsValid = false;
+			RequirementUtils::EmptyRequirements(mapData);
+			ContributorUtils::EmptyContributors(mapData);
+		}
+
 		void ResetMapData(){
-			currentMapLevelDetails.environmentType = u"Default";
-			currentMapLevelDetails.hasCustomColours = false;
-			currentMapLevelDetails.isCustom = false;
-			currentMapLevelDetails.saberCount = -1; //-1 = No Data, dont do anything
-			currentMapLevelDetails.isWIP = false;
-			currentMapLevelDetails.showRotationSpwanLines = true;
-			RequirementUtils::EmptyRequirements(currentMapLevelDetails);
-			ContributorUtils::EmptyContributors(currentMapLevelDetails);
+			ResetMapData(currentMapLevelDetails);
 		}
 
-		/*
-		*/
+		void UpdateMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap){
+			SetMapData(currentInfoDat, currentMapLevelDetails, difficultyBeatmap);
+		}
+		void UpdateMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::IPreviewBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
+			SetMapData(currentInfoDat, currentMapLevelDetails, level, difficulty, characteristic);
+		}
 
-		void UpdateMapData(GlobalNamespace::IPreviewBeatmapLevel* level, rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
-			bool isCustomLevel = false;
-			if(level){ 
-				isCustomLevel = isCustom(level);
-			}
-			if(isCustomLevel){
-				currentMapLevelDetails.difficulty = difficulty;
-				currentMapLevelDetails.characteristic = characteristic;
-				CustomJSONData::ValueUTF16 customData;
-				if(SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(currentInfoDat, customData, difficulty, characteristic)){
-					RequirementUtils::HandleRequirementDetails(currentMapLevelDetails);
-					ContributorUtils::FetchListOfContributors(currentMapLevelDetails);
-					currentMapLevelDetails.environmentType = SongUtils::CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
-					currentMapLevelDetails.hasCustomColours = SongUtils::CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
-					currentMapLevelDetails.showRotationSpwanLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
-					currentMapLevelDetails.saberCount = SongUtils::CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
-				}else{
-					SongInfo::ResetMapData();
-				}
-				
+		void SetMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, PinkCore::API::LevelDetails& mapData, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap){
+			GlobalNamespace::BeatmapDifficulty difficulty = difficultyBeatmap->get_difficulty();
+        	GlobalNamespace::BeatmapCharacteristicSO* characteristic = difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic();
+        	GlobalNamespace::IPreviewBeatmapLevel* level = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
+			SetMapData(currentInfoDat, mapData, level, difficulty, characteristic);
+		}
+
+		void SetMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, PinkCore::API::LevelDetails& mapData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
+			mapData.difficulty = difficulty;
+			mapData.characteristic = characteristic;
+			CustomJSONData::ValueUTF16 customData;
+			if(SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(currentInfoDat, customData, difficulty, characteristic)){
+				RequirementUtils::HandleRequirementDetails(mapData);
+				ContributorUtils::FetchListOfContributors(mapData);
+				mapData.environmentType = SongUtils::CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
+				mapData.hasCustomColours = SongUtils::CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
+				mapData.showRotationSpwanLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
+				mapData.saberCount = SongUtils::CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
+				mapData.isCustom = true;
+				mapData.dataIsValid = true;
 			}else{
-				SongInfo::ResetMapData();
+				SongInfo::ResetMapData(mapData);
 			}
 		}
+
+		void SetMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, PinkCore::API::LevelDetails& mapData, GlobalNamespace::IPreviewBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
+			bool mapIsCustom = false;
+			if(level) mapIsCustom = isCustom(level);
+			if(mapIsCustom){
+				SetMapData(currentInfoDat, mapData, difficulty, characteristic);
+				mapData.isCustom = mapIsCustom;
+				mapData.isWIP = isWIP(level);
+			}else{
+				ResetMapData();
+			}
+		}
+
+
 
 		bool isCustom(GlobalNamespace::IPreviewBeatmapLevel* level)
 		{
@@ -545,7 +570,7 @@ namespace SongUtils
 		}
 
 
-		PinkCore::API::LevelDetails get_mapData()
+		PinkCore::API::LevelDetails& get_mapData()
 		{
 			return currentMapLevelDetails;
 		}

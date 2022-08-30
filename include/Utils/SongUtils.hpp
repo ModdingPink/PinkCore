@@ -111,7 +111,14 @@ namespace SongUtils
 
 		
 		void ResetMapData();
-		void UpdateMapData(GlobalNamespace::IPreviewBeatmapLevel* level, rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
+		void ResetMapData(PinkCore::API::LevelDetails& mapData);
+
+		void UpdateMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap);
+		void UpdateMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::IPreviewBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
+
+		void SetMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, PinkCore::API::LevelDetails& mapData, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap);
+		void SetMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, PinkCore::API::LevelDetails& mapData, GlobalNamespace::IPreviewBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
+		void SetMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, PinkCore::API::LevelDetails& mapData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic);
 
 		/// @brief checks if the levelid is custom
 		/// @return true for custom, false for not custom
@@ -125,7 +132,7 @@ namespace SongUtils
 
 		/// @brief getter for whether the current song is custom
 		/// @return true for custom
-		PinkCore::API::LevelDetails get_mapData();
+		PinkCore::API::LevelDetails& get_mapData();
 
 		void set_mapIsCustom(bool val);
 		/*--------------------------------------------------------------*/

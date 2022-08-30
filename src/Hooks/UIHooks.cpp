@@ -56,25 +56,15 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_SetContent, &GlobalNamespace::Stand
 MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::StandardLevelDetailView::RefreshContent, void, GlobalNamespace::StandardLevelDetailView* self)
 {
 	StandardLevelDetailView_RefreshContent(self);
-	//INFO("casting to IPreviewBeatmapLevel");
-	auto currentSelectedLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(self->level);
-	//INFO("casted");
-	//INFO("Getting Difficulty");
-	auto difficulty = self->selectedDifficultyBeatmap->get_difficulty();
-	//INFO("Got Difficulty: %s", SongUtils::GetDiffFromEnum(difficulty).c_str());
-	//INFO("Getting Characteristic");
+
 	auto characteristic = self->selectedDifficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic();
-	StringW CharaName = characteristic->serializedName;
-	//INFO("Got Characteristic: %s", CharaName);
-	//INFO("Running UpdateMapData");
-	SongUtils::SongInfo::UpdateMapData(currentSelectedLevel, SongUtils::GetCurrentInfoDat(), difficulty, characteristic);
-	//INFO("Ran UpdateMapData");
-	//INFO("Running Modal Update");
+
+	SongUtils::SongInfo::UpdateMapData(SongUtils::GetCurrentInfoDat(), self->selectedDifficultyBeatmap);
+
 	UIUtils::SetupOrUpdateRequirementsModal(self);
-	//INFO("Ran Modal Update");
-	//INFO("Running Play Button Update");
+
 	RequirementUtils::UpdatePlayButton();
-	//INFO("Ran Play Button Update");
+
 	// set data for segmented controllers so they update with the selected level
     // if (self->level != nullptr && self->level->get_beatmapLevelData() != nullptr) {
 	// 	self->beatmapCharacteristicSegmentedControlController->SetData(self->level->get_beatmapLevelData()->get_difficultyBeatmapSets(), self->beatmapCharacteristicSegmentedControlController->get_selectedBeatmapCharacteristic());
