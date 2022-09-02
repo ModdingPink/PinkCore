@@ -4,7 +4,7 @@
   "info": {
     "name": "PinkCore",
     "id": "pinkcore",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "url": "https://github.com/BSMGPink/PinkCore",
     "additionalData": {
       "overrideSoName": "libpinkcore.so"
@@ -13,7 +13,7 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^3.9.0",
+      "versionRange": "^3.12.0",
       "additionalData": {
         "extraFiles": [
           "src/inline-hook"
@@ -22,7 +22,7 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.25.0",
+      "versionRange": "^0.26.0",
       "additionalData": {
         "includeQmod": true,
         "private": true
@@ -30,7 +30,7 @@
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.13",
+      "versionRange": "^0.15.19",
       "additionalData": {
         "includeQmod": true,
         "private": true
@@ -38,7 +38,7 @@
     },
     {
       "id": "questui",
-      "versionRange": "^0.16.2",
+      "versionRange": "^0.16.5",
       "additionalData": {
         "includeQmod": true,
         "private": true
@@ -46,7 +46,7 @@
     },
     {
       "id": "songloader",
-      "versionRange": "^0.10.1",
+      "versionRange": "^0.10.4",
       "additionalData": {
         "includeQmod": true,
         "private": true
