@@ -251,7 +251,11 @@ namespace UIUtils
 		static auto voidColourScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*, il2cpp_utils::CreationType::Manual>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false,
 			voidColour, voidColour, voidColour, voidColour, false, voidColour, voidColour, voidColour);
 
-		if (auto scheme = SongUtils::CustomData::GetCustomSongColour(voidColourScheme, false))
+		rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
+
+		SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(SongUtils::GetCurrentInfoDat(), customData, SongUtils::SongInfo::get_mapData().difficulty, SongUtils::SongInfo::get_mapData().characteristic);
+
+		if (auto scheme = SongUtils::CustomData::GetCustomSongColourFromCustomData(voidColourScheme, false, customData))
 		{
 			reinterpret_cast<UnityEngine::RectTransform*>(coloursModal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-7.5, 8));
 			coloursModal->Show(true, false, nullptr);
@@ -269,7 +273,7 @@ namespace UIUtils
 		bool isNew = false;
 
 		// if anything is needed, anyone worked on it, or the song is WIP, show the modal
-		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_currentlySelectedIsWIP() || SongUtils::SongInfo::get_currentlySelectedHasColours());
+		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_mapData().isWIP || SongUtils::SongInfo::get_mapData().hasCustomColours);
 		
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
 		int length = levelViews.Length();
@@ -312,7 +316,7 @@ namespace UIUtils
 				// can't capture requirementsList when it hasn't been set yet, and this is better than making it a global variable imo
 				requirementsModal->get_gameObject()->GetComponentInChildren<PinkCore::UI::RequirementModalListTableData*>()->tableView->ClearSelection();
 				// check if color cell
-				if (cell == 0 && SongUtils::SongInfo::get_currentlySelectedHasColours()) {
+				if (cell == 0 && SongUtils::SongInfo::get_mapData().hasCustomColours) {
 					// modals seem to be buggy when stacked
 					requirementsModal->Hide(true, custom_types::MakeDelegate<System::Action*>((std::function<void()>) [self] {
 						SetupOrShowColorsModal(self->get_transform());

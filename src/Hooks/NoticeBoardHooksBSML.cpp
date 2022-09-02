@@ -1,4 +1,4 @@
-#include "beatsaber-hook/shared/utils/logging.hpp"
+/*#include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "logging.hpp"
 #include "assets.hpp"
@@ -7,12 +7,16 @@
 #include "GlobalNamespace/MainFlowCoordinator.hpp"
 #include "GlobalNamespace/PlayerStatisticsViewController.hpp"
 #include "GlobalNamespace/MainMenuViewController.hpp"
+#include "GlobalNamespace/MenuTransitionsHelper.hpp"
 #include "HMUI/ViewController.hpp"
 #include "HMUI/HoverHint.hpp"
 #include "HMUI/ButtonSpriteSwap.hpp"
 #include "HMUI/ViewController_AnimationType.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
+#include "Zenject/DiContainer.hpp"
+#include "System/Action_1.hpp"
 
+#include "UnityEngine/WaitForSeconds.hpp"
 #include "UnityEngine/SceneManagement/Scene.hpp"
 #include "UnityEngine/SceneManagement/SceneManager.hpp"
 #include "UnityEngine/UI/Button.hpp"
@@ -75,23 +79,21 @@ MAKE_AUTO_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement:
 
 MAKE_AUTO_HOOK_MATCH(MainFlowCoordinator_DidActivate, &GlobalNamespace::MainFlowCoordinator::DidActivate, void, GlobalNamespace::MainFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 {
-	// when activating, we want to provide our own view controller for the right screen, so just take whatever is activated and display ours for right
 	if (firstActivation)
-	{
-		auto controller = PinkCore::UI::NoticeBoard::get_instance();
-		self->providedRightScreenViewController = controller;
-		self->providedBottomScreenViewController = controller;
-		MainFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-		self->providedRightScreenViewController = controller;
-		//self->ProvideInitialViewControllers(self->mainMenuViewController, self->leftScreenViewController, controller, self->bottomScreenViewController, self->topScreenViewController);
-	}
-	else MainFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+		self->providedRightScreenViewController = PinkCore::UI::NoticeBoard::get_instance();
+	MainFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+}
+
+MAKE_AUTO_HOOK_MATCH(MainFlowCoordinator_DidDeactivate, &GlobalNamespace::MainFlowCoordinator::DidDeactivate, void, GlobalNamespace::MainFlowCoordinator* self, bool removedFromHierarchy, bool screenSystemDisabling) {
+	MainFlowCoordinator_DidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
+	PinkCore::UI::NoticeBoard::get_instance()->__Deactivate(false, true, false);
 }
 
 // using unsafe cause I can't bother with actually getting the types correct since they are irrelevant anyways
-MAKE_AUTO_HOOK_FIND_CLASS_UNSAFE_INSTANCE(MenuTransitionsHelper_RestartGame, "", "MenuTransitionsHelper", "RestartGame", void, Il2CppObject* self, Il2CppObject* finishCallback)
+MAKE_AUTO_HOOK_MATCH(MenuTransitionsHelper_RestartGame, &GlobalNamespace::MenuTransitionsHelper::RestartGame, void, GlobalNamespace::MenuTransitionsHelper* self, System::Action_1<Zenject::DiContainer*>* finishCallback)
 {
 	PinkCore::UI::NoticeBoard::clear_instance();
 	setIcons = false;
 	MenuTransitionsHelper_RestartGame(self, finishCallback);
 }
+*/

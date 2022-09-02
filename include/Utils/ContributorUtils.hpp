@@ -1,7 +1,7 @@
 #pragma once
 #include "Contributor.hpp"
 #include <vector>
-
+#include "LevelDetailAPI.hpp"
 namespace PinkCore::UI {
 	class ContributorHandler;
 }
@@ -9,11 +9,11 @@ namespace PinkCore::UI {
 namespace ContributorUtils
 {
 	/// @brief fetches the internal list of contributors and stores it internally
-	void FetchListOfContributors();
+	void FetchListOfContributors(PinkCore::API::LevelDetails& levelDetail);
 
-	/// @brief gets the reference to the internal list of contributors
-	const std::vector<PinkCore::Contributor>& GetContributors();
-	
+	/// @brief clears the contributor list
+	void EmptyContributors(PinkCore::API::LevelDetails& levelDetail);
+
 	/// @brief Gets whether the passed contributor is a contributor for the current song
 	/// @param contributor the contributor to check against
 	/// @return true for is current, false for not

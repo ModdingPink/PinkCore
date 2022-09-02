@@ -27,7 +27,7 @@ namespace PinkCore::RequirementAPI
 
 	bool GetCurrentlySelectedCustomData(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& value)
 	{
-		return SongUtils::CustomData::GetCurrentCustomData(SongUtils::GetCurrentInfoDat(), value);
+		return SongUtils::CustomData::GetCurrentCustomDataJson(SongUtils::GetCurrentInfoDat(), value);
 	}
 
 	void DisablePlayButton(const ModInfo& info)

@@ -1,19 +1,24 @@
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 
 #include "Utils/SongUtils.hpp"
+#include "Utils/RequirementUtils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "GlobalNamespace/CustomPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/ColorScheme.hpp"
 #include "GlobalNamespace/FilteredBeatmapLevel.hpp"
+#include "GlobalNamespace/IDifficultyBeatmap.hpp"
+#include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "logging.hpp"
 #include "config.hpp"
-
+#include "LevelDetailAPI.hpp"
 #include "songloader/shared/CustomTypes/CustomLevelInfoSaveData.hpp"
 #include "sombrero/shared/FastColor.hpp"
 #include "Utils/UIUtils.hpp"
 #include <fstream>
+#include "Utils/ContributorUtils.hpp"
+
 static std::string toLower(std::string in)
 {
 	std::string output = "";
@@ -40,17 +45,11 @@ static std::string removeSpaces(std::string_view input)
 
 namespace SongUtils
 {
+
 	LoadedInfoEvent onLoadedInfoEvent;
 	std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>> currentInfoDat;
-
-	bool currentInfoDatValid = false;
-
-	std::u16string lastPhysicallySelectedCharacteristic = u"";
-	std::u16string lastPhysicallySelectedDifficulty = u"";
 	std::u16string currentLevelPath = u"";
-	
-	bool currrentlySelectedIsCustom = false;
-	bool currrentlySelectedIsWIP = false;
+	bool currentInfoDatValid;
 
 	LoadedInfoEvent& onLoadedInfo()
 	{
@@ -78,7 +77,7 @@ namespace SongUtils
 		else return std::nullopt; 
 	}
 
-	std::u16string GetDiffFromNumber(GlobalNamespace::BeatmapDifficulty selectedDifficulty)
+	std::u16string GetDiffFromEnum(GlobalNamespace::BeatmapDifficulty selectedDifficulty)
 	{
 		switch (selectedDifficulty.value)
 		{
@@ -103,23 +102,8 @@ namespace SongUtils
 		}
 	}
 
-	GlobalNamespace::BeatmapDifficulty GetNumberFromDiff(std::u16string difficulty)
+	GlobalNamespace::BeatmapDifficulty GetEnumFromDiff(std::u16string difficulty)
 	{
-		// another way of doing it with a map
-		/*
-		static std::map<std::string, GlobalNamespace::BeatmapDifficulty> stringToDiff = {
-			{ "Easy", GlobalNamespace::BeatmapDifficulty::Easy },
-			{ "Normal", GlobalNamespace::BeatmapDifficulty::Normal },
-			{ "Hard", GlobalNamespace::BeatmapDifficulty::Hard },
-			{ "Expert", GlobalNamespace::BeatmapDifficulty::Expert },
-			{ "ExpertPlus", GlobalNamespace::BeatmapDifficulty::ExpertPlus }
-		};
-
-		auto itr = stringToDiff.find(difficulty);
-		if (itr != stringToDiff.end()) return itr->second;
-		else return GlobalNamespace::BeatmapDifficulty::ExpertPlus;
-		return stringToDiff[difficulty];		
-		*/
 		if (difficulty == u"Easy") return GlobalNamespace::BeatmapDifficulty::Easy;
 		else if (difficulty == u"Normal") return GlobalNamespace::BeatmapDifficulty::Normal;
 		else if (difficulty == u"Hard") return GlobalNamespace::BeatmapDifficulty::Hard;
@@ -129,7 +113,58 @@ namespace SongUtils
 
 	namespace CustomData
 	{
-		
+
+		bool currentInfoDatValid = false;
+
+		bool get_currentInfoDatValid()
+		{
+			return currentInfoDatValid;
+		}
+
+		void set_currentInfoDatValid(bool value)
+		{
+			currentInfoDatValid = value;
+			onLoadedInfoEvent.invoke(getOptional(value));
+		}
+
+
+		void HandleGetMapInfoData(GlobalNamespace::IPreviewBeatmapLevel* level){
+			bool isCustom = false;
+			bool isWIP = false;
+			if(level) {
+				isCustom = SongUtils::SongInfo::isCustom(level);
+				isWIP = SongUtils::SongInfo::isWIP(level);
+			}
+			SongInfo::set_mapIsCustom(isCustom);
+			SongInfo::set_mapIsWIP(isWIP);
+			if (isCustom)
+			{
+				// clear current info dat
+				auto& d = SongUtils::GetCurrentInfoDatPtr();
+				if (SongUtils::CustomData::GetInfoJson(level, d))
+				{
+					INFO("Info.dat read successful!");
+					SongUtils::CustomData::set_currentInfoDatValid(true);
+				}
+				else
+				{
+					//custom dat read not successful
+					SongInfo::ResetMapData();
+					SongUtils::CustomData::set_currentInfoDatValid(false);
+					INFO("Info.dat read not successful!");
+				}
+
+			}
+			else
+			{
+				//base game map
+				SongInfo::ResetMapData();
+				SongUtils::CustomData::set_currentInfoDatValid(false);
+				INFO("Level was not custom!");
+			}
+		}
+
+
 		bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>& doc)
 		{
 			// if level nullptr or not custom it fails
@@ -156,6 +191,8 @@ namespace SongUtils
 			}
 			else
 			{
+				return false;
+				/*
 				songPath += u"/info.dat";
 				// get the path
 				INFO("Getting info.dat for %s", to_utf8(songPath).c_str());
@@ -177,61 +214,74 @@ namespace SongUtils
 				if (!doc) doc = std::make_shared<typename rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>(); 
 				doc->Parse(info.data());
 				// return true if it read the file right, return false if there was a parse error
-				return !doc->GetParseError();
+				return !doc->GetParseError();*/
 			}
 		}
 		
-		/*
-		bool GetInfoJson(GlobalNamespace::IPreviewBeatmapLevel* level, rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& doc)
+
+		bool GetCurrentCustomDataJson(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, CustomJSONData::ValueUTF16& out)
 		{
-			// if level nullptr or not custom it fails
-			if (!level || !SongInfo::isCustom(level)) return false;
-
-			// cast to custom level
-			GlobalNamespace::CustomPreviewBeatmapLevel* customLevel = reinterpret_cast<GlobalNamespace::CustomPreviewBeatmapLevel*>(level);
-
-			std::string songPath(customLevel->get_customLevelPath());
-			currentLevelPath = songPath;
-
-			auto infoDataOpt = il2cpp_utils::try_cast<CustomJSONData::CustomLevelInfoSaveData>(customLevel->get_standardLevelInfoSaveData());
-			// if an info.dat already exists on the given level, don't read the file again
-			if (infoDataOpt)
-			{
-				INFO("Found custom json data on level");
-				auto infoData = infoDataOpt.value();
-				doc.CopyFrom(*infoData->doc, doc.GetAllocator());
-				return true;
-			}
-			else
-			{
-				songPath += "/info.dat";
-				// get the path
-				INFO("Getting info.dat for %s", songPath.c_str());
-				// if the file doesnt exist, fail
-				if (!fileexists(songPath)) return false;
-
-				INFO("Reading file");
-				// read file
-				std::string info = readfile(songPath);
-
-				// parse into doc
-				doc.Parse(info.c_str());
-				// return true if it read the file right, return false if there was a parse error
-				return !doc.GetParseError();
-			}
-		}*/
-
-		bool GetCurrentCustomData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& out)
-		{
-			return GetCurrentCustomData(in, out, GetNumberFromDiff(SongUtils::SongInfo::get_lastPhysicallySelectedDifficulty()));
+			return GetCustomDataJsonFromDifficultyAndCharacteristic(in, out, SongInfo::get_mapData().difficulty, SongInfo::get_mapData().characteristic);
 		}
 
-		bool GetCurrentCustomData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& out, GlobalNamespace::BeatmapDifficulty difficulty)
+		bool GetCustomDataJsonFromCharacteristic(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, CustomJSONData::ValueUTF16& out, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
 		{
 			bool hasCustomData = false;
-			auto& lastPhysicallySelectedCharacteristic = SongUtils::SongInfo::get_lastPhysicallySelectedCharacteristic();
-			std::u16string difficultyToFind = SongUtils::GetDiffFromNumber(difficulty);
-			INFO("Looking for characteristic: %s", to_utf8(difficultyToFind).c_str());
+			INFO("Looking for characteristic: %s", to_utf8(characteristic->serializedName).c_str());
+
+			auto difficultyBeatmapSetsitr = in.FindMember(u"_difficultyBeatmapSets");
+			// if we find the sets iterator
+			if (difficultyBeatmapSetsitr != in.MemberEnd())
+			{
+				auto setArr = difficultyBeatmapSetsitr->value.GetArray();
+				for (auto& beatmapCharacteristicItr : setArr)
+				{
+					std::u16string beatmapCharacteristicName = beatmapCharacteristicItr.FindMember(u"_beatmapCharacteristicName")->value.GetString();
+					INFO("Found CharacteristicName: %s", (char*)beatmapCharacteristicName.c_str());
+					// if the last selected beatmap characteristic is this specific one
+					if (beatmapCharacteristicName == characteristic->serializedName)
+					{
+						hasCustomData = true;
+						//auto difficultyBeatmaps = beatmapCharacteristicItr.GetObject().FindMember(u"_difficultyBeatmaps");
+						out.CopyFrom(beatmapCharacteristicItr, in.GetAllocator());
+					}
+				}
+			}
+			return hasCustomData;
+		}
+
+
+		bool GetCustomDataJsonFromDifficultyAndCharacteristic(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, CustomJSONData::ValueUTF16& out, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+		{
+			bool hasCustomData = false;
+			CustomJSONData::ValueUTF16 customData;
+			std::u16string difficultyToFind = SongUtils::GetDiffFromEnum(difficulty);
+			if(GetCustomDataJsonFromCharacteristic(in, customData, characteristic)){
+				auto difficultyBeatmaps = customData.GetObject().FindMember(u"_difficultyBeatmaps");	
+				auto beatmaps = difficultyBeatmaps->value.GetArray();
+				for (auto& beatmap : beatmaps)
+				{
+					auto beatmapDiffNameItr = beatmap.GetObject().FindMember(u"_difficulty");
+					std::u16string diffString = beatmapDiffNameItr->value.GetString();
+					INFO("Found diffstring: %s", (char*)diffString.c_str());
+					// if the last selected difficulty is this specific one
+					if (difficultyToFind == diffString)
+					{
+						auto specificCustomData = beatmap.GetObject().FindMember(u"_customData");
+						if (specificCustomData != beatmap.MemberEnd())
+						{
+							hasCustomData = true;
+							out.CopyFrom(specificCustomData->value, in.GetAllocator());
+						}
+					}
+				}
+			}
+			return hasCustomData;
+
+			/*
+			bool hasCustomData = false;
+			std::u16string difficultyToFind = SongUtils::GetDiffFromEnum(difficulty);
+			INFO("Looking for characteristic: %s", to_utf8(characteristic->serializedName).c_str());
 			INFO("Looking for diff: %s", to_utf8(difficultyToFind).c_str());
 
 			auto difficultyBeatmapSetsitr = in.FindMember(u"_difficultyBeatmapSets");
@@ -244,7 +294,7 @@ namespace SongUtils
 					std::u16string beatmapCharacteristicName = beatmapCharacteristicItr.FindMember(u"_beatmapCharacteristicName")->value.GetString();
 					INFO("Found CharacteristicName: %s", (char*)beatmapCharacteristicName.c_str());
 					// if the last selected beatmap characteristic is this specific one
-					if (beatmapCharacteristicName == lastPhysicallySelectedCharacteristic)
+					if (beatmapCharacteristicName == characteristic->serializedName)
 					{
 						auto difficultyBeatmaps = beatmapCharacteristicItr.GetObject().FindMember(u"_difficultyBeatmaps");
 						auto beatmaps = difficultyBeatmaps->value.GetArray();
@@ -267,77 +317,62 @@ namespace SongUtils
 					}
 				}
 			}
-			return hasCustomData;
+			return hasCustomData;*/
 		}
 
 
 
-		void GetCustomCharacteristicItems(StringW characteristic, UnityEngine::Sprite*& sprite, StringW& hoverText){
+		void GetCustomCharacteristicItems(GlobalNamespace::BeatmapCharacteristicSO* characteristic, UnityEngine::Sprite*& sprite, StringW& hoverText){
 			auto& d = SongUtils::GetCurrentInfoDat();
 			bool hasCustomData = false;
-
-			auto difficultyBeatmapSetsitr = d.FindMember(u"_difficultyBeatmapSets");
-			// if we find the sets iterator
-			if (difficultyBeatmapSetsitr != d.MemberEnd())
-			{
-				auto setArr = difficultyBeatmapSetsitr->value.GetArray();
-				for (auto& beatmapCharacteristicItr : setArr)
-				{
-					std::u16string beatmapCharacteristicName = beatmapCharacteristicItr.FindMember(u"_beatmapCharacteristicName")->value.GetString();
-					INFO("Found CharacteristicName: %s", (char*)beatmapCharacteristicName.c_str());
-					// if the last selected beatmap characteristic is this specific one
-					if (beatmapCharacteristicName == characteristic)
-					{
-						auto customDataItr = beatmapCharacteristicItr.GetObject().FindMember(u"_customData");
-						if(customDataItr != beatmapCharacteristicItr.MemberEnd()){		
-							auto characteristicLabel = customDataItr->value.GetObject().FindMember(u"_characteristicLabel");
-							auto characteristicIconFilePath = customDataItr->value.FindMember(u"_characteristicIconImageFilename");
-							if(characteristicLabel != customDataItr->value.GetObject().MemberEnd()){
-								hoverText = characteristicLabel->value.GetString();
-							}
-							if(characteristicIconFilePath != customDataItr->value.GetObject().MemberEnd()){
-								StringW path = currentLevelPath;
-								path = path + "/" + characteristicIconFilePath->value.GetString();
-								sprite = UIUtils::FileToSprite(path);
-							}
-						}
-					}
+			CustomJSONData::ValueUTF16 customData;
+			GetCustomDataJsonFromCharacteristic(d, customData, characteristic);
+			auto customDataItr = customData.GetObject().FindMember(u"_customData");
+			if(customDataItr != customData.MemberEnd()){		
+				auto characteristicLabel = customDataItr->value.GetObject().FindMember(u"_characteristicLabel");
+				auto characteristicIconFilePath = customDataItr->value.FindMember(u"_characteristicIconImageFilename");
+				if(characteristicLabel != customDataItr->value.GetObject().MemberEnd()){
+					hoverText = characteristicLabel->value.GetString();
+				}
+				if(characteristicIconFilePath != customDataItr->value.GetObject().MemberEnd()){
+					StringW path = currentLevelPath;
+					path = path + "/" + characteristicIconFilePath->value.GetString();
+					sprite = UIUtils::FileToSprite(path);
 				}
 			}
 		}
-
-	void SetCharacteristicAndDifficulty(GlobalNamespace::BeatmapDifficulty beatmapDifficulty, GlobalNamespace::BeatmapCharacteristicSO* beatmapCharacteristic){
-		auto serializedNameCS = beatmapCharacteristic ? beatmapCharacteristic->get_serializedName() : nullptr;
-		std::u16string serializedName(serializedNameCS ? serializedNameCS : u"");
-		SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(serializedName);
-		SongUtils::SongInfo::set_lastPhysicallySelectedDifficulty(SongUtils::GetDiffFromNumber(beatmapDifficulty));
-	}
-
-	bool SetColourFromIteratorString(const char16_t *name, Sombrero::FastColor& mapColour, CustomJSONData::ValueUTF16& customData){
-		auto colorItr = customData.GetObject().FindMember(name);
-		if (colorItr != customData.MemberEnd()) {
-			if(colorItr->value.FindMember(u"r") == colorItr->value.MemberEnd()) return false;
-			if(colorItr->value.FindMember(u"g") == colorItr->value.MemberEnd()) return false;
-			if(colorItr->value.FindMember(u"b") == colorItr->value.MemberEnd()) return false;
-			mapColour = { colorItr->value[u"r"].GetFloat() , colorItr->value[u"g"].GetFloat() , colorItr->value[u"b"].GetFloat(), 1.0f };
-			return true;
-		}
-		return false;
-	}
-
-	GlobalNamespace::ColorScheme* GetCustomSongColour(GlobalNamespace::ColorScheme* defaultColorScheme, bool hasOverride) {
-
-		auto& d = SongUtils::GetCurrentInfoDat();
-		rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
-		if (SongUtils::CustomData::GetCurrentCustomData(d, customData)) {
 			
-			Sombrero::FastColor colorLeft = defaultColorScheme->saberAColor;
-			Sombrero::FastColor colorRight = defaultColorScheme->saberBColor;
-			Sombrero::FastColor envColorLeft = defaultColorScheme->environmentColor0;
-			Sombrero::FastColor envColorRight = defaultColorScheme->environmentColor1;
-			Sombrero::FastColor envColorLeftBoost = defaultColorScheme->environmentColor0Boost;
-			Sombrero::FastColor envColorRightBoost = defaultColorScheme->environmentColor1Boost;
-			Sombrero::FastColor obstacleColor = defaultColorScheme->obstaclesColor;
+
+		bool SetColourFromIteratorString(const char16_t *name, Sombrero::FastColor& mapColour, CustomJSONData::ValueUTF16& customData){
+			auto colorItr = customData.GetObject().FindMember(name);
+			if (colorItr != customData.MemberEnd()) {
+				if(colorItr->value.FindMember(u"r") == colorItr->value.MemberEnd()) return false;
+				if(colorItr->value.FindMember(u"g") == colorItr->value.MemberEnd()) return false;
+				if(colorItr->value.FindMember(u"b") == colorItr->value.MemberEnd()) return false;
+				mapColour = { colorItr->value[u"r"].GetFloat() , colorItr->value[u"g"].GetFloat() , colorItr->value[u"b"].GetFloat(), 1.0f };
+				return true;
+			}
+			return false;
+		}
+
+		GlobalNamespace::ColorScheme* GetCustomSongColour(GlobalNamespace::ColorScheme* colorScheme, bool hasOverride) {
+			CustomJSONData::ValueUTF16 customData;
+			if(SongUtils::CustomData::GetCurrentCustomDataJson(SongUtils::GetCurrentInfoDat(), customData)){
+				return SongUtils::CustomData::GetCustomSongColourFromCustomData(colorScheme, hasOverride, customData);
+			}
+			return nullptr;
+		}
+
+
+		GlobalNamespace::ColorScheme* GetCustomSongColourFromCustomData(GlobalNamespace::ColorScheme* colorScheme, bool hasOverride, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& customData) {
+
+			Sombrero::FastColor colorLeft = colorScheme->saberAColor;
+			Sombrero::FastColor colorRight = colorScheme->saberBColor;
+			Sombrero::FastColor envColorLeft = colorScheme->environmentColor0;
+			Sombrero::FastColor envColorRight = colorScheme->environmentColor1;
+			Sombrero::FastColor envColorLeftBoost = colorScheme->environmentColor0Boost;
+			Sombrero::FastColor envColorRightBoost = colorScheme->environmentColor1Boost;
+			Sombrero::FastColor obstacleColor = colorScheme->obstaclesColor;
 			
 			bool hasBoostColours = false;
 			bool hasSaberColours = false;
@@ -363,46 +398,154 @@ namespace SongUtils
 				}
 
 				if(config.forceNoteColours && hasOverride){
-					colorLeft = defaultColorScheme->saberAColor;
-					colorRight = defaultColorScheme->saberBColor;
+					colorLeft = colorScheme->saberAColor;
+					colorRight = colorScheme->saberBColor;
 				}
 				StringW colorSchemeId = "PinkCoreMapColorScheme";
 				StringW colorSchemeNameLocalizationKey = "PinkCore Map Color Scheme";
-				auto newColorScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false, colorLeft, colorRight, envColorLeft, envColorRight, defaultColorScheme->supportsEnvironmentColorBoost, envColorLeftBoost, envColorRightBoost, obstacleColor);
-
-
+				auto newColorScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false, colorLeft, colorRight, envColorLeft, envColorRight, colorScheme->supportsEnvironmentColorBoost, envColorLeftBoost, envColorRightBoost, obstacleColor);
 				return newColorScheme;
 
 			}
 			else {
 				return nullptr;
 			}
+		
+			
 		}
-		else {
-			return nullptr;
-		}
-	}
 
-	void ExtractRequirements(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& requirementsArray, std::vector<std::string>& output)
-	{
-		auto actualArray = requirementsArray.GetArray();
-		for (auto& requirement : actualArray)
+		void ExtractRequirements(const CustomJSONData::ValueUTF16& requirementsArray, std::vector<std::string>& output)
 		{
-			std::string requirementName = to_utf8(requirement.GetString());
-			std::string requirementNameWithoutSpaces = removeSpaces(requirementName);
+			auto actualArray = requirementsArray.GetArray();
+			for (auto& requirement : actualArray)
+			{
+				std::string requirementName = to_utf8(requirement.GetString());
+				std::string requirementNameWithoutSpaces = removeSpaces(requirementName);
 
-			auto it = std::find(output.begin(), output.end(), requirementName);
+				auto it = std::find(output.begin(), output.end(), requirementName);
 
-			if (it == output.end())
-				output.push_back(requirementName);
+				if (it == output.end())
+					output.push_back(requirementName);
+			}
+
+			std::sort(output.begin(), output.end());
 		}
 
-		std::sort(output.begin(), output.end());
+		bool MapHasColoursChecker(CustomJSONData::ValueUTF16& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+		{
+			static const char16_t* colours[] = {u"_colorLeft", u"_colorRight",u"_envColorLeft", u"_envColorRight", u"_envColorLeftBoost", u"_envColorRightBoost", u"_obstacleColor"};
+			for (auto name : colours) {
+				auto itr = customData.GetObject().FindMember(name);
+				if (itr != customData.MemberEnd()) {
+					auto end = itr->value.MemberEnd();
+					if(itr->value.FindMember(u"r") == end) continue;
+					if(itr->value.FindMember(u"g") == end) continue;
+					if(itr->value.FindMember(u"b") == end) continue;
+					return true;
+				}
+			}
+			return false;
+		}
+
+		int MapSaberCountChecker(CustomJSONData::ValueUTF16& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+		{
+			auto itr = customData.GetObject().FindMember(u"_oneSaber");
+			if (itr != customData.MemberEnd()) {
+				if(itr->value.GetBool()){ //if one saber is true
+					return 1; //only have 1 saber
+				}else{ 
+					return 2; //if its false, then we have 2 sabers
+				}
+			}
+			return -1; //if the object doesnt exist, then we use -1 to specify that this option shouldnt be used
+		}
+
+		const char16_t* MapEnvironmentTypeChecker(CustomJSONData::ValueUTF16& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+		{
+
+			auto itr = customData.GetObject().FindMember(u"_environmentType");
+			if (itr != customData.MemberEnd()) {
+				return itr->value.GetString(); //only have 1 saber
+			}
+			return u"Default"; //if the object doesnt exist, then we use Default to specify that this option shouldnt be used
+		}
+
+		bool MapShouldShowRotationSpawnLines(CustomJSONData::ValueUTF16& customData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic)
+		{
+			auto itr = customData.GetObject().FindMember(u"_showRotationNoteSpawnLines");
+			if (itr != customData.MemberEnd()) {
+				return itr->value.GetBool();
+			}
+			return true; //if the object doesnt exist, then we use true to specify that the base game option should still happen
+		}
 	}
-}
 
 	namespace SongInfo
 	{
+		PinkCore::API::LevelDetails currentMapLevelDetails;
+
+		void ResetMapData(PinkCore::API::LevelDetails& mapData){
+			mapData.environmentType = u"Default";
+			mapData.hasCustomColours = false;
+			mapData.isCustom = false;
+			mapData.saberCount = -1; //-1 = No Data, dont do anything
+			mapData.isWIP = false;
+			mapData.showRotationSpwanLines = true;
+			mapData.dataIsValid = false;
+			RequirementUtils::EmptyRequirements(mapData);
+			ContributorUtils::EmptyContributors(mapData);
+		}
+
+		void ResetMapData(){
+			ResetMapData(currentMapLevelDetails);
+		}
+
+		void UpdateMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap){
+			SetMapData(currentInfoDat, currentMapLevelDetails, difficultyBeatmap);
+		}
+		void UpdateMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, GlobalNamespace::IPreviewBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
+			SetMapData(currentInfoDat, currentMapLevelDetails, level, difficulty, characteristic);
+		}
+
+		void SetMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, PinkCore::API::LevelDetails& mapData, GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap){
+			GlobalNamespace::BeatmapDifficulty difficulty = difficultyBeatmap->get_difficulty();
+        	GlobalNamespace::BeatmapCharacteristicSO* characteristic = difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic();
+        	GlobalNamespace::IPreviewBeatmapLevel* level = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(difficultyBeatmap->get_level());
+			SetMapData(currentInfoDat, mapData, level, difficulty, characteristic);
+		}
+
+		void SetMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, PinkCore::API::LevelDetails& mapData, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
+			mapData.difficulty = difficulty;
+			mapData.characteristic = characteristic;
+			CustomJSONData::ValueUTF16 customData;
+			if(SongUtils::CustomData::GetCustomDataJsonFromDifficultyAndCharacteristic(currentInfoDat, customData, difficulty, characteristic)){
+				RequirementUtils::HandleRequirementDetails(mapData);
+				ContributorUtils::FetchListOfContributors(mapData);
+				mapData.environmentType = SongUtils::CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
+				mapData.hasCustomColours = SongUtils::CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
+				mapData.showRotationSpwanLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
+				mapData.saberCount = SongUtils::CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
+				mapData.isCustom = true;
+				mapData.dataIsValid = true;
+			}else{
+				SongInfo::ResetMapData(mapData);
+			}
+		}
+
+		void SetMapData(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& currentInfoDat, PinkCore::API::LevelDetails& mapData, GlobalNamespace::IPreviewBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty difficulty, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
+			bool mapIsCustom = false;
+			if(level) mapIsCustom = isCustom(level);
+			if(mapIsCustom){
+				SetMapData(currentInfoDat, mapData, difficulty, characteristic);
+				mapData.isCustom = mapIsCustom;
+				mapData.isWIP = isWIP(level);
+			}else{
+				ResetMapData();
+			}
+		}
+
+
+
 		bool isCustom(GlobalNamespace::IPreviewBeatmapLevel* level)
 		{
 			if (!level) return false;
@@ -415,99 +558,32 @@ namespace SongUtils
 			//broke in multi
 			//now the RSL makes this consistent, resorting back to this
 			StringW levelidCS = level->get_levelID();
-			if (levelidCS->Contains("custom_level_")) return true;
-
-			return false;
-			
+			return levelidCS->Contains("custom_level_");
 		}
 
-		/*-------------------------------------------------*/
-
-		bool get_currentlySelectedIsCustom()
+		bool isWIP(GlobalNamespace::IPreviewBeatmapLevel* level)
 		{
-			return currrentlySelectedIsCustom;
+			if (!level) return false;
+			StringW levelidCS = level->get_levelID();
+		    // if the level ID contains `WIP` then the song is a WIP song
+			return levelidCS.ends_with(u" WIP");
 		}
 
-		void set_currentlySelectedIsCustom(bool val)
+
+		PinkCore::API::LevelDetails& get_mapData()
 		{
-			currrentlySelectedIsCustom = val;
-		}
-		/*-------------------------------------------------*/
-
-
-		bool get_currentlySelectedHasColours()
-		{
-			if (!get_currentlySelectedIsCustom())
-				return false;
-			
-			auto& d = SongUtils::GetCurrentInfoDat();
-			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
-			if (SongUtils::CustomData::GetCurrentCustomData(d, customData)) {
-				static const char16_t* colours[] = {u"_colorLeft", u"_colorRight",u"_envColorLeft", u"_envColorRight", u"_envColorLeftBoost", u"_envColorRightBoost", u"_obstacleColor"};
-
-				for (auto name : colours) {
-					auto itr = customData.GetObject().FindMember(name);
-					if (itr != customData.MemberEnd()) {
-						auto end = itr->value.MemberEnd();
-						if(itr->value.FindMember(u"r") == end) continue;
-						if(itr->value.FindMember(u"g") == end) continue;
-						if(itr->value.FindMember(u"b") == end) continue;
-						return true;
-					}
-				}
-			}
-			return false;
+			return currentMapLevelDetails;
 		}
 
-		// void set_currentlySelectedHasColours(bool val)
-		// {
-		// 	currentlySelectedHasColours = val;
-		// }
-		/*-------------------------------------------------*/
-
-		bool get_currentlySelectedIsWIP()
+		void set_mapIsCustom(bool val)
 		{
-			return currrentlySelectedIsWIP;
+			currentMapLevelDetails.isCustom = val;
 		}
 
-		void set_currentlySelectedIsWIP(bool val)
+		void set_mapIsWIP(bool val)
 		{
-			currrentlySelectedIsWIP = val;
-		}
-		/*-------------------------------------------------*/
-
-		bool get_currentInfoDatValid()
-		{
-			return currentInfoDatValid;
-		}
-
-		void set_currentInfoDatValid(bool value)
-		{
-			currentInfoDatValid = value;
-			onLoadedInfoEvent.invoke(getOptional(value));
+			currentMapLevelDetails.isWIP = val;
 		}
 		
-		/*-------------------------------------------------*/
-
-		const std::u16string& get_lastPhysicallySelectedCharacteristic()
-		{
-			return lastPhysicallySelectedCharacteristic;
-		}
-
-		void set_lastPhysicallySelectedCharacteristic(std::u16string_view value)
-		{
-			lastPhysicallySelectedCharacteristic = value;
-		}
-		/*-------------------------------------------------*/
-
-		const std::u16string& get_lastPhysicallySelectedDifficulty()
-		{
-			return lastPhysicallySelectedDifficulty;
-		}
-
-		void set_lastPhysicallySelectedDifficulty(std::u16string_view value)
-		{
-			lastPhysicallySelectedDifficulty = value;
-		}
 	}
 }

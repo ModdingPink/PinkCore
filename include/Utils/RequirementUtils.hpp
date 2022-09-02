@@ -5,6 +5,7 @@
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "beatsaber-hook/shared/rapidjson/include/rapidjson/document.h"
+#include "LevelDetailAPI.hpp"
 
 namespace PinkCore::UI {
 	class RequirementHandler;
@@ -14,12 +15,12 @@ namespace RequirementUtils
 	using FoundRequirementsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
 	using FoundSuggestionsEvent = UnorderedEventCallback<const std::vector<std::string>&>;
 
-	void PreHandleRequirements(GlobalNamespace::IPreviewBeatmapLevel* level);
+	/// @brief empties the requirements, used if the infodat fails or the map is not custom
+	void EmptyRequirements(PinkCore::API::LevelDetails& levelDetail);
 
-
-	/// @brief handle hte requirement details so all backing information is up to date
+	/// @brief handle the requirement details so all backing information is up to date
 	//void HandleRequirementDetails(GlobalNamespace::StandardLevelDetailView* detailView);
-	void HandleRequirementDetails();
+	void HandleRequirementDetails(PinkCore::API::LevelDetails& levelDetail);
 
 	/// @brief checks if passed requirement string is installed
 	/// @param requirement the requirement to check
@@ -63,11 +64,6 @@ namespace RequirementUtils
 	/// @brief updates the play button based on if the player is allowed to start
 	void UpdatePlayButton();
 
-	/// @brief gets a const reference to the current requirement vector
-	const std::vector<std::string>& GetCurrentRequirements();
-
-	/// @brief gets a const reference to the current suggestion vector
-	const std::vector<std::string>& GetCurrentSuggestions();
 	namespace ExternalAPI
 	{
 		/// @brief

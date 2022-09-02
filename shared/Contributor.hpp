@@ -35,3 +35,4 @@ namespace PinkCore
 		}
 	};
 }
+#undef pinkcore_id

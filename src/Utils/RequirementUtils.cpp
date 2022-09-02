@@ -6,8 +6,7 @@
 
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/UI/Button.hpp"
-
-using StandardLevelDetailView = GlobalNamespace::StandardLevelDetailView;
+#include "LevelDetailAPI.hpp"
 
 #include <algorithm>
 
@@ -38,8 +37,6 @@ namespace RequirementUtils
 
 	std::vector<std::string> installedRequirements = {};
 	std::vector<std::string> forcedSuggestions = {};
-	std::vector<std::string> currentRequirements = {};
-	std::vector<std::string> currentSuggestions = {};
 
 	std::vector<std::string> disablingModIds = {};
 	
@@ -47,61 +44,28 @@ namespace RequirementUtils
 	FoundSuggestionsEvent onFoundSuggestionsEvent;
 	
 
-	void PreHandleRequirements(GlobalNamespace::IPreviewBeatmapLevel* level) {
-		if (!level) return;
-		bool isCustom = SongUtils::SongInfo::isCustom(level);
-		SongUtils::SongInfo::set_currentlySelectedIsCustom(isCustom);
-		if(isCustom) INFO("is custom");
-		else INFO("is not custom");
-		if (isCustom)
-		{
-			// clear current info dat
-			auto& d = SongUtils::GetCurrentInfoDatPtr();
-			if (SongUtils::CustomData::GetInfoJson(level, d))
-			{
-				INFO("Info.dat read successful!");
-				SongUtils::SongInfo::set_currentInfoDatValid(true);
-				// Requirements and suggestions are called on RequirementUtils::HandleRequirementDetails();
-				// TODO: Move this over there
-			}
-			else
-			{
-				SongUtils::SongInfo::set_currentInfoDatValid(false);
-				RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
-				RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
-
-				INFO("Info.dat read not successful!");
-			}
-
-			// if the level ID contains `WIP` then the song is a WIP song
-			std::string levelIDString = level->get_levelID();
-			bool isWIP = levelIDString.find("WIP") != std::string::npos;
-			SongUtils::SongInfo::set_currentlySelectedIsWIP(isWIP);
-		}
-		else
-		{
-			SongUtils::SongInfo::set_currentlySelectedIsWIP(false);
-			SongUtils::SongInfo::set_currentInfoDatValid(false);
-			RequirementUtils::onFoundRequirements().invoke(std::vector<std::string>{});
-			RequirementUtils::onFoundSuggestions().invoke(std::vector<std::string>{});
-		}
+	void EmptyRequirements(PinkCore::API::LevelDetails& levelDetail) {
+		levelDetail.currentRequirements.clear();
+		levelDetail.currentSuggestions.clear();
+		RequirementUtils::onFoundRequirements().invoke(levelDetail.currentRequirements);
+        RequirementUtils::onFoundSuggestions().invoke(levelDetail.currentSuggestions);
 	}
-	//void HandleRequirementDetails(StandardLevelDetailView* detailView)
-	void HandleRequirementDetails()
+
+	void HandleRequirementDetails(PinkCore::API::LevelDetails& levelDetail)
 	{
 		if (installedRequirements.empty()) FindInstalledRequirements();
-		currentRequirements.clear();
-		currentSuggestions.clear();
+		levelDetail.currentRequirements.clear();
+		levelDetail.currentSuggestions.clear();
 
 
 		// if custom
-		if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && SongUtils::SongInfo::get_currentInfoDatValid())
+		if (SongUtils::SongInfo::get_mapData().isCustom && SongUtils::CustomData::get_currentInfoDatValid())
 		{
 			auto& doc = SongUtils::GetCurrentInfoDat();
 			//INFO("handling requirements for %s", doc["_songName"].GetString());
 			rapidjson::GenericValue<rapidjson::UTF16<char16_t>> customData;
 			// get the custom data, if it exists
-			if (SongUtils::CustomData::GetCurrentCustomData(doc, customData))
+			if (SongUtils::CustomData::GetCurrentCustomDataJson(doc, customData))
 			{
 				INFO("There was custom data!");
 				// there was custom data
@@ -109,18 +73,18 @@ namespace RequirementUtils
 				if (requirementsArray != customData.MemberEnd())
 				{
 					INFO("Extracting Requirements");
-					SongUtils::CustomData::ExtractRequirements(requirementsArray->value, currentRequirements);
+					SongUtils::CustomData::ExtractRequirements(requirementsArray->value, levelDetail.currentRequirements);
 				}
 
 				auto suggestionsArray = customData.FindMember(u"_suggestions");
 				if (suggestionsArray != customData.MemberEnd())
 				{
 					INFO("Extracting Suggestions");
-					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, currentSuggestions);
+					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, levelDetail.currentSuggestions);
 				}
 
-                RequirementUtils::onFoundRequirements().invoke(RequirementUtils::GetCurrentRequirements());
-                RequirementUtils::onFoundSuggestions().invoke(RequirementUtils::GetCurrentSuggestions());
+                RequirementUtils::onFoundRequirements().invoke(levelDetail.currentRequirements);
+                RequirementUtils::onFoundSuggestions().invoke(levelDetail.currentSuggestions);
 			}
 			else
 			{
@@ -134,9 +98,10 @@ namespace RequirementUtils
 	bool AllowPlayerToStart()
 	{
 		if (disablingModIds.size() > 0) return false;
-		if (!SongUtils::SongInfo::get_currentlySelectedIsCustom()) return true;
+		auto mapData = SongUtils::SongInfo::get_mapData();
+		if (!mapData.isCustom) return true;
 		// for every required requirement
-		for (auto req : currentRequirements)
+		for (auto req : mapData.currentRequirements)
 		{
 			// if any is not installed, return false
 			if (!GetRequirementInstalled(req) && !GetIsForcedSuggestion(req)) return false;
@@ -147,7 +112,8 @@ namespace RequirementUtils
 
 	bool IsAnythingNeeded()
 	{
-		return !currentRequirements.empty() || !currentSuggestions.empty();
+		auto mapData = SongUtils::SongInfo::get_mapData();
+		return !mapData.currentRequirements.empty() || !mapData.currentSuggestions.empty();
 	}
 
 	bool IsAnythingMissing()
@@ -157,7 +123,7 @@ namespace RequirementUtils
 		if (!AllowPlayerToStart()) return true;
 
 		// for every suggested suggestion
-		for (auto sug : currentSuggestions)
+		for (auto sug : SongUtils::SongInfo::get_mapData().currentSuggestions)
 		{
 			// if any is not installed, return false
 			if (!GetRequirementInstalled(sug)) return true;
@@ -198,7 +164,7 @@ namespace RequirementUtils
 	bool GetSongHasRequirement(std::string requirement)
 	{
 		// find the req in the suggestions list, if found return true, else return false
-		for (auto req : currentRequirements)
+		for (auto req : SongUtils::SongInfo::get_mapData().currentRequirements)
 		{
 			if (req.find(requirement) != std::string::npos)
 			{
@@ -212,7 +178,7 @@ namespace RequirementUtils
 	bool GetSongHasSuggestion(std::string requirement)
 	{
 		// find the req in the suggestions list, if found return true, else return false
-		for (auto sug : currentSuggestions)
+		for (auto sug : SongUtils::SongInfo::get_mapData().currentSuggestions)
 		{
 			if (sug.find(requirement) != std::string::npos)
 			{
@@ -235,16 +201,6 @@ namespace RequirementUtils
 				INFO("Found loaded id: %s", mod.second.info.id.c_str());
 			}
 		}
-	}
-
-	const std::vector<std::string>& GetCurrentRequirements()
-	{
-		return currentRequirements;
-	}
-
-	const std::vector<std::string>& GetCurrentSuggestions()
-	{
-		return currentSuggestions;
 	}
 
 	/*
@@ -270,8 +226,8 @@ namespace RequirementUtils
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>().LastOrDefault();
 		if (levelViews) {
 			bool interactable = AllowPlayerToStart();
-            bool isCustom = SongUtils::SongInfo::get_currentlySelectedIsCustom();
-            bool isWip = SongUtils::SongInfo::get_currentlySelectedIsWIP();
+            bool isCustom = SongUtils::SongInfo::get_mapData().isCustom;
+            bool isWip = SongUtils::SongInfo::get_mapData().isWIP;
 			INFO("interactable: %d, custom: %d, wip: %d", interactable, isCustom, isWip);
             {
                 levelViews->get_practiceButton()->set_interactable(interactable);

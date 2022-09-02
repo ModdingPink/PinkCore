@@ -21,6 +21,7 @@
 #include "GlobalNamespace/BeatmapCharacteristicSegmentedControlController.hpp"
 #include "GlobalNamespace/IBeatmapLevelData.hpp"
 #include "GlobalNamespace/BeatmapLevelDataExtensions.hpp"
+#include "GlobalNamespace/PlayerData.hpp"
 
 #include "UnityEngine/UI/Button.hpp"
 #include "UnityEngine/GameObject.hpp"
@@ -37,20 +38,31 @@
 MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_SetContent, &GlobalNamespace::StandardLevelDetailView::SetContent, void, GlobalNamespace::StandardLevelDetailView* self, ::GlobalNamespace::IBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty defaultDifficulty, GlobalNamespace::BeatmapCharacteristicSO* defaultBeatmapCharacteristic, GlobalNamespace::PlayerData* playerData)
 {
 	auto currentSelectedLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(level);
-	RequirementUtils::PreHandleRequirements(currentSelectedLevel);
+	
+	//this will only work on a post fix, which we cant do because refresh is in the method which we need to do shit on anyway so AAAAAAAAAAAAAAAAAAA 3:<
+	//GlobalNamespace::BeatmapDifficulty difficulty = defaultDifficulty;
+	//if(!difficulty) difficulty = self->beatmapDifficultySegmentedControlController->selectedDifficulty;
+	//GlobalNamespace::BeatmapCharacteristicSO* characteristic = defaultBeatmapCharacteristic;
+	//if(!characteristic) characteristic = self->beatmapCharacteristicSegmentedControlController->selectedBeatmapCharacteristic;
+	
+	SongUtils::CustomData::HandleGetMapInfoData(currentSelectedLevel);
+
+	//this ensures we get the info dat at the earliest point
 
 	StandardLevelDetailView_SetContent(self, level, defaultDifficulty, defaultBeatmapCharacteristic, playerData);
 }
 
+
 MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::StandardLevelDetailView::RefreshContent, void, GlobalNamespace::StandardLevelDetailView* self)
 {
 	StandardLevelDetailView_RefreshContent(self);
-	auto beatmapCharacteristicSegmentedControlController = self->beatmapCharacteristicSegmentedControlController;
-	auto selectedBeatmapCharacteristic = beatmapCharacteristicSegmentedControlController ? beatmapCharacteristicSegmentedControlController->selectedBeatmapCharacteristic : nullptr;
-    SongUtils::CustomData::SetCharacteristicAndDifficulty(self->beatmapDifficultySegmentedControlController->selectedDifficulty, selectedBeatmapCharacteristic);
-	RequirementUtils::HandleRequirementDetails();
-	ContributorUtils::FetchListOfContributors();
+
+	auto characteristic = self->selectedDifficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic();
+
+	SongUtils::SongInfo::UpdateMapData(SongUtils::GetCurrentInfoDat(), self->selectedDifficultyBeatmap);
+
 	UIUtils::SetupOrUpdateRequirementsModal(self);
+
 	RequirementUtils::UpdatePlayButton();
 
 	// set data for segmented controllers so they update with the selected level
@@ -60,30 +72,9 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::S
     // }
 }
 
-MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &GlobalNamespace::BeatmapCharacteristicSegmentedControlController::SetData, void, GlobalNamespace::BeatmapCharacteristicSegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<::GlobalNamespace::IDifficultyBeatmapSet*>* difficultyBeatmapSets, GlobalNamespace::BeatmapCharacteristicSO* selectedBeatmapCharacteristic)
-{	
-    BeatmapCharacteristicSegmentedControlController_SetData(self, difficultyBeatmapSets,selectedBeatmapCharacteristic);
-	if (!SongUtils::SongInfo::get_currentlySelectedIsCustom() || !config.enableCustomCharacteristics) return;
-    int i = 0;
-    ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(self->segmentedControl->dataItems->Length());
-
-    for(auto dataItem : self->segmentedControl->dataItems){
-        UnityEngine::Sprite* characteristicSprite = nullptr;
-        StringW characteristicText = "";
-        SongUtils::CustomData::GetCustomCharacteristicItems(self->beatmapCharacteristics->get_Item(i)->serializedName, characteristicSprite, characteristicText);
-        if(characteristicText == "") characteristicText = Polyglot::Localization::Get(self->beatmapCharacteristics->get_Item(i)->characteristicNameLocalizationKey);
-        if(characteristicSprite == nullptr) characteristicSprite = self->beatmapCharacteristics->get_Item(i)->get_icon();
-        dataItemArray[i] = HMUI::IconSegmentedControl::DataItem::New_ctor(characteristicSprite, characteristicText);
-        i++;
-    }
-	int selectedCell = self->segmentedControl->selectedCellNumber;
-    self->segmentedControl->SetData(dataItemArray);
-    self->segmentedControl->SelectCellWithNumber(selectedCell);
-}
-
 MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDifficultyMethods::Name, StringW, GlobalNamespace::BeatmapDifficulty difficulty) {
 	
-	if (SongUtils::SongInfo::get_currentlySelectedIsCustom() && config.enableCustomDiffNames) {
+	if (SongUtils::SongInfo::get_mapData().isCustom && config.enableCustomDiffNames) {
 		StringW newDifficultyLabel = DifficultyNameUtils::GetDifficultyNameFromCache(difficulty);
 		if (newDifficultyLabel->get_Length() != 0) {
 			return newDifficultyLabel;
@@ -93,43 +84,17 @@ MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDif
 }
 
 MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &GlobalNamespace::BeatmapDifficultySegmentedControlController::SetData, void, GlobalNamespace::BeatmapDifficultySegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<GlobalNamespace::IDifficultyBeatmap*>* difficultyBeatmapsList, GlobalNamespace::BeatmapDifficulty selectedDifficulty)
-{
-	auto difficultyBeatmaps = ArrayW<GlobalNamespace::IDifficultyBeatmap*>(difficultyBeatmapsList);
-	SongUtils::SongInfo::set_lastPhysicallySelectedDifficulty(SongUtils::GetDiffFromNumber(selectedDifficulty));
+{	
 
-	if (SongUtils::SongInfo::get_currentlySelectedIsCustom()) {
+	auto difficultyBeatmaps = ArrayW<GlobalNamespace::IDifficultyBeatmap*>(difficultyBeatmapsList);
+
+	if (SongUtils::SongInfo::get_mapData().isCustom) {
 		if (difficultyBeatmaps[0] != nullptr) {
-			SongUtils::SongInfo::set_lastPhysicallySelectedCharacteristic(difficultyBeatmaps[0]->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->get_serializedName());
 			if (config.enableCustomDiffNames) {
-				DifficultyNameUtils::SetDifficultyNameCacheFromArray(difficultyBeatmaps);
+				DifficultyNameUtils::SetDifficultyNameCacheFromArray(difficultyBeatmaps, difficultyBeatmaps[0]->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic());
 			}
 		}
 	}
 	BeatmapDifficultySegmentedControlController_SetData(self, difficultyBeatmapsList, selectedDifficulty);
 }
 
-MAKE_AUTO_HOOK_MATCH(ModalView_Show, &HMUI::ModalView::Show, void, HMUI::ModalView* self, bool animated, bool moveToCenter, System::Action* finishedCallback)
-{
-	ModalView_Show(self, animated, moveToCenter, finishedCallback); 
-	auto cb = self->blockerGO->get_gameObject()->GetComponent<UnityEngine::Canvas*>();
-	auto screen = self->get_transform()->get_parent()->get_gameObject()->GetComponentInParent<HMUI::Screen*>();
-	auto canvases = screen->get_gameObject()->GetComponentsInChildren<UnityEngine::Canvas*>();
-
-	int highest = 0;
-	for (auto& canvas : canvases) {
-		if (canvas->get_sortingLayerID() == cb->get_sortingLayerID()) {
-			// if highest lower than current, assign
-			if (highest < canvas->get_sortingOrder()) {
-				highest = canvas->get_sortingOrder();
-			}
-		}
-	}
-
-	highest ++;
-	cb->set_overrideSorting(true);
-	cb->set_sortingOrder(highest);
-
-	auto cm = self->get_gameObject()->GetComponent<UnityEngine::Canvas*>();
-	cm->set_overrideSorting(true); 
-	cm->set_sortingOrder(highest + 1);
-}
