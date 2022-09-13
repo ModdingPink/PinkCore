@@ -13,7 +13,7 @@
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^3.12.0",
+      "versionRange": "^3.13.0",
       "additionalData": {
         "extraFiles": [
           "src/inline-hook"
@@ -22,7 +22,7 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.26.0",
+      "versionRange": "^0.26.1",
       "additionalData": {
         "includeQmod": true,
         "private": true
@@ -30,7 +30,7 @@
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.19",
+      "versionRange": "^0.15.20",
       "additionalData": {
         "includeQmod": true,
         "private": true
@@ -38,7 +38,7 @@
     },
     {
       "id": "questui",
-      "versionRange": "^0.16.5",
+      "versionRange": "^0.16.6",
       "additionalData": {
         "includeQmod": true,
         "private": true
@@ -46,7 +46,7 @@
     },
     {
       "id": "songloader",
-      "versionRange": "^0.10.4",
+      "versionRange": "^0.10.5",
       "additionalData": {
         "includeQmod": true,
         "private": true
