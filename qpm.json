@@ -22,7 +22,7 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.27.0",
+      "versionRange": "^0.28.0",
       "additionalData": {
         "includeQmod": true,
         "private": true
@@ -38,7 +38,7 @@
     },
     {
       "id": "questui",
-      "versionRange": "^0.17.1",
+      "versionRange": "^0.17.3",
       "additionalData": {
         "includeQmod": true,
         "private": true
@@ -46,7 +46,7 @@
     },
     {
       "id": "songloader",
-      "versionRange": "^0.10.7",
+      "versionRange": "^0.10.9",
       "additionalData": {
         "includeQmod": true,
         "private": true
