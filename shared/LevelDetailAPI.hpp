@@ -25,6 +25,8 @@ namespace PinkCore::API
 		bool hasCustomColours;
         std::vector<std::string> currentRequirements = {};
 	    std::vector<std::string> currentSuggestions = {};
+        std::vector<std::string> currentWarnings = {};
+        std::vector<std::string> currentInformation = {};
         std::vector<Contributor> currentContributors = {};
 	};
 

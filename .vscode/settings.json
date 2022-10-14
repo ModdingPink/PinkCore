@@ -1,5 +1,7 @@
 {
     "files.associations": {
+        "*.bsml": "xml",
+        "*.qmod": "zip",
         "string_view": "cpp",
         "algorithm": "cpp",
         "string": "cpp",
@@ -87,6 +89,7 @@
         "__functional_03": "cpp",
         "complex": "cpp",
         "shared_mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "memory_resource": "cpp"
     }
 }

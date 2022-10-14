@@ -83,6 +83,20 @@ namespace RequirementUtils
 					SongUtils::CustomData::ExtractRequirements(suggestionsArray->value, levelDetail.currentSuggestions);
 				}
 
+				auto warningsArray = customData.FindMember(u"_warnings");
+				if (warningsArray != customData.MemberEnd())
+				{
+					INFO("Extracting Warnings");
+					SongUtils::CustomData::ExtractRequirements(warningsArray->value, levelDetail.currentWarnings);
+				}
+
+				auto informationArray = customData.FindMember(u"_information");
+				if (informationArray != customData.MemberEnd())
+				{
+					INFO("Extracting Information");
+					SongUtils::CustomData::ExtractRequirements(informationArray->value, levelDetail.currentInformation);
+				}
+
                 RequirementUtils::onFoundRequirements().invoke(levelDetail.currentRequirements);
                 RequirementUtils::onFoundSuggestions().invoke(levelDetail.currentSuggestions);
 			}

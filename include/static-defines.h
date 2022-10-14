@@ -4,8 +4,8 @@
 #define VERSION "0.0.1";
 #endif
 
-#ifndef ID
-#define ID "PinkCore"
+#ifndef MOD_ID
+#define MOD_ID "PinkCore"
 #endif
 
 #define DATAPATH "/sdcard/ModData/com.beatgames.beatsaber/Mods/PinkCore/"

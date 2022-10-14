@@ -26,14 +26,14 @@ namespace PinkCore::UI
     {
         reuseIdentifier = "RequirementModalListTableCell";
         cellSize = 8.5f;
-        missingSpriteSprite = VectorToSprite(std::vector<uint8_t>(_binary_MissingSprite_png_start, _binary_MissingSprite_png_end));
-        requirementFoundSprite = VectorToSprite(std::vector<uint8_t>(_binary_RequirementFound_png_start, _binary_RequirementFound_png_end));
-        requirementMissingSprite = VectorToSprite(std::vector<uint8_t>(_binary_RequirementMissing_png_start, _binary_RequirementMissing_png_end));
-        suggestionFoundSprite = VectorToSprite(std::vector<uint8_t>(_binary_SuggestionFound_png_start, _binary_SuggestionFound_png_end));
-        suggestionMissingSprite = VectorToSprite(std::vector<uint8_t>(_binary_SuggestionMissing_png_start, _binary_SuggestionMissing_png_end));
-        infoSprite = VectorToSprite(std::vector<uint8_t>(_binary_Info_png_start, _binary_Info_png_end));
-        wipSprite = VectorToSprite(std::vector<uint8_t>(_binary_WIP_png_start, _binary_WIP_png_end));
-        coloursSprite = VectorToSprite(std::vector<uint8_t>(_binary_Colors_png_start, _binary_Colors_png_end));
+        missingSpriteSprite = ArrayToSprite(IncludedAssets::MissingSprite_png);
+        requirementFoundSprite = ArrayToSprite(IncludedAssets::RequirementFound_png);
+        requirementMissingSprite = ArrayToSprite(IncludedAssets::RequirementMissing_png);
+        suggestionFoundSprite = ArrayToSprite(IncludedAssets::SuggestionFound_png);
+        suggestionMissingSprite = ArrayToSprite(IncludedAssets::SuggestionMissing_png);
+        infoSprite = ArrayToSprite(IncludedAssets::Info_png);
+        wipSprite = ArrayToSprite(IncludedAssets::WIP_png);
+        coloursSprite = ArrayToSprite(IncludedAssets::Colors_png);
     }
     
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetTableCell()

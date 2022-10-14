@@ -12,7 +12,7 @@ using namespace GlobalNamespace;
 static std::optional<std::string> alternativeDataPath = std::nullopt;
 std::string GetAlternativeDataPath() {
     if(!alternativeDataPath.has_value()) {
-        auto path = getDataDir(ID) + "PlayerData";
+        auto path = getDataDir(MOD_ID) + "PlayerData";
         mkpath(path);
         alternativeDataPath.emplace(path);
     }

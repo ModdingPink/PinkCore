@@ -367,7 +367,7 @@ namespace UIUtils
 	UnityEngine::Sprite* FileToSprite(std::u16string_view path) 
 	{
 		INFO("FileToSprite Path: %s", to_utf8(path).c_str());
-		if (!fileexists(to_utf8(path))) return VectorToSprite(std::vector<uint8_t>(_binary_MissingSprite_png_start, _binary_MissingSprite_png_end));
+		if (!fileexists(to_utf8(path))) return ArrayToSprite(IncludedAssets::MissingSprite_png);
 		std::ifstream instream(path, std::ios::in | std::ios::binary);
         std::vector<uint8_t> data = std::vector<uint8_t>(std::istreambuf_iterator<char>(instream), std::istreambuf_iterator<char>());
 		return VectorToSprite(data);
@@ -375,7 +375,7 @@ namespace UIUtils
 
 	UnityEngine::Sprite* FileToSprite(std::string_view path)
     {
-		if (!fileexists(path)) return VectorToSprite(std::vector<uint8_t>(_binary_MissingSprite_png_start, _binary_MissingSprite_png_end));
+		if (!fileexists(path)) return ArrayToSprite(IncludedAssets::MissingSprite_png);
         std::ifstream instream(path, std::ios::in | std::ios::binary);
         std::vector<uint8_t> data((std::istreambuf_iterator<char>(instream)), std::istreambuf_iterator<char>());
         Array<uint8_t>* bytes = il2cpp_utils::vectorToArray(data);
@@ -384,6 +384,6 @@ namespace UIUtils
             texture->set_wrapMode(UnityEngine::TextureWrapMode::Clamp);
             return UnityEngine::Sprite::Create(texture, UnityEngine::Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), UnityEngine::Vector2(0.5f,0.5f), 100.0f, 1u, UnityEngine::SpriteMeshType::FullRect, UnityEngine::Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
         }
-        return VectorToSprite(std::vector<uint8_t>(_binary_MissingSprite_png_start, _binary_MissingSprite_png_end));
+        return ArrayToSprite(IncludedAssets::MissingSprite_png);
     }
 }
