@@ -44,8 +44,8 @@ bool setIcons = false;
 // 	QuestUI::BeatSaberUI::AddHoverHint(newsButton, "Beat Saber Modding News");
 //     //swap the default button icons to our own button images
 //     HMUI::ButtonSpriteSwap* spriteSwap = newsButton->get_gameObject()->GetComponent<HMUI::ButtonSpriteSwap*>();
-//     auto highlightedImage = QuestUI::BeatSaberUI::VectorToSprite(std::vector<uint8_t>(_binary_MainMenuIconHighlight_png_start,_binary_MainMenuIconHighlight_png_end));
-//     auto defaultImage = QuestUI::BeatSaberUI::VectorToSprite(std::vector<uint8_t>(_binary_MainMenuIcon_png_start,_binary_MainMenuIcon_png_end));
+//     auto highlightedImage = QuestUI::BeatSaberUI::ArrayToSprite(IncludedAssets::MainMenuIconHighlight_png);
+//     auto defaultImage = QuestUI::BeatSaberUI::ArrayToSprite(IncludedAssets::MainMenuIcon_png);
 //     spriteSwap->normalStateSprite = defaultImage;
 //     spriteSwap->highlightStateSprite = highlightedImage;
 //     spriteSwap->pressedStateSprite = highlightedImage;

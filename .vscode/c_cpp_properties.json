@@ -1,13 +1,14 @@
 {
+  "env": {
+    "ndkPath": "S:/NDK/android-ndk-r23b"
+  },
   "configurations": [
     {
       "defines": [
         "MOD_ID=\"PinkCore\"",
-        "VERSION=\"0.0.1\"",
+        "VERSION=\"0.1.0\"",
         "__GNUC__",
-        "__aarch64__",
-        "ID=\"PinkCore\"",
-        "USE_CODEGEN_FIELDS"
+        "__aarch64__"
       ],
       "includePath": [
         "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
@@ -18,8 +19,14 @@
         "${workspaceFolder}/include",
         "${workspaceFolder}/shared",
         "${workspaceFolder}",
-        "${default}"
+        "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/aarch64-linux-android",
+        "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include",
+        "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/*",
+        "${ndkPath}/sources/cxx-stl/llvm-libc++abi/include",
+        "${ndkPath}/sources/cxx-stl/llvm-libc++/include",
+        "${ndkPath}/"
       ],
+      "compilerPath": "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/bin/aarch64-linux-android24-clang.cmd",
       "name": "Quest",
       "cStandard": "c11",
       "cppStandard": "c++20",

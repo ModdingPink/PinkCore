@@ -30,7 +30,7 @@ ModInfo modInfo;
 
 extern "C" void setup(ModInfo& info)
 {
-	info.id = ID;
+	info.id = MOD_ID;
 	info.version = VERSION;
 
 	modInfo = info;
@@ -60,5 +60,5 @@ extern "C" void load()
 
 	custom_types::Register::AutoRegister();
 
-	QuestUI::Register::RegisterModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({ID, VERSION});
+	QuestUI::Register::RegisterModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({MOD_ID, VERSION});
 }
