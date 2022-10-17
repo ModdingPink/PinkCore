@@ -52,6 +52,5 @@ namespace IncludedAssets {
 	DECLARE_FILE(SuggestionFound_png)
 	DECLARE_FILE(SuggestionMissing_png)
 	DECLARE_FILE(WIP_png)
-	DECLARE_FILE(colors_bsml)
 
 }

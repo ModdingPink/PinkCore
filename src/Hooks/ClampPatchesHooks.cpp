@@ -1,6 +1,7 @@
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "hooks.hpp"
 #include "config.hpp"
+#include "logging.hpp"
 
 #include "UnityEngine/Vector2.hpp"
 
@@ -22,7 +23,7 @@ auto OfType(auto range) {
     using namespace Sombrero::Linq::Functional;
 
     return range | Where([](auto i) {
-        return il2cpp_utils::AssignableFrom<T>(reinterpret_cast<Il2CppObject*>(i)->klass);
+        return i != nullptr && il2cpp_utils::AssignableFrom<T>(reinterpret_cast<Il2CppObject*>(i)->klass);
     }) | Select([](auto i) {
         return reinterpret_cast<T>(i);
     });
@@ -30,20 +31,22 @@ auto OfType(auto range) {
 
 void BeatmapObjectsInTimeRowProcessor_HandleCurrentTimeSliceAllNotesAndSlidersDidFinishTimeSliceTranspile(BeatmapObjectsInTimeRowProcessor* self,
                GlobalNamespace::BeatmapObjectsInTimeRowProcessor::TimeSliceContainer_1<::GlobalNamespace::BeatmapDataItem*>* allObjectsTimeSlice, float nextTimeSliceTime) {
-
-
     auto notesInColumnsReusableProcessingListOfLists = self->notesInColumnsReusableProcessingListOfLists;
     for (auto const &l: notesInColumnsReusableProcessingListOfLists) {
         l->Clear();
     }
 
-    auto items = ListWrapper<BeatmapDataItem*>(allObjectsTimeSlice->items);
+    auto items = ListWrapper<BeatmapDataItem*>(allObjectsTimeSlice->get_items());
 
+    // Removing usage of OfType / Linq for now since it caused crashes with v3 maps
+    //auto enumerable = OfType<NoteData *>(items);
+    //auto enumerable2 = OfType<SliderData *>(items);
+    //auto enumerable3 = OfType<BeatmapObjectsInTimeRowProcessor::SliderTailData *>(items);
 
-    auto enumerable = OfType<NoteData *>(items);
-    auto enumerable2 = OfType<SliderData *>(items);
-    auto enumerable3 = OfType<BeatmapObjectsInTimeRowProcessor::SliderTailData *>(items);
-    for (auto noteData : enumerable) {
+    // used to be enumerable
+    for (auto data : items) {
+        auto noteData = il2cpp_utils::try_cast<NoteData>(data).value_or(nullptr);
+        if (!noteData) continue;
 
         // TRANSPILE HERE
         // CLAMP
@@ -69,8 +72,15 @@ void BeatmapObjectsInTimeRowProcessor_HandleCurrentTimeSliceAllNotesAndSlidersDi
             list2[l]->SetBeforeJumpNoteLineLayer((NoteLineLayer) l);
         }
     }
-    for (auto sliderData: enumerable2) {
-        for (auto noteData2: enumerable) {
+    // used to be enumerable2
+    for (auto data : items) {
+        auto sliderData = il2cpp_utils::try_cast<SliderData>(data).value_or(nullptr);
+        if (!sliderData) continue;
+        // used to be enumerable
+        for (auto data : items) {
+            auto noteData2 = il2cpp_utils::try_cast<NoteData>(data).value_or(nullptr);
+            if (!noteData2) continue;
+            
             if (BeatmapObjectsInTimeRowProcessor::SliderHeadPositionOverlapsWithNote(sliderData, noteData2)) {
                 sliderData->SetHasHeadNote(true);
                 sliderData->SetHeadBeforeJumpLineLayer(noteData2->beforeJumpNoteLineLayer);
@@ -96,9 +106,16 @@ void BeatmapObjectsInTimeRowProcessor_HandleCurrentTimeSliceAllNotesAndSlidersDi
             }
         }
     }
-    for (auto sliderTailData: enumerable3) {
+    // used to be enumerable3
+    for (auto data : items) {
+        auto sliderTailData = il2cpp_utils::try_cast<BeatmapObjectsInTimeRowProcessor::SliderTailData>(data).value_or(nullptr);
+        if (!sliderTailData) continue;
         auto slider = sliderTailData->slider;
-        for (auto noteData3: enumerable) {
+        // used to be enumerable
+        for (auto data : items) {
+            auto noteData3 = il2cpp_utils::try_cast<NoteData>(data).value_or(nullptr);
+            if (!noteData3) continue;
+
             if (BeatmapObjectsInTimeRowProcessor::SliderTailPositionOverlapsWithNote(slider, noteData3)) {
                 slider->SetHasTailNote(true);
                 slider->SetTailBeforeJumpLineLayer(noteData3->beforeJumpNoteLineLayer);
