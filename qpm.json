@@ -22,33 +22,29 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.28.0",
+      "versionRange": "^0.29.0",
       "additionalData": {
-        "includeQmod": true,
         "private": true
       }
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.21",
+      "versionRange": "^0.15.22",
       "additionalData": {
-        "includeQmod": true,
         "private": true
       }
     },
     {
       "id": "questui",
-      "versionRange": "^0.17.3",
+      "versionRange": "^0.17.6",
       "additionalData": {
-        "includeQmod": true,
         "private": true
       }
     },
     {
       "id": "songloader",
-      "versionRange": "^0.10.9",
+      "versionRange": "^0.10.10",
       "additionalData": {
-        "includeQmod": true,
         "private": true
       }
     },
