@@ -7,7 +7,11 @@
     "version": "1.8.5",
     "url": "https://github.com/BSMGPink/PinkCore",
     "additionalData": {
-      "overrideSoName": "libpinkcore.so"
+      "soLink": "https://github.com/BSMGPink/PinkCore/releases/download/v1.8.5/libpinkcore.so",
+      "debugSoLink": "https://github.com/BSMGPink/PinkCore/releases/download/v1.8.5/debug_libpinkcore.so",
+      "overrideSoName": "libpinkcore.so",
+      "modLink": "https://github.com/BSMGPink/PinkCore/releases/download/v1.8.5/PinkCore.qmod",
+      "branchName": "version-v1.8.5"
     }
   },
   "dependencies": [
