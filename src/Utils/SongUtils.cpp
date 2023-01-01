@@ -490,7 +490,7 @@ namespace SongUtils
 			mapData.isCustom = false;
 			mapData.saberCount = -1; //-1 = No Data, dont do anything
 			mapData.isWIP = false;
-			mapData.showRotationSpwanLines = true;
+			mapData.showRotationSpawnLines = true;
 			mapData.dataIsValid = false;
 			RequirementUtils::EmptyRequirements(mapData);
 			ContributorUtils::EmptyContributors(mapData);
@@ -523,7 +523,7 @@ namespace SongUtils
 				ContributorUtils::FetchListOfContributors(mapData);
 				mapData.environmentType = SongUtils::CustomData::MapEnvironmentTypeChecker(customData, difficulty, characteristic);
 				mapData.hasCustomColours = SongUtils::CustomData::MapHasColoursChecker(customData, difficulty, characteristic);
-				mapData.showRotationSpwanLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
+				mapData.showRotationSpawnLines = SongUtils::CustomData::MapShouldShowRotationSpawnLines(customData, difficulty, characteristic);
 				mapData.saberCount = SongUtils::CustomData::MapSaberCountChecker(customData, difficulty, characteristic);
 				mapData.isCustom = true;
 				mapData.dataIsValid = true;

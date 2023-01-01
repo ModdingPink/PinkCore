@@ -19,7 +19,7 @@ namespace PinkCore::API
 		bool isWIP = false;
 		GlobalNamespace::BeatmapCharacteristicSO* characteristic;
 		GlobalNamespace::BeatmapDifficulty difficulty;
-		bool showRotationSpwanLines;
+		bool showRotationSpawnLines;
 		const char16_t* environmentType;
 		int saberCount;
 		bool hasCustomColours;
