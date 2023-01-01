@@ -81,5 +81,5 @@ MAKE_AUTO_HOOK_MATCH(BeatLineManager_HandleNoteWasSpawned, &GlobalNamespace::Bea
 {
     if (!SongUtils::SongInfo::get_mapData().isCustom) { BeatLineManager_HandleNoteWasSpawned(self, noteController); return; }
 
-    if(SongUtils::SongInfo::get_mapData().showRotationSpwanLines) BeatLineManager_HandleNoteWasSpawned(self, noteController);
+    if(SongUtils::SongInfo::get_mapData().showRotationSpawnLines) BeatLineManager_HandleNoteWasSpawned(self, noteController);
 }
