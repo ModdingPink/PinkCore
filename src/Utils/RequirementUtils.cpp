@@ -324,8 +324,7 @@ namespace RequirementUtils
 			if (itr != disablingModIds.end()) 
 			{
 				INFO("Mod %s is no longer disabling the play button", id.c_str());
-				disablingModIds.erase(itr, itr++);
-				return;
+				disablingModIds.erase(itr);
 			}
 			UpdatePlayButton();
 		}
