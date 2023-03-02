@@ -9,6 +9,7 @@
 #include "System/Action_3.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
+#include "GlobalNamespace/LayoutWidthLimiter.hpp"
 #include "UnityEngine/Resources.hpp" 
 #include "HMUI/TableView_ScrollPositionType.hpp"
 #include "custom-types/shared/delegate.hpp"
