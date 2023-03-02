@@ -35,9 +35,9 @@ std::u16string ReplaceAll(std::u16string str, const std::u16string& from, const 
 
 const Sombrero::FastVector3 favouriteSize = Sombrero::FastVector3(1.4,1.4,1.4);
 
-MAKE_AUTO_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace::LevelListTableCell::SetDataFromLevelAsync, void, GlobalNamespace::LevelListTableCell* self, GlobalNamespace::IPreviewBeatmapLevel* level, bool isFavorite)
+MAKE_AUTO_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace::LevelListTableCell::SetDataFromLevelAsync, void, GlobalNamespace::LevelListTableCell* self, GlobalNamespace::IPreviewBeatmapLevel* level, bool isFavorite, bool isPromoted, bool isUpdated)
 {
-	LevelListTableCell_SetDataFromLevelAsync(self, level, isFavorite);
+	LevelListTableCell_SetDataFromLevelAsync(self, level, isFavorite, isPromoted, isUpdated);
 
 	if (!level)
 	{

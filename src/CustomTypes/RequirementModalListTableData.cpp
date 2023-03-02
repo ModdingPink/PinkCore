@@ -9,6 +9,7 @@
 #include "System/Action_3.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
+#include "GlobalNamespace/LayoutWidthLimiter.hpp"
 #include "UnityEngine/Resources.hpp" 
 #include "HMUI/TableView_ScrollPositionType.hpp"
 #include "custom-types/shared/delegate.hpp"
@@ -56,6 +57,13 @@ namespace PinkCore::UI
         tableCell->songDurationText->get_gameObject()->SetActive(false);
         tableCell->favoritesBadgeImage->get_gameObject()->SetActive(false);
         static auto BpmIcon = ConstString("BpmIcon");
+
+        // new stuff in 1.28.0 that needs to be disabled
+        tableCell->updatedBadgeGo->SetActive(false);
+        tableCell->promoBadgeGo->SetActive(false);
+        tableCell->promoBackgroundGo->SetActive(false);
+        tableCell->layoutWidthLimiter->set_limitWidth(false);
+
         tableCell->get_transform()->Find(BpmIcon)->get_gameObject()->SetActive(false);
         reinterpret_cast<RectTransform*>(tableCell->songNameText->get_transform())->set_anchorMax({2, 0.5});
         reinterpret_cast<RectTransform*>(tableCell->songAuthorText->get_transform())->set_anchorMax({2, 0.5});
