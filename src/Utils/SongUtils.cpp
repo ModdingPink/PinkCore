@@ -380,17 +380,18 @@ namespace SongUtils
 			bool hasSaberColours = false;
 			bool hasLightColours = false;
 			bool hasObstacleColours = false;
+			bool hasWhiteLightColours = false;
 			if(SetColourFromIteratorString(u"_colorLeft", colorLeft, customData)) hasSaberColours = true;
 			if(SetColourFromIteratorString(u"_colorRight", colorRight, customData)) hasSaberColours = true;
 			if(SetColourFromIteratorString(u"_envColorLeft", envColorLeft, customData)) hasLightColours = true;
 			if(SetColourFromIteratorString(u"_envColorRight", envColorRight, customData)) hasLightColours = true;
-			if(SetColourFromIteratorString(u"_envColorWhite", envColorWhite, customData)) hasLightColours = true; 
+			if(SetColourFromIteratorString(u"_envColorWhite", envColorWhite, customData)) hasWhiteLightColours = true; 
 			if(SetColourFromIteratorString(u"_envColorLeftBoost", envColorLeftBoost, customData)) hasBoostColours = true; 
 			if(SetColourFromIteratorString(u"_envColorRightBoost", envColorRightBoost, customData)) hasBoostColours = true; 
-			if(SetColourFromIteratorString(u"_envColorWhiteBoost", envColorWhiteBoost, customData)) hasBoostColours = true; 
+			if(SetColourFromIteratorString(u"_envColorWhiteBoost", envColorWhiteBoost, customData)) hasWhiteLightColours = true; 
 			if(SetColourFromIteratorString(u"_obstacleColor", obstacleColor, customData)) hasObstacleColours = true;
 
-			if (hasSaberColours || hasLightColours || hasBoostColours || hasObstacleColours) {
+			if (hasSaberColours || hasLightColours || hasBoostColours || hasObstacleColours || hasWhiteLightColours) {
 				if(hasSaberColours && !hasLightColours){
 					envColorLeft = colorLeft;
 					envColorRight = colorRight;
