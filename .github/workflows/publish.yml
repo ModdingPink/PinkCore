@@ -34,14 +34,14 @@ jobs:
       with:
         github_token: ${{secrets.GITHUB_TOKEN}}
         workflow: cargo-build.yml
-        name: linux-qpm-rust
+        name: linux-qpm
         path: QPM
-        repo: RedBrumbler/QuestPackageManager-Rust
+        repo: QuestPackageManager/QPM.CLI
       
     - name: QPM Collapse
       run: |
-        chmod +x ./QPM/qpm-rust
-        ./QPM/qpm-rust collapse
+        chmod +x ./QPM/qpm
+        ./QPM/qpm collapse
 
     - name: QPM Dependencies Cache
       id: cache-qpm-deps
@@ -49,7 +49,7 @@ jobs:
       env:
         cache-name: cache-qpm-deps
       with:
-        path: /home/runner/.local/share/QPM-Rust/cache
+        path: /home/runner/.local/share/qpm/cache
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
@@ -58,16 +58,7 @@ jobs:
 
     - name: QPM Restore
       run: |
-        ./QPM/qpm-rust restore
-
-    - name: List Post Restore
-      run: |
-        echo includes:
-        ls -la ${GITHUB_WORKSPACE}/extern/includes
-        echo libs:
-        ls -la ${GITHUB_WORKSPACE}/extern/libs
-        echo cache:
-        ls -la $HOME/.local/share/QPM-Rust/cache
+        ./QPM/qpm restore
 
     - name: Get Tag Version
       id: get_tag_version
@@ -78,12 +69,12 @@ jobs:
       
     - name: QPM Edit Version
       run: |
-        ./QPM/qpm-rust package edit --version "${{ steps.get_tag_version.outputs.VERSION }}"
+        ./QPM/qpm package edit --version "${{ steps.get_tag_version.outputs.VERSION }}"
         
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm-rust qmod build
+        ./QPM/qpm qmod build
         pwsh -Command ./build.ps1
     
     - name: Create Qmod
@@ -178,10 +169,10 @@ jobs:
 
     - name: Change QPM Package Info
       run: |
-        ./QPM/qpm-rust package edit-extra --branchName "version-${{ steps.get_tag_version.outputs.TAG }}"
-        ./QPM/qpm-rust package edit-extra --soLink "${{ steps.upload_release_asset.outputs.browser_download_url }}"
-        ./QPM/qpm-rust package edit-extra --debugSoLink "${{ steps.upload_debug_asset.outputs.browser_download_url }}"
-        ./QPM/qpm-rust package edit-extra --modLink "${{ steps.upload_qmod_asset.outputs.browser_download_url }}"
+        ./QPM/qpm package edit-extra --branchName "version-${{ steps.get_tag_version.outputs.TAG }}"
+        ./QPM/qpm package edit-extra --soLink "${{ steps.upload_release_asset.outputs.browser_download_url }}"
+        ./QPM/qpm package edit-extra --debugSoLink "${{ steps.upload_debug_asset.outputs.browser_download_url }}"
+        ./QPM/qpm package edit-extra --modLink "${{ steps.upload_qmod_asset.outputs.browser_download_url }}"
 
     - name: Commit Changed package info
       run: |
@@ -202,4 +193,4 @@ jobs:
         git push --tags --force
         
     - name: QPM Publish
-      run: ./QPM/qpm-rust publish "${{secrets.QPM_KEY}}"
+      run: ./QPM/qpm publish "${{secrets.QPM_KEY}}"

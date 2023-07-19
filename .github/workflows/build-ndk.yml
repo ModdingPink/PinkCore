@@ -47,14 +47,14 @@ jobs:
       with:
         github_token: ${{secrets.GITHUB_TOKEN}}
         workflow: cargo-build.yml
-        name: linux-qpm-rust
+        name: linux-qpm
         path: QPM
-        repo: RedBrumbler/QuestPackageManager-Rust
+        repo: QuestPackageManager/QPM.CLI
         
     - name: QPM Collapse
       run: |
-        chmod +x ./QPM/qpm-rust
-        ./QPM/qpm-rust collapse
+        chmod +x ./QPM/qpm
+        ./QPM/qpm collapse
     
     - name: QPM Dependencies Cache
       id: cache-qpm-deps
@@ -62,7 +62,7 @@ jobs:
       env:
         cache-name: cache-qpm-deps
       with:
-        path: /home/runner/.local/share/QPM-Rust/cache
+        path: /home/runner/.local/share/qpm/cache
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('qpm.json') }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
@@ -71,21 +71,12 @@ jobs:
 
     - name: QPM Restore
       run: |
-        ./QPM/qpm-rust restore
-
-    - name: List Post Restore
-      run: |
-        echo includes:
-        ls -la ${GITHUB_WORKSPACE}/extern/includes
-        echo libs:
-        ls -la ${GITHUB_WORKSPACE}/extern/libs
-        echo cache:
-        ls -la $HOME/.local/share/QPM-Rust/cache
+        ./QPM/qpm restore
 
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
-        ./QPM/qpm-rust qmod build
+        ./QPM/qpm qmod build
         pwsh -Command ./build.ps1
 
     - name: Create Qmod
