@@ -370,23 +370,28 @@ namespace SongUtils
 			Sombrero::FastColor colorRight = colorScheme->saberBColor;
 			Sombrero::FastColor envColorLeft = colorScheme->environmentColor0;
 			Sombrero::FastColor envColorRight = colorScheme->environmentColor1;
+			Sombrero::FastColor envColorWhite = colorScheme->environmentColorW;
 			Sombrero::FastColor envColorLeftBoost = colorScheme->environmentColor0Boost;
 			Sombrero::FastColor envColorRightBoost = colorScheme->environmentColor1Boost;
+			Sombrero::FastColor envColorWhiteBoost = colorScheme->environmentColorWBoost;
 			Sombrero::FastColor obstacleColor = colorScheme->obstaclesColor;
 			
 			bool hasBoostColours = false;
 			bool hasSaberColours = false;
 			bool hasLightColours = false;
 			bool hasObstacleColours = false;
+			bool hasWhiteLightColours = false;
 			if(SetColourFromIteratorString(u"_colorLeft", colorLeft, customData)) hasSaberColours = true;
 			if(SetColourFromIteratorString(u"_colorRight", colorRight, customData)) hasSaberColours = true;
 			if(SetColourFromIteratorString(u"_envColorLeft", envColorLeft, customData)) hasLightColours = true;
 			if(SetColourFromIteratorString(u"_envColorRight", envColorRight, customData)) hasLightColours = true;
+			if(SetColourFromIteratorString(u"_envColorWhite", envColorWhite, customData)) hasWhiteLightColours = true; 
 			if(SetColourFromIteratorString(u"_envColorLeftBoost", envColorLeftBoost, customData)) hasBoostColours = true; 
 			if(SetColourFromIteratorString(u"_envColorRightBoost", envColorRightBoost, customData)) hasBoostColours = true; 
+			if(SetColourFromIteratorString(u"_envColorWhiteBoost", envColorWhiteBoost, customData)) hasWhiteLightColours = true; 
 			if(SetColourFromIteratorString(u"_obstacleColor", obstacleColor, customData)) hasObstacleColours = true;
 
-			if (hasSaberColours || hasLightColours || hasBoostColours || hasObstacleColours) {
+			if (hasSaberColours || hasLightColours || hasBoostColours || hasObstacleColours || hasWhiteLightColours) {
 				if(hasSaberColours && !hasLightColours){
 					envColorLeft = colorLeft;
 					envColorRight = colorRight;
@@ -404,6 +409,11 @@ namespace SongUtils
 				StringW colorSchemeId = "PinkCoreMapColorScheme";
 				StringW colorSchemeNameLocalizationKey = "PinkCore Map Color Scheme";
 				auto newColorScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false, colorLeft, colorRight, envColorLeft, envColorRight, colorScheme->supportsEnvironmentColorBoost, envColorLeftBoost, envColorRightBoost, obstacleColor);
+
+				// Apply the new colours to the scheme directly since there is no constructor for this
+				newColorScheme->environmentColorW = envColorWhite;
+				newColorScheme->environmentColorWBoost = envColorWhiteBoost;
+
 				return newColorScheme;
 
 			}
