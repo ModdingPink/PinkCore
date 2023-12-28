@@ -7,10 +7,10 @@ namespace PinkCore
 {
     Logger& Logging::getLogger()
     {
-        static Logger* logger = new Logger({MOD_ID, VERSION}, LoggerOptions(false, true));
+        static Logger* logger = new Logger({MOD_ID, VERSION, VERSION_LONG}, LoggerOptions(false, true));
         return *logger;
     }
-    
+
     LoggerContextObject& Logging::getContextLogger(const char* func, const char* file, int line)
     {
         std::string contextString(string_format("%s:%i", file, line));

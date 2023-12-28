@@ -3,13 +3,15 @@
 #include "static-defines.h"
 #include "assets.hpp"
 
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "bsml/shared/BSML.hpp"
+#include "bsml/shared/Helpers/creation.hpp"
+#include "bsml/shared/BSML/Components/ExternalComponents.hpp"
+#include "bsml/shared/BSML/Components/Backgroundable.hpp"
+#include "bsml/shared/BSML/MainThreadScheduler.hpp"
 
 #include "VRUIControls/VRGraphicRaycaster.hpp"
 #include "UnityEngine/UI/Button.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
 #include "UnityEngine/Component.hpp"
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/RectTransform.hpp"
@@ -26,8 +28,7 @@
 
 DEFINE_TYPE(PinkCore::UI, NoticeBoard);
 
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
+using namespace BSML::Lite;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace TMPro;
@@ -57,17 +58,15 @@ namespace PinkCore::UI
 			CreateSwitchingButtons();
 
 			container = CreateScrollableSettingsContainer(get_transform());
-			ExternalComponents* components = container->GetComponent<ExternalComponents*>();
+			auto components = container->GetComponent<BSML::ExternalComponents*>();
 			RectTransform* rect = components->Get<RectTransform*>();
 			rect->set_sizeDelta({0.0f, 0.0f});
 			rect->set_anchoredPosition({0.0f,3.0f});
 			// backgroundable for the text, gives it some borders
-			auto* backgroundable = container->GetComponent<Backgroundable*>();
-			if (!backgroundable)
-			{
-				backgroundable = container->AddComponent<Backgroundable*>();
-			}
-			backgroundable->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
+			auto* backgroundable = container->GetComponent<BSML::Backgroundable*>();
+			if (!backgroundable) backgroundable = container->AddComponent<BSML::Backgroundable*>();
+			backgroundable->ApplyBackground("round-rect-panel");
+			backgroundable->ApplyAlpha(0.5f);
 
 			auto* layoutgroup = container->GetComponent<VerticalLayoutGroup*>();
 			RectOffset* offset = RectOffset::New_ctor(2, 2, 0, 0);
@@ -82,7 +81,7 @@ namespace PinkCore::UI
 	{
 		if (!instance)
 		{
-			instance = CreateViewController<PinkCore::UI::NoticeBoard*>();
+			instance = BSML::Helpers::CreateViewController<PinkCore::UI::NoticeBoard*>();
 		}
 		return instance;
 	}
@@ -124,9 +123,9 @@ namespace PinkCore::UI
 		horizon->set_childControlWidth(true);
 		horizon->set_childForceExpandWidth(true);
 
-		canvas_T->set_localScale(Vector3::get_one() * 0.25f);
+		canvas_T->set_localScale({0.25f, 0.25f, 0.25f});
 
-		noticeBoardButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){
+		noticeBoardButton = CreateUIButton(horizon, "", "SettingsButton", [&](){
 			if (state == BoardState::Board) return;
 			state = BoardState::Board;
 			title->set_text(il2cpp_utils::newcsstr(titles[state]));
@@ -138,7 +137,7 @@ namespace PinkCore::UI
 
 		UIUtils::SwapButtonSprites(noticeBoardButton, ArrayToSprite(Assets::NewsBoard::NewsIcon_png), ArrayToSprite(Assets::NewsBoard::NewsIconActive_png));
 
-		donationButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){
+		donationButton = CreateUIButton(horizon, "", "SettingsButton", [&](){
 			if (state == BoardState::Donation) return;
 			state = BoardState::Donation;
 			title->set_text(il2cpp_utils::newcsstr(titles[state]));
@@ -163,7 +162,7 @@ namespace PinkCore::UI
 
 		TextMeshProUGUI* tmproText = CreateText(layout->get_transform(), text, false);
 		tmproText->set_fontSize(tmproText->get_fontSize() * 0.65f);
-		tmproText->set_alignment(TextAlignmentOptions::_get_MidlineLeft());
+		tmproText->set_alignment(TextAlignmentOptions::MidlineLeft);
 		tmproText->set_enableWordWrapping(true);
 
 		LayoutElement* noticelayout = tmproText->get_gameObject()->AddComponent<LayoutElement*>();

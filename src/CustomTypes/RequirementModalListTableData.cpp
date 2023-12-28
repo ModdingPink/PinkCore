@@ -3,23 +3,19 @@
 #include "Utils/RequirementUtils.hpp"
 #include "Utils/ContributorUtils.hpp"
 #include "Utils/SongUtils.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/ArrayUtil.hpp"
+#include "bsml/shared/BSML.hpp"
 #include "assets.hpp"
 #include "System/Action_3.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "bsml/shared/BSML/MainThreadScheduler.hpp"
 
-#include "GlobalNamespace/LayoutWidthLimiter.hpp"
 #include "UnityEngine/Resources.hpp"
-#include "HMUI/TableView_ScrollPositionType.hpp"
 #include "custom-types/shared/delegate.hpp"
 #include "logging.hpp"
 DEFINE_TYPE(PinkCore::UI, RequirementModalListTableData);
 
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
+using namespace BSML::Lite;
 
 namespace PinkCore::UI
 {
@@ -43,32 +39,32 @@ namespace PinkCore::UI
         if (!tableCell)
         {
             if (!songListTableCellInstance)
-                songListTableCellInstance = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>(), [](auto x){ return x->get_name() == u"LevelListTableCell"; });
+                songListTableCellInstance = Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>().FirstOrDefault([](auto x){ return x->name == u"LevelListTableCell"; });
 
             tableCell = Instantiate(songListTableCellInstance);
         }
 
-        tableCell->notOwned = false;
+        tableCell->_notOwned = false;
 
         tableCell->set_reuseIdentifier(reuseIdentifier);
         tableCell->set_interactable(true);
 
-        tableCell->songBpmText->get_gameObject()->SetActive(false);
-        tableCell->songDurationText->get_gameObject()->SetActive(false);
-        tableCell->favoritesBadgeImage->get_gameObject()->SetActive(false);
+        tableCell->_songBpmText->get_gameObject()->SetActive(false);
+        tableCell->_songDurationText->get_gameObject()->SetActive(false);
+        tableCell->_favoritesBadgeImage->get_gameObject()->SetActive(false);
         static auto BpmIcon = ConstString("BpmIcon");
 
         // new stuff in 1.28.0 that needs to be disabled
-        tableCell->updatedBadgeGo->SetActive(false);
-        tableCell->promoBadgeGo->SetActive(false);
-        tableCell->promoBackgroundGo->SetActive(false);
-        tableCell->layoutWidthLimiter->set_limitWidth(false);
+        tableCell->_updatedBadgeGo->SetActive(false);
+        tableCell->_promoBadgeGo->SetActive(false);
+        // tableCell->_promoBackgroundGo->SetActive(false);
+        // tableCell->_layoutWidthLimiter->set_limitWidth(false);
 
         tableCell->get_transform()->Find(BpmIcon)->get_gameObject()->SetActive(false);
-        reinterpret_cast<RectTransform*>(tableCell->songNameText->get_transform())->set_anchorMax({2, 0.5});
-        reinterpret_cast<RectTransform*>(tableCell->songAuthorText->get_transform())->set_anchorMax({2, 0.5});
-        tableCell->selectedBackgroundColor = tableCell->highlightBackgroundColor;
-        tableCell->selectedAndHighlightedBackgroundColor = tableCell->highlightBackgroundColor;
+        reinterpret_cast<RectTransform*>(tableCell->_songNameText->get_transform())->set_anchorMax({2, 0.5});
+        reinterpret_cast<RectTransform*>(tableCell->_songAuthorText->get_transform())->set_anchorMax({2, 0.5});
+        tableCell->_selectedBackgroundColor = tableCell->_highlightBackgroundColor;
+        tableCell->_selectedAndHighlightedBackgroundColor = tableCell->_highlightBackgroundColor;
         /*
         INFO("creating the funny Sc2bad delegate");
         std::function<void(HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*)> fun = [tableCell](HMUI::SelectableCell* a, HMUI::SelectableCell::TransitionType b, Il2CppObject* c){
@@ -88,9 +84,9 @@ namespace PinkCore::UI
         tableCell->set_interactable(false);
         static auto WIPLevel = ConstString("WIP Level");
         static auto WorkInProgress = ConstString("Please Play in Practice Mode");
-        tableCell->songNameText->set_text(WIPLevel);
-        tableCell->songAuthorText->set_text(WorkInProgress);
-        tableCell->coverImage->set_sprite(wipSprite);
+        tableCell->_songNameText->set_text(WIPLevel);
+        tableCell->_songAuthorText->set_text(WorkInProgress);
+        tableCell->_coverImage->set_sprite(wipSprite);
         return tableCell;
     }
 
@@ -101,9 +97,9 @@ namespace PinkCore::UI
         tableCell->set_interactable(true);
         static auto colourAvailable = ConstString("Custom Colours Available");
         static auto previewColour = ConstString("Click here to preview & enable them.");
-        tableCell->songNameText->set_text(colourAvailable);
-        tableCell->songAuthorText->set_text(previewColour);
-        tableCell->coverImage->set_sprite(coloursSprite);
+        tableCell->_songNameText->set_text(colourAvailable);
+        tableCell->_songAuthorText->set_text(previewColour);
+        tableCell->_coverImage->set_sprite(coloursSprite);
         return tableCell;
     }
 
@@ -125,37 +121,27 @@ namespace PinkCore::UI
         UnityEngine::Sprite* sprite;
         StringW subText;
 
-		if (required && (!forcedSuggestion || suggested))
-        {
-            if (installed)
-            {
+		if (required && (!forcedSuggestion || suggested)) {
+            if (installed) {
                 sprite = requirementFoundSprite;
                 subText = RequirementFound;
-            }
-            else
-            {
+            } else {
                 sprite = requirementMissingSprite;
                 subText = RequirementMissing;
             }
-        }
-        // it was a suggestion or forced suggestion
-        else
-        {
-            if (installed)
-            {
+        } else { // it was a suggestion or forced suggestion
+            if (installed) {
                 sprite = suggestionFoundSprite;
                 subText = SuggestionFound;
-            }
-            else
-            {
+            } else {
                 sprite = suggestionMissingSprite;
                 subText = SuggestionMissing;
             }
         }
 
-        tableCell->songNameText->set_text(requirementName);
-        tableCell->songAuthorText->set_text(subText);
-        tableCell->coverImage->set_sprite(sprite);
+        tableCell->_songNameText->set_text(requirementName);
+        tableCell->_songAuthorText->set_text(subText);
+        tableCell->_coverImage->set_sprite(sprite);
 
         return tableCell;
     }
@@ -175,14 +161,12 @@ namespace PinkCore::UI
         auto tableCell = GetTableCell();
         auto& contributor = SongUtils::SongInfo::get_mapData().currentContributors[idx];
         tableCell->set_interactable(false);
+        tableCell->_songNameText->set_text(contributor.name);
+        tableCell->_songAuthorText->set_text(contributor.role);
         if (contributor.iconPath.empty()) {
-            tableCell->songNameText->set_text(contributor.name);
-            tableCell->songAuthorText->set_text(contributor.role);
-            tableCell->coverImage->set_sprite(infoSprite);
+            tableCell->_coverImage->set_sprite(infoSprite);
         } else {
-            tableCell->songNameText->set_text(contributor.name);
-            tableCell->songAuthorText->set_text(contributor.role);
-            tableCell->coverImage->set_sprite(UIUtils::FileToSprite(SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath));
+            tableCell->_coverImage->set_sprite(UIUtils::FileToSprite(SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath));
         }
 
         return tableCell;

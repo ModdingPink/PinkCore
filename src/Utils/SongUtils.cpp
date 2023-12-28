@@ -70,30 +70,30 @@ namespace SongUtils
 	{
 		return currentLevelPath;
 	}
-	
-	static inline std::optional<std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>> getOptional(bool value) 
-	{ 
+
+	static inline std::optional<std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>> getOptional(bool value)
+	{
 		if (value) return currentInfoDat;
-		else return std::nullopt; 
+		else return std::nullopt;
 	}
 
 	std::u16string GetDiffFromEnum(GlobalNamespace::BeatmapDifficulty selectedDifficulty)
 	{
-		switch (selectedDifficulty.value)
+		switch (selectedDifficulty)
 		{
-			case 0:
+			case GlobalNamespace::BeatmapDifficulty::Easy:
 				return u"Easy";
 				break;
-			case 1:
+			case GlobalNamespace::BeatmapDifficulty::Normal:
 				return u"Normal";
 				break;
-			case 2:
+			case GlobalNamespace::BeatmapDifficulty::Hard:
 				return u"Hard";
 				break;
-			case 3:
+			case GlobalNamespace::BeatmapDifficulty::Expert:
 				return u"Expert";
 				break;
-			case 4:
+			case GlobalNamespace::BeatmapDifficulty::ExpertPlus:
 				return u"ExpertPlus";
 				break;
 			default:
@@ -173,10 +173,10 @@ namespace SongUtils
 			// cast to custom level
 			GlobalNamespace::CustomPreviewBeatmapLevel* customLevel;
 			if (auto filter = il2cpp_utils::try_cast<GlobalNamespace::FilteredBeatmapLevel>(level)) {
-				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomPreviewBeatmapLevel>(filter.value()->beatmapLevel);
+				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomPreviewBeatmapLevel>(filter.value()->_beatmapLevel);
 			} else {
 				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomPreviewBeatmapLevel>(level);
-			}			
+			}
 			std::u16string songPath(customLevel->get_customLevelPath());
 			currentLevelPath = songPath;
 
@@ -211,13 +211,13 @@ namespace SongUtils
 				instream.read((char*)&info[0], size);
 
 				// parse into doc
-				if (!doc) doc = std::make_shared<typename rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>(); 
+				if (!doc) doc = std::make_shared<typename rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>>();
 				doc->Parse(info.data());
 				// return true if it read the file right, return false if there was a parse error
 				return !doc->GetParseError();*/
 			}
 		}
-		
+
 
 		bool GetCurrentCustomDataJson(rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>& in, CustomJSONData::ValueUTF16& out)
 		{
@@ -257,7 +257,7 @@ namespace SongUtils
 			CustomJSONData::ValueUTF16 customData;
 			std::u16string difficultyToFind = SongUtils::GetDiffFromEnum(difficulty);
 			if(GetCustomDataJsonFromCharacteristic(in, customData, characteristic)){
-				auto difficultyBeatmaps = customData.GetObject().FindMember(u"_difficultyBeatmaps");	
+				auto difficultyBeatmaps = customData.GetObject().FindMember(u"_difficultyBeatmaps");
 				auto beatmaps = difficultyBeatmaps->value.GetArray();
 				for (auto& beatmap : beatmaps)
 				{
@@ -328,7 +328,7 @@ namespace SongUtils
 			CustomJSONData::ValueUTF16 customData;
 			GetCustomDataJsonFromCharacteristic(d, customData, characteristic);
 			auto customDataItr = customData.GetObject().FindMember(u"_customData");
-			if(customDataItr != customData.MemberEnd()){		
+			if(customDataItr != customData.MemberEnd()){
 				auto characteristicLabel = customDataItr->value.GetObject().FindMember(u"_characteristicLabel");
 				auto characteristicIconFilePath = customDataItr->value.FindMember(u"_characteristicIconImageFilename");
 				if(characteristicLabel != customDataItr->value.GetObject().MemberEnd()){
@@ -341,7 +341,7 @@ namespace SongUtils
 				}
 			}
 		}
-			
+
 
 		bool SetColourFromIteratorString(const char16_t *name, Sombrero::FastColor& mapColour, CustomJSONData::ValueUTF16& customData){
 			auto colorItr = customData.GetObject().FindMember(name);
@@ -375,7 +375,7 @@ namespace SongUtils
 			Sombrero::FastColor envColorRightBoost = colorScheme->environmentColor1Boost;
 			Sombrero::FastColor envColorWhiteBoost = colorScheme->environmentColorWBoost;
 			Sombrero::FastColor obstacleColor = colorScheme->obstaclesColor;
-			
+
 			bool hasBoostColours = false;
 			bool hasSaberColours = false;
 			bool hasLightColours = false;
@@ -385,10 +385,10 @@ namespace SongUtils
 			if(SetColourFromIteratorString(u"_colorRight", colorRight, customData)) hasSaberColours = true;
 			if(SetColourFromIteratorString(u"_envColorLeft", envColorLeft, customData)) hasLightColours = true;
 			if(SetColourFromIteratorString(u"_envColorRight", envColorRight, customData)) hasLightColours = true;
-			if(SetColourFromIteratorString(u"_envColorWhite", envColorWhite, customData)) hasWhiteLightColours = true; 
-			if(SetColourFromIteratorString(u"_envColorLeftBoost", envColorLeftBoost, customData)) hasBoostColours = true; 
-			if(SetColourFromIteratorString(u"_envColorRightBoost", envColorRightBoost, customData)) hasBoostColours = true; 
-			if(SetColourFromIteratorString(u"_envColorWhiteBoost", envColorWhiteBoost, customData)) hasWhiteLightColours = true; 
+			if(SetColourFromIteratorString(u"_envColorWhite", envColorWhite, customData)) hasWhiteLightColours = true;
+			if(SetColourFromIteratorString(u"_envColorLeftBoost", envColorLeftBoost, customData)) hasBoostColours = true;
+			if(SetColourFromIteratorString(u"_envColorRightBoost", envColorRightBoost, customData)) hasBoostColours = true;
+			if(SetColourFromIteratorString(u"_envColorWhiteBoost", envColorWhiteBoost, customData)) hasWhiteLightColours = true;
 			if(SetColourFromIteratorString(u"_obstacleColor", obstacleColor, customData)) hasObstacleColours = true;
 
 			if (hasSaberColours || hasLightColours || hasBoostColours || hasObstacleColours || hasWhiteLightColours) {
@@ -411,8 +411,8 @@ namespace SongUtils
 				auto newColorScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false, colorLeft, colorRight, envColorLeft, envColorRight, colorScheme->supportsEnvironmentColorBoost, envColorLeftBoost, envColorRightBoost, obstacleColor);
 
 				// Apply the new colours to the scheme directly since there is no constructor for this
-				newColorScheme->environmentColorW = envColorWhite;
-				newColorScheme->environmentColorWBoost = envColorWhiteBoost;
+				newColorScheme->_environmentColorW = envColorWhite;
+				newColorScheme->_environmentColorWBoost = envColorWhiteBoost;
 
 				return newColorScheme;
 
@@ -420,8 +420,8 @@ namespace SongUtils
 			else {
 				return nullptr;
 			}
-		
-			
+
+
 		}
 
 		void ExtractRequirements(const CustomJSONData::ValueUTF16& requirementsArray, std::vector<std::string>& output)
@@ -463,7 +463,7 @@ namespace SongUtils
 			if (itr != customData.MemberEnd()) {
 				if(itr->value.GetBool()){ //if one saber is true
 					return 1; //only have 1 saber
-				}else{ 
+				}else{
 					return 2; //if its false, then we have 2 sabers
 				}
 			}
@@ -562,7 +562,7 @@ namespace SongUtils
 			//had to resort to the code below again, multi for some reason shits itself here
 			//return il2cpp_functions::class_is_assignable_from(classof(GlobalNamespace::CustomPreviewBeatmapLevel*), il2cpp_functions::object_get_class(reinterpret_cast<Il2CppObject*>(level)));
 			// the above check should suffice, but this code will remain as backup
-			
+
 
 			//the above did not suffice.
 			//broke in multi
@@ -594,6 +594,6 @@ namespace SongUtils
 		{
 			currentMapLevelDetails.isWIP = val;
 		}
-		
+
 	}
 }

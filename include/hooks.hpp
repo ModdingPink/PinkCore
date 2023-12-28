@@ -4,12 +4,12 @@
 #include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
-class Hooks 
+class Hooks
 {
 	private:
 		inline static std::vector<void(*)(Logger& logger)> installFuncs;
 	public:
-		static void AddInstallFunc(void(*installFunc)(Logger& logger)) 
+		static void AddInstallFunc(void(*installFunc)(Logger& logger))
 		{
 			installFuncs.push_back(installFunc);
 		}
@@ -41,7 +41,7 @@ struct Hook_##name_ { \
     using funcType = retval (*)(__VA_ARGS__); \
     static_assert(std::is_same_v<funcType, ::Hooking::InternalMethodCheck<decltype(mPtr)>::funcType>, "Hook method signature does not match!"); \
     constexpr static const char* name() { return #name_; } \
-    static const MethodInfo* getInfo() { return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get(); } \
+    static const MethodInfo* getInfo() { return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::methodInfo(); } \
     static funcType* trampoline() { return &name_; } \
     static inline retval (*name_)(__VA_ARGS__) = nullptr; \
     static funcType hook() { return hook_##name_; } \
@@ -55,7 +55,7 @@ struct Hook_##name_ { \
     using funcType = retval (*)(__VA_ARGS__); \
     static_assert(std::is_same_v<funcType, ::Hooking::InternalMethodCheck<decltype(mPtr)>::funcType>, "Hook method signature does not match!"); \
     constexpr static const char* name() { return #name_; } \
-    static const MethodInfo* getInfo() { return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get(); } \
+    static const MethodInfo* getInfo() { return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::methodInfo(); } \
     static funcType* trampoline() { return &name_; } \
     static inline retval (*name_)(__VA_ARGS__) = nullptr; \
     static funcType hook() { return hook_##name_; } \

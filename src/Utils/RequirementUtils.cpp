@@ -39,10 +39,10 @@ namespace RequirementUtils
 	std::vector<std::string> forcedSuggestions = {};
 
 	std::vector<std::string> disablingModIds = {};
-	
+
 	FoundRequirementsEvent onFoundRequirementsEvent;
 	FoundSuggestionsEvent onFoundSuggestionsEvent;
-	
+
 
 	void EmptyRequirements(PinkCore::API::LevelDetails& levelDetail) {
 		levelDetail.currentRequirements.clear();
@@ -206,15 +206,15 @@ namespace RequirementUtils
 	void FindInstalledRequirements()
 	{
 		return;
-		for (auto mod : Modloader::getMods())
-		{
-			// if mod is loaded, put it in the list of installed requirements
-			if (mod.second.get_loaded())
-			{
-				installedRequirements.push_back(mod.second.info.id);
-				INFO("Found loaded id: %s", mod.second.info.id.c_str());
-			}
-		}
+		// for (auto mod : modloader::getMods())
+		// {
+		// 	// if mod is loaded, put it in the list of installed requirements
+		// 	if (mod.second.get_loaded())
+		// 	{
+		// 		installedRequirements.push_back(mod.second.info.id);
+		// 		INFO("Found loaded id: %s", mod.second.info.id.c_str());
+		// 	}
+		// }
 	}
 
 	/*
@@ -287,7 +287,7 @@ namespace RequirementUtils
 			}
 			else return false;
 		}
-		
+
 		bool RemoveSuggestion(std::string identifier)
 		{
 			auto it = std::find(forcedSuggestions.begin(), forcedSuggestions.end(), identifier);
@@ -299,12 +299,12 @@ namespace RequirementUtils
 			else return false;
 		}
 
-		
+
 
 		void RegisterDisablingModId(std::string id)
 		{
 			auto itr = std::find(disablingModIds.begin(), disablingModIds.end(), id);
-			if (itr != disablingModIds.end()) 
+			if (itr != disablingModIds.end())
 			{
 				INFO("Mod %s is trying to disable the play button again!", id.c_str());
 				return;
@@ -321,7 +321,7 @@ namespace RequirementUtils
 		void RemoveDisablingModId(std::string id)
 		{
 			auto itr = std::find(disablingModIds.begin(), disablingModIds.end(), id);
-			if (itr != disablingModIds.end()) 
+			if (itr != disablingModIds.end())
 			{
 				INFO("Mod %s is no longer disabling the play button", id.c_str());
 				disablingModIds.erase(itr);

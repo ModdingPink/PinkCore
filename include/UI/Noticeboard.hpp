@@ -14,7 +14,7 @@ enum BoardState {
 };
 
 DECLARE_CLASS_CODEGEN(PinkCore::UI, NoticeBoard, HMUI::ViewController,
-	DECLARE_OVERRIDE_METHOD(void, DidActivate, il2cpp_utils::FindMethodUnsafe("HMUI", "ViewController", "DidActivate", 3), bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
+	DECLARE_OVERRIDE_METHOD_MATCH(void, DidActivate, &HMUI::ViewController::DidActivate, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling);
 	DECLARE_INSTANCE_FIELD(UnityEngine::GameObject*, container);
 	DECLARE_INSTANCE_FIELD(UnityEngine::GameObject*, boardLayout);
 	DECLARE_INSTANCE_FIELD(UnityEngine::GameObject*, donationLayout);

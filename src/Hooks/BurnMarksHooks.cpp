@@ -12,18 +12,18 @@
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/Material.hpp"
 
-MAKE_AUTO_HOOK_MATCH(MainSettingsModelSO_Load, &GlobalNamespace::MainSettingsModelSO::Load, void, GlobalNamespace::MainSettingsModelSO* self, bool forced)
+MAKE_AUTO_HOOK_MATCH(MainSettingsModelSO_Load, &GlobalNamespace::MainSettingsModelSO::Load, void, GlobalNamespace::MainSettingsModelSO* self, ::GlobalNamespace::ISaveData * saveData, bool forced)
 {
 	self->burnMarkTrailsEnabled->set_value(true);
-	MainSettingsModelSO_Load(self, forced); 
+	MainSettingsModelSO_Load(self, saveData, forced);
 }
 
 //stops the marks from spawning, this way it allows it to be configurable during runtime without a reload.
 MAKE_AUTO_HOOK_MATCH(SaberBurnMarkArea_LateUpdate, &GlobalNamespace::SaberBurnMarkArea::LateUpdate, void, GlobalNamespace::SaberBurnMarkArea* self)
 {
 	if (config.enableBurnMarks) {
-		SaberBurnMarkArea_LateUpdate(self); 
+		SaberBurnMarkArea_LateUpdate(self);
 	} else {
-		self->renderer->get_sharedMaterial()->set_mainTexture(UnityEngine::Texture2D::get_blackTexture());
+		self->_renderer->get_sharedMaterial()->set_mainTexture(UnityEngine::Texture2D::get_blackTexture());
     }
 }

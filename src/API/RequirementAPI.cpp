@@ -30,12 +30,12 @@ namespace PinkCore::RequirementAPI
 		return SongUtils::CustomData::GetCurrentCustomDataJson(SongUtils::GetCurrentInfoDat(), value);
 	}
 
-	void DisablePlayButton(const ModInfo& info)
+	void DisablePlayButton(const modloader::ModInfo& info)
 	{
 		RequirementUtils::ExternalAPI::RegisterDisablingModId(info.id);
 	}
 
-	void EnablePlayButton(const ModInfo& info)
+	void EnablePlayButton(const modloader::ModInfo& info)
 	{
 		RequirementUtils::ExternalAPI::RemoveDisablingModId(info.id);
 	}
