@@ -3,6 +3,7 @@ include(qpm_defines.cmake)
 
 cmake_minimum_required(VERSION 3.22)
 project(${COMPILE_ID})
+include(${EXTERN_DIR}/includes/kaleb/shared/cmake/assets.cmake)
 
 # c++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -38,10 +39,9 @@ target_include_directories(${COMPILE_ID} PRIVATE ${SOURCE_DIR})
 target_include_directories(${COMPILE_ID} PRIVATE ${INCLUDE_DIR})
 # add shared dir as include dir
 target_include_directories(${COMPILE_ID} PUBLIC ${SHARED_DIR})
-# codegen includes 
-target_include_directories(${COMPILE_ID} PRIVATE ${EXTERN_DIR}/includes/${CODEGEN_ID}/include)
 
-target_link_libraries(${COMPILE_ID} PRIVATE -llog -lz)
+add_assets(${COMPILE_ID}-assets STATIC ${CMAKE_CURRENT_LIST_DIR}/assets ${INCLUDE_DIR}/assets.hpp)
+target_link_libraries(${COMPILE_ID} PRIVATE -llog -lz ${COMPILE_ID}-assets)
 # add extern stuff like libs and other includes
 include(extern.cmake)
 
