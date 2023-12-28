@@ -7,7 +7,6 @@
 
 #include "HMUI/TitleViewController.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
 
 DEFINE_TYPE(PinkCore::UI, PinkCoreFlowCoordinator);
 

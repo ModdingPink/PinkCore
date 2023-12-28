@@ -10,7 +10,7 @@
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
 #include "GlobalNamespace/LayoutWidthLimiter.hpp"
-#include "UnityEngine/Resources.hpp" 
+#include "UnityEngine/Resources.hpp"
 #include "HMUI/TableView_ScrollPositionType.hpp"
 #include "custom-types/shared/delegate.hpp"
 #include "logging.hpp"
@@ -27,16 +27,16 @@ namespace PinkCore::UI
     {
         reuseIdentifier = "RequirementModalListTableCell";
         cellSize = 8.5f;
-        missingSpriteSprite = ArrayToSprite(IncludedAssets::MissingSprite_png);
-        requirementFoundSprite = ArrayToSprite(IncludedAssets::RequirementFound_png);
-        requirementMissingSprite = ArrayToSprite(IncludedAssets::RequirementMissing_png);
-        suggestionFoundSprite = ArrayToSprite(IncludedAssets::SuggestionFound_png);
-        suggestionMissingSprite = ArrayToSprite(IncludedAssets::SuggestionMissing_png);
-        infoSprite = ArrayToSprite(IncludedAssets::Info_png);
-        wipSprite = ArrayToSprite(IncludedAssets::WIP_png);
-        coloursSprite = ArrayToSprite(IncludedAssets::Colors_png);
+        missingSpriteSprite = ArrayToSprite(Assets::Requirements::MissingSprite_png);
+        requirementFoundSprite = ArrayToSprite(Assets::Requirements::RequirementFound_png);
+        requirementMissingSprite = ArrayToSprite(Assets::Requirements::RequirementMissing_png);
+        suggestionFoundSprite = ArrayToSprite(Assets::Requirements::SuggestionFound_png);
+        suggestionMissingSprite = ArrayToSprite(Assets::Requirements::SuggestionMissing_png);
+        infoSprite = ArrayToSprite(Assets::Requirements::Info_png);
+        wipSprite = ArrayToSprite(Assets::Requirements::WIP_png);
+        coloursSprite = ArrayToSprite(Assets::Requirements::Colors_png);
     }
-    
+
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetTableCell()
     {
         auto tableCell = reinterpret_cast<GlobalNamespace::LevelListTableCell*>(tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
@@ -74,12 +74,12 @@ namespace PinkCore::UI
         std::function<void(HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*)> fun = [tableCell](HMUI::SelectableCell* a, HMUI::SelectableCell::TransitionType b, Il2CppObject* c){
 
         };
-        auto delegate = custom_types::MakeDelegate<System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*>(classof(System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*), fun);        
+        auto delegate = custom_types::MakeDelegate<System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*>(classof(System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*), fun);
         INFO("delegate made");
         tableCell->add_selectionDidChangeEvent(delegate);
         INFO("delegate added to did change event");
         */
-        return tableCell;    
+        return tableCell;
     }
 
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetWipCell()
@@ -106,7 +106,7 @@ namespace PinkCore::UI
         tableCell->coverImage->set_sprite(coloursSprite);
         return tableCell;
     }
-    
+
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetRequirementOrSuggestionCell(std::string requirementName)
     {
         auto tableCell = GetTableCell();
@@ -121,7 +121,7 @@ namespace PinkCore::UI
 		bool required = RequirementUtils::GetSongHasRequirement(requirementName);
 		bool suggested = RequirementUtils::GetSongHasSuggestion(requirementName);
 		bool forcedSuggestion = RequirementUtils::GetIsForcedSuggestion(requirementName);
-        
+
         UnityEngine::Sprite* sprite;
         StringW subText;
 
@@ -184,7 +184,7 @@ namespace PinkCore::UI
             tableCell->songAuthorText->set_text(contributor.role);
             tableCell->coverImage->set_sprite(UIUtils::FileToSprite(SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath));
         }
-        
+
         return tableCell;
     }
 

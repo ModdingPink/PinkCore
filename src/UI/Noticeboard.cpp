@@ -49,10 +49,10 @@ namespace PinkCore::UI
 		// if this is the first time this viewcontroller was activated
 		if (firstActivation)
 		{
-			
+
 			//parentViewController->
 			INFO("NoticeBoard activated!");
-			
+
 			title = UIUtils::AddHeader(get_transform(), titles[state], Color(0.94f, 0.11f, 0.5f, 1.0f));
 			CreateSwitchingButtons();
 
@@ -77,7 +77,7 @@ namespace PinkCore::UI
 			// ToggleVisibility();
 		}
 	}
-	
+
 	PinkCore::UI::NoticeBoard* NoticeBoard::get_instance()
 	{
 		if (!instance)
@@ -94,14 +94,14 @@ namespace PinkCore::UI
 
 	void NoticeBoard::CreateSwitchingButtons()
 	{
-		
+
 		GameObject* canvas = CreateCanvas();
 		auto* canvas_T = canvas->get_transform();
 
 		canvas_T->SetParent(get_transform(), true);
 		VerticalLayoutGroup* layout = CreateVerticalLayoutGroup(canvas_T);
 		HorizontalLayoutGroup* horizon = CreateHorizontalLayoutGroup(layout->get_transform());
-		
+
 		/*
 		// Adds a Background to the buttons, but I didn't like the look of it, but kept the code
 		auto* backgroundable = horizon->get_gameObject()->GetComponent<Backgroundable*>();
@@ -113,7 +113,7 @@ namespace PinkCore::UI
 		RectOffset* offset = RectOffset::New_ctor(2, 2, 2, 2);
 		horizon->set_padding(offset);
 		*/
-		
+
 		canvas_T->set_localPosition(Vector3::get_zero());
 		canvas_T->GetComponent<RectTransform*>()->set_anchoredPosition({-30.0f, 45.0f});
 
@@ -126,7 +126,7 @@ namespace PinkCore::UI
 
 		canvas_T->set_localScale(Vector3::get_one() * 0.25f);
 
-		noticeBoardButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
+		noticeBoardButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){
 			if (state == BoardState::Board) return;
 			state = BoardState::Board;
 			title->set_text(il2cpp_utils::newcsstr(titles[state]));
@@ -136,9 +136,9 @@ namespace PinkCore::UI
 			else CreateTextLayout(container->get_transform(), NoticeBoardText::get_text(), boardLayout);
 		});
 
-		UIUtils::SwapButtonSprites(noticeBoardButton, ArrayToSprite(IncludedAssets::NewsIcon_png), ArrayToSprite(IncludedAssets::NewsIconActive_png));
+		UIUtils::SwapButtonSprites(noticeBoardButton, ArrayToSprite(Assets::NewsBoard::NewsIcon_png), ArrayToSprite(Assets::NewsBoard::NewsIconActive_png));
 
-		donationButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
+		donationButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){
 			if (state == BoardState::Donation) return;
 			state = BoardState::Donation;
 			title->set_text(il2cpp_utils::newcsstr(titles[state]));
@@ -148,8 +148,8 @@ namespace PinkCore::UI
 			else CreateTextLayout(container->get_transform(), DonationText::get_text(), donationLayout);
 		});
 
-		UIUtils::SwapButtonSprites(donationButton, ArrayToSprite(IncludedAssets::Donation_png), ArrayToSprite(IncludedAssets::DonationActive_png));
-		
+		UIUtils::SwapButtonSprites(donationButton, ArrayToSprite(Assets::NewsBoard::Donation_png), ArrayToSprite(Assets::NewsBoard::DonationActive_png));
+
 		LayoutElement* layoutelem = horizon->get_gameObject()->AddComponent<LayoutElement*>();
 		layoutelem->set_preferredHeight(30.0f);
 		layoutelem->set_preferredWidth(85.0f);
@@ -157,7 +157,7 @@ namespace PinkCore::UI
 
 	void NoticeBoard::CreateTextLayout(Transform* parent, const std::string& text, GameObject*& output)
 	{
-		
+
 		HorizontalLayoutGroup* horizon = CreateHorizontalLayoutGroup(parent);
 		VerticalLayoutGroup* layout = CreateVerticalLayoutGroup(horizon->get_transform());
 
@@ -165,7 +165,7 @@ namespace PinkCore::UI
 		tmproText->set_fontSize(tmproText->get_fontSize() * 0.65f);
 		tmproText->set_alignment(TextAlignmentOptions::_get_MidlineLeft());
 		tmproText->set_enableWordWrapping(true);
-		
+
 		LayoutElement* noticelayout = tmproText->get_gameObject()->AddComponent<LayoutElement*>();
 		layout->set_childControlHeight(true);
 		layout->set_childForceExpandHeight(true);

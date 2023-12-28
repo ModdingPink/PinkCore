@@ -166,7 +166,7 @@ namespace UIUtils
 		spriteSwap->disabledStateSprite = disabled;
 
 		auto imageView = button->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>();
-		if (imageView) imageView->skew = 0.18f; 
+		if (imageView) imageView->skew = 0.18f;
 	}
 
 	void SwapButtonSprites(UnityEngine::UI::Button* button, std::string normalName, std::string selectedName)
@@ -186,7 +186,7 @@ namespace UIUtils
 		spriteSwap->disabledStateSprite = disabled;
 
 		auto imageView = button->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>();
-		if (imageView) imageView->skew = 0.18f; 
+		if (imageView) imageView->skew = 0.18f;
 	}
 
 
@@ -214,9 +214,9 @@ namespace UIUtils
 				config.enableCustomSongColours = enabled;
 				SaveConfig();
 			});
-			
+
 			AddHoverHint(colourToggle, "Allow Custom Songs to override note/light colors");
-			
+
 			auto playerNoteToggle = CreateToggle(layout, "Ignore Custom Song Note Colors", config.forceNoteColours, [](bool enabled) {
 				config.forceNoteColours = enabled;
 				SaveConfig();
@@ -274,10 +274,10 @@ namespace UIUtils
 
 		// if anything is needed, anyone worked on it, or the song is WIP, show the modal
 		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_mapData().isWIP || SongUtils::SongInfo::get_mapData().hasCustomColours);
-		
+
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
 		int length = levelViews.Length();
-		UnityEngine::RectTransform* heartRectTrans; 
+		UnityEngine::RectTransform* heartRectTrans;
 		if (length > 0)
 		{
 			heartRectTrans = reinterpret_cast<UnityEngine::RectTransform*>(levelViews[length - 1]->favoriteToggle->get_transform());
@@ -311,7 +311,7 @@ namespace UIUtils
 			layout->GetComponent<RectTransform*>()->set_anchoredPosition(pos);
 
 			requirementsModal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), nullptr);
-		
+
 			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(requirementsModal->get_transform(), Vector2(0.0f, -32.25f), Vector2(55.0f, 63.5f), [self](int cell) {
 				// can't capture requirementsList when it hasn't been set yet, and this is better than making it a global variable imo
 				requirementsModal->get_gameObject()->GetComponentInChildren<PinkCore::UI::RequirementModalListTableData*>()->tableView->ClearSelection();
@@ -324,14 +324,14 @@ namespace UIUtils
 				}
 			});
 			//
-		
+
 		}
 		else if (requirementsList)
 		{
 			UnityEngine::Transform* parent = requirementsList->get_transform();
 			UnityEngine::UI::Button* button = nullptr;
 
-			// GetComponentInParent doesnt work on disabled objects, so lets do it manually 
+			// GetComponentInParent doesnt work on disabled objects, so lets do it manually
 			while (parent)
 			{
 				button = parent->GetComponent<UnityEngine::UI::Button*>();
@@ -354,20 +354,20 @@ namespace UIUtils
 			}
 			if (modalView)
 				requirementsModal = modalView;
-			
+
 
 		}
 
-		if (requirementsList) 
+		if (requirementsList)
 			requirementsList->Refresh();
 		//RequirementUtils::UpdateRequirementHandler(requirementsHandler, isNew);
 		//ContributorUtils::UpdateContributorHandler(contributorsHandler, isNew);
 	}
-	
-	UnityEngine::Sprite* FileToSprite(std::u16string_view path) 
+
+	UnityEngine::Sprite* FileToSprite(std::u16string_view path)
 	{
 		INFO("FileToSprite Path: %s", to_utf8(path).c_str());
-		if (!fileexists(to_utf8(path))) return ArrayToSprite(IncludedAssets::MissingSprite_png);
+		if (!fileexists(to_utf8(path))) return ArrayToSprite(Assets::Requirements::MissingSprite_png);
 		std::ifstream instream(path, std::ios::in | std::ios::binary);
         std::vector<uint8_t> data = std::vector<uint8_t>(std::istreambuf_iterator<char>(instream), std::istreambuf_iterator<char>());
 		return VectorToSprite(data);
@@ -375,7 +375,7 @@ namespace UIUtils
 
 	UnityEngine::Sprite* FileToSprite(std::string_view path)
     {
-		if (!fileexists(path)) return ArrayToSprite(IncludedAssets::MissingSprite_png);
+		if (!fileexists(path)) return ArrayToSprite(Assets::Requirements::MissingSprite_png);
         std::ifstream instream(path, std::ios::in | std::ios::binary);
         std::vector<uint8_t> data((std::istreambuf_iterator<char>(instream)), std::istreambuf_iterator<char>());
         Array<uint8_t>* bytes = il2cpp_utils::vectorToArray(data);
@@ -384,6 +384,6 @@ namespace UIUtils
             texture->set_wrapMode(UnityEngine::TextureWrapMode::Clamp);
             return UnityEngine::Sprite::Create(texture, UnityEngine::Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), UnityEngine::Vector2(0.5f,0.5f), 100.0f, 1u, UnityEngine::SpriteMeshType::FullRect, UnityEngine::Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
         }
-        return ArrayToSprite(IncludedAssets::MissingSprite_png);
+        return ArrayToSprite(Assets::Requirements::MissingSprite_png);
     }
 }
