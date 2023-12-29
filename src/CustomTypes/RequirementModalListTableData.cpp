@@ -36,10 +36,9 @@ namespace PinkCore::UI
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetTableCell()
     {
         auto tableCell = reinterpret_cast<GlobalNamespace::LevelListTableCell*>(tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
-        if (!tableCell)
-        {
+        if (!tableCell) {
             if (!songListTableCellInstance)
-                songListTableCellInstance = Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>().FirstOrDefault([](auto x){ return x->name == u"LevelListTableCell"; });
+                songListTableCellInstance = Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>().FirstOrDefault([](auto x){ return x->get_name() == "LevelListTableCell"; });
 
             tableCell = Instantiate(songListTableCellInstance);
         }

@@ -16,6 +16,7 @@
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/Texture.hpp"
 #include "UnityEngine/TextureWrapMode.hpp"
+#include "UnityEngine/TextureFormat.hpp"
 #include "UnityEngine/Object.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/AdditionalCanvasShaderChannels.hpp"

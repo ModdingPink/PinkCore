@@ -29,6 +29,8 @@
 #include "UnityEngine/Sprite.hpp"
 #include "HMUI/ModalView.hpp"
 #include "HMUI/Screen.hpp"
+#include "HMUI/SegmentedControl.hpp"
+#include "HMUI/IconSegmentedControl.hpp"
 #include "Polyglot/Localization.hpp"
 #include "GlobalNamespace/GameplayCoreInstaller.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
@@ -47,7 +49,7 @@ MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &G
     int i = 0;
     ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(self->_segmentedControl->_dataItems->Length());
 
-    for(auto dataItem : self->_segmentedControl->dataItems){
+    for(auto dataItem : self->_segmentedControl->_dataItems){
         UnityEngine::Sprite* characteristicSprite = nullptr;
         StringW characteristicText = "";
         SongUtils::CustomData::GetCustomCharacteristicItems(self->_beatmapCharacteristics->get_Item(i), characteristicSprite, characteristicText);
