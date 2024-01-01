@@ -103,7 +103,7 @@ namespace UIUtils
 		vertical->get_rectTransform()->set_anchoredPosition(anchoredPosition);
 		HorizontalLayoutGroup* horizontal = CreateHorizontalLayoutGroup(vertical->get_transform());
 
-		TextMeshProUGUI* text = CreateText(horizontal->get_transform(), title, false);
+		TextMeshProUGUI* text = CreateText(horizontal->get_transform(), title, TMPro::FontStyles::Normal);
 		text->set_fontSize(text->get_fontSize() * 2.0f);
 		text->set_alignment(TextAlignmentOptions::Center);
 
