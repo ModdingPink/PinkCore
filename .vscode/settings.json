@@ -89,6 +89,10 @@
         "__functional_03": "cpp",
         "complex": "cpp",
         "shared_mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "*.tcc": "cpp",
+        "__memory": "cpp",
+        "charconv": "cpp",
+        "format": "cpp"
     }
 }

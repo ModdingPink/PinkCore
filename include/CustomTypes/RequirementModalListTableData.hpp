@@ -2,7 +2,6 @@
 
 #include "custom-types/shared/macros.hpp"
 
-#include "HMUI/TableView_IDataSource.hpp"
 #include "HMUI/TableView.hpp"
 #include "HMUI/TableCell.hpp"
 
@@ -25,9 +24,9 @@ DECLARE_CLASS_CODEGEN_INTERFACES(PinkCore::UI, RequirementModalListTableData, Un
         DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, missingSpriteSprite);
         DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, infoSprite);
         DECLARE_INSTANCE_METHOD(void, Refresh);
-        DECLARE_OVERRIDE_METHOD(HMUI::TableCell*, CellForIdx, il2cpp_utils::il2cpp_type_check::MetadataGetter<&HMUI::TableView::IDataSource::CellForIdx>::get(), HMUI::TableView* tableView, int idx);
-        DECLARE_OVERRIDE_METHOD(float, CellSize, il2cpp_utils::il2cpp_type_check::MetadataGetter<&HMUI::TableView::IDataSource::CellSize>::get());
-        DECLARE_OVERRIDE_METHOD(int, NumberOfCells, il2cpp_utils::il2cpp_type_check::MetadataGetter<&HMUI::TableView::IDataSource::NumberOfCells>::get());
+        DECLARE_OVERRIDE_METHOD_MATCH(HMUI::TableCell*, CellForIdx, &HMUI::TableView::IDataSource::CellForIdx, HMUI::TableView* tableView, int idx);
+        DECLARE_OVERRIDE_METHOD_MATCH(float, CellSize, &HMUI::TableView::IDataSource::CellSize);
+        DECLARE_OVERRIDE_METHOD_MATCH(int, NumberOfCells, &HMUI::TableView::IDataSource::NumberOfCells);
 
         DECLARE_CTOR(ctor);
 

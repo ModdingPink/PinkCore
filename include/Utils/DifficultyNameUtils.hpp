@@ -1,5 +1,5 @@
 #pragma once
-#include "modloader/shared/modloader.hpp"
+#include "scotland2/shared/modloader.h"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp" 
 #include "beatsaber-hook/shared/utils/typedefs.h"

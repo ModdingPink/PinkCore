@@ -76,7 +76,7 @@ namespace DifficultyNameUtils
 	void SetDifficultyNameCacheFromArray(ArrayW<GlobalNamespace::IDifficultyBeatmap*>& difficultyArray, GlobalNamespace::BeatmapCharacteristicSO* characteristic){
 		if(!characteristic) return;
 		auto& doc = SongUtils::GetCurrentInfoDat();
-		for (int i = 0; i < difficultyArray.Length(); i++) {
+		for (int i = 0; i < difficultyArray.size(); i++) {
 			GlobalNamespace::BeatmapDifficulty difficulty = difficultyArray[i]->get_difficulty();
 			SetDifficultyNameCacheFromDifficulty(difficulty, GetDifficultyNameFromDoc(doc, difficulty, characteristic));
 		}

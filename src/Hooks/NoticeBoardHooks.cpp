@@ -11,8 +11,7 @@
 #include "HMUI/ViewController.hpp"
 #include "HMUI/HoverHint.hpp"
 #include "HMUI/ButtonSpriteSwap.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
+#include "bsml/shared/BSML-Lite.hpp" 
 #include "Zenject/DiContainer.hpp"
 #include "System/Action_1.hpp"
 
@@ -21,13 +20,12 @@
 #include "UnityEngine/SceneManagement/SceneManager.hpp"
 #include "UnityEngine/UI/Button.hpp"
 #include "UnityEngine/Events/UnityAction.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "custom-types/shared/delegate.hpp"
 
 #include "Utils/NoticeBoardText.hpp"
 #include "Utils/DonationText.hpp"
 #include "Polyglot/Localization.hpp" 
-#include "questui/shared/BeatSaberUI.hpp"
+#include "bsml/shared/BSML-Lite.hpp"
 
 bool firstWarmup = true;
 bool setIcons = false;
@@ -80,7 +78,7 @@ MAKE_AUTO_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement:
 MAKE_AUTO_HOOK_MATCH(MainFlowCoordinator_DidActivate, &GlobalNamespace::MainFlowCoordinator::DidActivate, void, GlobalNamespace::MainFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 {
 	if (firstActivation)
-		self->providedRightScreenViewController = PinkCore::UI::NoticeBoard::get_instance();
+		self->_providedRightScreenViewController = PinkCore::UI::NoticeBoard::get_instance();
 	MainFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 

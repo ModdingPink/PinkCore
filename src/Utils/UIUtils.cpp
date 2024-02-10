@@ -1,8 +1,8 @@
 // file copied from https://github.com/RedBrumbler/Qosmetics/blob/rewrite/src/Utils/UIUtils.cpp
 #include "Utils/UIUtils.hpp"
 
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+#include "bsml/shared/BSML-Lite.hpp"
+#include "bsml/shared/BSML/Components/Backgroundable.hpp"
 
 #include "UnityEngine/Vector3.hpp"
 #include "UnityEngine/Canvas.hpp"
@@ -23,6 +23,9 @@
 #include "UnityEngine/UI/Button.hpp"
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/UI/LayoutRebuilder.hpp"
+#include "UnityEngine/UI/ContentSizeFitter.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
+#include "UnityEngine/TextureFormat.hpp"
 
 #include "HMUI/TitleViewController.hpp"
 #include "HMUI/ViewController.hpp"
@@ -44,7 +47,6 @@
 #include "Utils/ContributorUtils.hpp"
 #include "Utils/SongUtils.hpp"
 
-#include "questui/shared/ArrayUtil.hpp"
 #include "System/Action.hpp"
 #include "custom-types/shared/delegate.hpp"
 
@@ -62,8 +64,8 @@ using namespace HMUI;
 using namespace UnityEngine;
 using namespace UnityEngine::Events;
 using namespace UnityEngine::UI;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
+using namespace BSML::Lite;
+using namespace BSML;
 using namespace TMPro;
 
 
@@ -111,16 +113,18 @@ namespace UIUtils
 		layoutelem->set_preferredWidth(size.x);
 
 		Backgroundable* background = horizontal->get_gameObject()->AddComponent<Backgroundable*>();
-		background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"), 1.0f);
+		background->ApplyBackground("title-gradient");
+		background->ApplyAlpha(1.0f);
+
 
 		ImageView* imageView = background->get_gameObject()->GetComponentInChildren<ImageView*>();
 		imageView->gradient = true;
-		imageView->gradientDirection = 0;
+		imageView->_gradientDirection = 0;
 		imageView->set_color(Color::get_white());
 		imageView->set_color0(leftColor);
 		imageView->set_color1(rightColor);
-		imageView->skew = 0.18f;
-		imageView->curvedCanvasSettingsHelper->Reset();
+		imageView->_skew = 0.18f;
+		imageView->_curvedCanvasSettingsHelper->Reset();
 		return text;
 	}
 
@@ -144,7 +148,7 @@ namespace UIUtils
 		ImageView* buttonImageView = BackButtonBG_T->get_gameObject()->GetComponent<ImageView*>();
 		buttonImageView->set_color(color);
 		buttonImageView->set_color0(color);
-		buttonImageView->set_color1(color * 0.9f);
+		buttonImageView->set_color1(Color::op_Multiply(color, 0.9f));
 
 		ButtonStaticAnimations* anim = BackButtonBG_T->get_parent()->get_gameObject()->GetComponent<ButtonStaticAnimations*>();
 		anim->set_enabled(buttonanim);
@@ -153,45 +157,45 @@ namespace UIUtils
 	void SwapButtonSprites(UnityEngine::UI::Button* button, UnityEngine::Sprite* normal, UnityEngine::Sprite* highlighted)
 	{
 		Texture* highl = highlighted->get_texture();
-		highl->set_wrapMode(UnityEngine::TextureWrapMode::_get_Clamp());
+		highl->set_wrapMode(UnityEngine::TextureWrapMode::Clamp);
 		UnityEngine::Sprite* pressed = highlighted;
 		UnityEngine::Sprite* selected = normal;
 		Texture* sel = selected->get_texture();
-		sel->set_wrapMode(UnityEngine::TextureWrapMode::_get_Clamp());
+		sel->set_wrapMode(UnityEngine::TextureWrapMode::Clamp);
 		UnityEngine::Sprite* disabled = selected;
 		HMUI::ButtonSpriteSwap* spriteSwap = button->get_gameObject()->GetComponent<HMUI::ButtonSpriteSwap*>();
-		spriteSwap->normalStateSprite = selected;
-		spriteSwap->highlightStateSprite = highlighted;
-		spriteSwap->pressedStateSprite = pressed;
-		spriteSwap->disabledStateSprite = disabled;
+		spriteSwap->_normalStateSprite = selected;
+		spriteSwap->_highlightStateSprite = highlighted;
+		spriteSwap->_pressedStateSprite = pressed;
+		spriteSwap->_disabledStateSprite = disabled;
 
 		auto imageView = button->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>();
-		if (imageView) imageView->skew = 0.18f; 
+		if (imageView) imageView->_skew = 0.18f; 
 	}
 
 	void SwapButtonSprites(UnityEngine::UI::Button* button, std::string normalName, std::string selectedName)
 	{
 		UnityEngine::Sprite* highlighted = UIUtils::FileToSprite(selectedName);
 		Texture* highl = highlighted->get_texture();
-		highl->set_wrapMode(UnityEngine::TextureWrapMode::_get_Clamp());
+		highl->set_wrapMode(UnityEngine::TextureWrapMode::Clamp);
 		UnityEngine::Sprite* pressed = highlighted;
 		UnityEngine::Sprite* selected = UIUtils::FileToSprite(normalName);
 		Texture* sel = selected->get_texture();
-		sel->set_wrapMode(UnityEngine::TextureWrapMode::_get_Clamp());
+		sel->set_wrapMode(UnityEngine::TextureWrapMode::Clamp);
 		UnityEngine::Sprite* disabled = selected;
 		HMUI::ButtonSpriteSwap* spriteSwap = button->get_gameObject()->GetComponent<HMUI::ButtonSpriteSwap*>();
-		spriteSwap->normalStateSprite = selected;
-		spriteSwap->highlightStateSprite = highlighted;
-		spriteSwap->pressedStateSprite = pressed;
-		spriteSwap->disabledStateSprite = disabled;
+		spriteSwap->_normalStateSprite = selected;
+		spriteSwap->_highlightStateSprite = highlighted;
+		spriteSwap->_pressedStateSprite = pressed;
+		spriteSwap->_disabledStateSprite = disabled;
 
 		auto imageView = button->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>();
-		if (imageView) imageView->skew = 0.18f; 
+		if (imageView) imageView->_skew = 0.18f; 
 	}
 
 
 	void SetPlaylistViewState(bool state){
-		auto levelPackView = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::AnnotatedBeatmapLevelCollectionsViewController*>().LastOrDefault();
+		auto levelPackView = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::AnnotatedBeatmapLevelCollectionsViewController*>().back_or_default();
 		if (levelPackView) levelPackView->get_transform()->get_parent()->get_gameObject()->SetActive(state);
 	}
 
@@ -228,16 +232,16 @@ namespace UIUtils
 
 			CreateText(horizontal, "Selected Custom Song's Colors");
 
-			colourSchemeView = Object::Instantiate(Resources::FindObjectsOfTypeAll<GlobalNamespace::ColorSchemeView*>().Last(), horizontal->get_transform(), false);
+			colourSchemeView = Object::Instantiate(Resources::FindObjectsOfTypeAll<GlobalNamespace::ColorSchemeView*>().back().value(), horizontal->get_transform(), false);
 
 			// doesn't work? basically copied from songcore though
-			AddHoverHint(colourSchemeView->saberAColorImage, "Left Saber Color");
-			AddHoverHint(colourSchemeView->saberBColorImage, "Right Saber Color");
-			AddHoverHint(colourSchemeView->environment0ColorImage, "Primary Light Color");
-			AddHoverHint(colourSchemeView->environment1ColorImage, "Secondary Light Color");
-			AddHoverHint(colourSchemeView->obstacleColorImage, "Wall Color");
-			AddHoverHint(colourSchemeView->environmentColor0BoostImage, "Primary Light Boost Color");
-			AddHoverHint(colourSchemeView->environmentColor1BoostImage, "Secondary Light Boost Color");
+			AddHoverHint(colourSchemeView->_saberAColorImage, "Left Saber Color");
+			AddHoverHint(colourSchemeView->_saberBColorImage, "Right Saber Color");
+			AddHoverHint(colourSchemeView->_environment0ColorImage, "Primary Light Color");
+			AddHoverHint(colourSchemeView->_environment1ColorImage, "Secondary Light Color");
+			AddHoverHint(colourSchemeView->_obstacleColorImage, "Wall Color");
+			AddHoverHint(colourSchemeView->_environmentColor0BoostImage, "Primary Light Boost Color");
+			AddHoverHint(colourSchemeView->_environmentColor1BoostImage, "Secondary Light Boost Color");
 
 
 
@@ -257,10 +261,10 @@ namespace UIUtils
 
 		if (auto scheme = SongUtils::CustomData::GetCustomSongColourFromCustomData(voidColourScheme, false, customData))
 		{
-			reinterpret_cast<UnityEngine::RectTransform*>(coloursModal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-7.5, 8));
+			coloursModal->get_transform().cast<RectTransform>()->set_anchoredPosition(UnityEngine::Vector2(-7.5, 8));
 			coloursModal->Show(true, false, nullptr);
 
-			colourSchemeView->SetColors(scheme->saberAColor, scheme->saberBColor, scheme->environmentColor0, scheme->environmentColor1, scheme->environmentColor0Boost, scheme->environmentColor1Boost, scheme->obstaclesColor);
+			colourSchemeView->SetColors(scheme->_saberAColor, scheme->_saberBColor, scheme->_environmentColor0, scheme->_environmentColor1, scheme->_environmentColor0Boost, scheme->_environmentColor1Boost, scheme->_obstaclesColor);
 		}
 	}
 
@@ -276,11 +280,11 @@ namespace UIUtils
 		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_mapData().isWIP || SongUtils::SongInfo::get_mapData().hasCustomColours);
 		
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
-		int length = levelViews.Length();
+		int length = levelViews.size();
 		UnityEngine::RectTransform* heartRectTrans; 
 		if (length > 0)
 		{
-			heartRectTrans = reinterpret_cast<UnityEngine::RectTransform*>(levelViews[length - 1]->favoriteToggle->get_transform());
+			heartRectTrans = levelViews[length - 1]->_favoriteToggle->get_transform().cast<RectTransform>();
 			if(showModal) heartRectTrans->set_anchoredPosition({3, -2});
 			else heartRectTrans->set_anchoredPosition({3, 0});
 		}
@@ -293,11 +297,11 @@ namespace UIUtils
 			using namespace UnityEngine::UI;
 
 			Vector2 pos = Vector2(30.5f, 25.0f);
-			VerticalLayoutGroup* layout = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(self->get_transform());
-			HorizontalLayoutGroup* horizon = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(layout->get_transform());
+			VerticalLayoutGroup* layout = CreateVerticalLayoutGroup(self->get_transform());
+			HorizontalLayoutGroup* horizon = CreateHorizontalLayoutGroup(layout->get_transform());
 
-			auto button = BeatSaberUI::CreateUIButton(horizon->get_transform(), "?", "PlayButton", {0, 0}, {9.0f, 7.2f}, [] {
-				reinterpret_cast<UnityEngine::RectTransform*>(requirementsModal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-27.0f, -15.0f));
+			auto button = CreateUIButton(horizon->get_transform(), "?", "PlayButton", {0, 0}, {9.0f, 7.2f}, [] {
+				requirementsModal->get_transform().cast<RectTransform>()->set_anchoredPosition(UnityEngine::Vector2(-27.0f, -15.0f));
 				requirementsModal->Show(true, false, nullptr);
 			});
 			//haha YOINK, THANKS FOR THE BUTTON CODE METALIT WOOOOOOOOOOOOOOOOOO, WE LOVE GPL-3.0
@@ -310,7 +314,7 @@ namespace UIUtils
 
 			layout->GetComponent<RectTransform*>()->set_anchoredPosition(pos);
 
-			requirementsModal = QuestUI::BeatSaberUI::CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), nullptr);
+			requirementsModal = CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), nullptr);
 		
 			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(requirementsModal->get_transform(), Vector2(0.0f, -32.25f), Vector2(55.0f, 63.5f), [self](int cell) {
 				// can't capture requirementsList when it hasn't been set yet, and this is better than making it a global variable imo

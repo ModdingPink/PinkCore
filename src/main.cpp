@@ -1,8 +1,8 @@
-#include "modloader/shared/modloader.hpp"
+#include "scotland2/shared/modloader.h"
 #include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "custom-types/shared/register.hpp"
-#include "questui/shared/QuestUI.hpp"
+#include "bsml/shared/BSML.hpp"
 
 #include "songloader/shared/CustomTypes/CustomLevelInfoSaveData.hpp"
 
@@ -26,14 +26,11 @@
 
 #include "config.hpp"
 
-ModInfo modInfo;
+modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 
-extern "C" void setup(ModInfo& info)
+extern "C" void setup(CModInfo& info)
 {
-	info.id = MOD_ID;
-	info.version = VERSION;
-
-	modInfo = info;
+	info = modInfo.to_c();
 }
 
 extern "C" void load()
@@ -42,7 +39,7 @@ extern "C" void load()
     il2cpp_functions::Class_Init(classof(HMUI::CurvedTextMeshPro*));
 	Logger& logger = PinkCore::Logging::getLogger();
 	logger.info("Loading pinkcore!");
-	QuestUI::Init();
+	BSML::Init();
 	
 
 	// if config load fails, save the config so it will work next time
@@ -60,5 +57,5 @@ extern "C" void load()
 
 	custom_types::Register::AutoRegister();
 
-	QuestUI::Register::RegisterModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({MOD_ID, VERSION});
+	BSML::Register::RegisterSettingsMenu<PinkCore::UI::PinkCoreFlowCoordinator*>("Pinkcore");
 }

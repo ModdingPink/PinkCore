@@ -36,11 +36,11 @@ namespace PinkCore::RequirementAPI
 
 	/// @brief disables the play button with your mod, allowing the player to not play maps
 	/// @param info your mod info, always pass the same modinfo to the method or we'll get weird behaviour
-	void DisablePlayButton(const ModInfo& info);
+	void DisablePlayButton(const modloader::ModInfo& info);
 
 	/// @brief disables the play button with your mod, allowing the player to play maps again
 	/// @param info your mod info, always pass the same modinfo to the method or we'll get weird behaviour
-	void EnablePlayButton(const ModInfo& info);
+	void EnablePlayButton(const modloader::ModInfo& info);
 }
 
 #undef pinkcore_id

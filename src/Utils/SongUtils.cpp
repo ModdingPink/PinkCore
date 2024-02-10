@@ -79,7 +79,7 @@ namespace SongUtils
 
 	std::u16string GetDiffFromEnum(GlobalNamespace::BeatmapDifficulty selectedDifficulty)
 	{
-		switch (selectedDifficulty.value)
+		switch (selectedDifficulty.value__)
 		{
 			case 0:
 				return u"Easy";
@@ -173,7 +173,7 @@ namespace SongUtils
 			// cast to custom level
 			GlobalNamespace::CustomPreviewBeatmapLevel* customLevel;
 			if (auto filter = il2cpp_utils::try_cast<GlobalNamespace::FilteredBeatmapLevel>(level)) {
-				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomPreviewBeatmapLevel>(filter.value()->beatmapLevel);
+				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomPreviewBeatmapLevel>(filter.value()->_beatmapLevel);
 			} else {
 				customLevel = il2cpp_utils::cast<GlobalNamespace::CustomPreviewBeatmapLevel>(level);
 			}			
@@ -411,8 +411,8 @@ namespace SongUtils
 				auto newColorScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false, colorLeft, colorRight, envColorLeft, envColorRight, colorScheme->supportsEnvironmentColorBoost, envColorLeftBoost, envColorRightBoost, obstacleColor);
 
 				// Apply the new colours to the scheme directly since there is no constructor for this
-				newColorScheme->environmentColorW = envColorWhite;
-				newColorScheme->environmentColorWBoost = envColorWhiteBoost;
+				newColorScheme->_environmentColorW = envColorWhite;
+				newColorScheme->_environmentColorWBoost = envColorWhiteBoost;
 
 				return newColorScheme;
 

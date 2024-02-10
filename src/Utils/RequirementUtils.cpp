@@ -206,15 +206,15 @@ namespace RequirementUtils
 	void FindInstalledRequirements()
 	{
 		return;
-		for (auto mod : Modloader::getMods())
-		{
-			// if mod is loaded, put it in the list of installed requirements
-			if (mod.second.get_loaded())
-			{
-				installedRequirements.push_back(mod.second.info.id);
-				INFO("Found loaded id: %s", mod.second.info.id.c_str());
-			}
-		}
+		// for (auto mod : Modloader::getMods())
+		// {
+		// 	// if mod is loaded, put it in the list of installed requirements
+		// 	if (mod.second.get_loaded())
+		// 	{
+		// 		installedRequirements.push_back(mod.second.info.id);
+		// 		INFO("Found loaded id: %s", mod.second.info.id.c_str());
+		// 	}
+		// }
 	}
 
 	/*
@@ -237,7 +237,7 @@ namespace RequirementUtils
 	*/
 	void UpdatePlayButton()
 	{
-		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>().LastOrDefault();
+		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>()->LastOrDefault();
 		if (levelViews) {
 			bool interactable = AllowPlayerToStart();
             bool isCustom = SongUtils::SongInfo::get_mapData().isCustom;

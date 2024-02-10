@@ -28,7 +28,6 @@
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/Sprite.hpp"
-#include "HMUI/IconSegmentedControl_DataItem.hpp"
 #include "HMUI/ModalView.hpp"
 #include "HMUI/Screen.hpp"
 #include "Polyglot/Localization.hpp"

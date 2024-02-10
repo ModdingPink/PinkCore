@@ -21,6 +21,6 @@ MAKE_AUTO_HOOK_MATCH(LevelFilteringNavigationController_Setup, &GlobalNamespace:
 	LevelFilteringNavigationController_Setup(self, songPackMask, levelPackToBeSelectedAfterPresent, startLevelCategory, hidePacksIfOneOrNone, enableCustomLevels);
 
 	if (levelPackToBeSelectedAfterPresent == nullptr && config.openToCustomLevels && enableCustomLevels) {
-		self->selectLevelCategoryViewController->Setup(startLevelCategory.CustomSongs, self->enabledLevelCategories);
+		self->_selectLevelCategoryViewController->Setup(startLevelCategory.CustomSongs, self->_enabledLevelCategories);
 	}
 }

@@ -1,20 +1,23 @@
 #include "UI/Settings/PinkCoreDonationViewController.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+
+#include "bsml/shared/BSML-Lite.hpp"
+#include "bsml/shared/BSML/Components/ExternalComponents.hpp"
+#include "bsml/shared/BSML/Components/Backgroundable.hpp"
 
 #include "Utils/UIUtils.hpp"
 #include "Utils/DonationText.hpp"
 
 #include "UnityEngine/RectOffset.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
+
 DEFINE_TYPE(PinkCore::UI, PinkCoreDonationViewController);
 
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace HMUI;
 using namespace TMPro;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
+using namespace BSML;
+using namespace BSML::Lite;
 
 namespace PinkCore::UI
 {
@@ -35,7 +38,9 @@ namespace PinkCore::UI
 			{
 				backgroundable = container->AddComponent<Backgroundable*>();
 			}
-			backgroundable->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
+
+			backgroundable->ApplyBackground("round-rect-panel");
+			backgroundable->ApplyAlpha(0.5f);
 
 			auto* layoutgroup = container->GetComponent<VerticalLayoutGroup*>();
 			RectOffset* offset = RectOffset::New_ctor(2, 2, 0, 0);
@@ -47,7 +52,7 @@ namespace PinkCore::UI
 			
 			auto text = CreateText(layout->get_transform(), DonationText::get_text());
 			text->set_fontSize(text->get_fontSize() * 0.65f);
-			text->set_alignment(TextAlignmentOptions::_get_MidlineLeft());
+			text->set_alignment(TextAlignmentOptions::MidlineLeft);
 			text->set_enableWordWrapping(true);
 
 			LayoutElement* noticelayout = text->get_gameObject()->AddComponent<LayoutElement*>();

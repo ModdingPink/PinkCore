@@ -1,37 +1,38 @@
 {
-  "env": {
-    "ndkPath": "S:/NDK/android-ndk-r23b"
-  },
-  "configurations": [
-    {
-      "defines": [
-        "MOD_ID=\"PinkCore\"",
-        "VERSION=\"0.1.0\"",
-        "__GNUC__",
-        "__aarch64__"
-      ],
-      "includePath": [
-        "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
-        "${workspaceFolder}/extern/includes/questui/shared/cppcodec",
-        "${workspaceFolder}/extern/includes/codegen/include",
-        "${workspaceFolder}/extern/includes/fmt/fmt/include",
-        "${workspaceFolder}/extern/includes",
-        "${workspaceFolder}/include",
-        "${workspaceFolder}/shared",
-        "${workspaceFolder}",
-        "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/aarch64-linux-android",
-        "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include",
-        "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/*",
-        "${ndkPath}/sources/cxx-stl/llvm-libc++abi/include",
-        "${ndkPath}/sources/cxx-stl/llvm-libc++/include",
-        "${ndkPath}/"
-      ],
-      "compilerPath": "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/bin/aarch64-linux-android24-clang.cmd",
-      "name": "Quest",
-      "cStandard": "c11",
-      "cppStandard": "c++20",
-      "intelliSenseMode": "linux-clang-arm64"
-    }
-  ],
-  "version": 4
+    "env": {
+        "ndkPath": "/home/kodenamekrak/ndk/r26b"
+    },
+    "configurations": [
+        {
+            "defines": [
+                "MOD_ID=\"PinkCore\"",
+                "VERSION=\"0.1.0\"",
+                "__GNUC__",
+                "__aarch64__"
+            ],
+            "includePath": [
+                "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
+                "${workspaceFolder}/extern/includes/questui/shared/cppcodec",
+                "${workspaceFolder}/extern/includes/codegen/include",
+                "${workspaceFolder}/extern/includes/fmt/fmt/include",
+                "${workspaceFolder}/extern/includes",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/shared",
+                "${workspaceFolder}",
+                "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/aarch64-linux-android",
+                "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include",
+                "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/*",
+                "${ndkPath}/sources/cxx-stl/llvm-libc++abi/include",
+                "${ndkPath}/sources/cxx-stl/llvm-libc++/include",
+                "${ndkPath}/"
+            ],
+            "compilerPath": "${ndkPath}/toolchains/llvm/prebuilt/windows-x86_64/bin/aarch64-linux-android24-clang.cmd",
+            "name": "Quest",
+            "cStandard": "c11",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "linux-clang-arm64",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+        }
+    ],
+    "version": 4
 }

@@ -1,5 +1,5 @@
 #include "UI/Settings/PinkCoreSettingsViewController.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
+#include "bsml/shared/BSML-Lite.hpp"
 #include "Utils/UIUtils.hpp"
 #include "config.hpp"
 #include "logging.hpp"
@@ -9,8 +9,7 @@ DEFINE_TYPE(PinkCore::UI, PinkCoreSettingsViewController);
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace HMUI;
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
+using namespace BSML::Lite;
 
 // simple toggle macro because typing the same thing every time is dumb
 #define TOGGLE(name, displayName) \
@@ -36,6 +35,6 @@ namespace PinkCore::UI
 			TOGGLE(openToCustomLevels, "Open To Custom Levels");
 		}
 		if (customColourToggle)
-			customColourToggle->set_isOn(config.enableCustomSongColours);
+			customColourToggle->set_Value(config.enableCustomSongColours);
 	}
 }

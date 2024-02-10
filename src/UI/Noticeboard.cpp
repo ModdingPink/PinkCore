@@ -3,10 +3,10 @@
 #include "static-defines.h"
 #include "assets.hpp"
 
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "bsml/shared/BSML-Lite.hpp"
+#include "bsml/shared/BSML/Components/Backgroundable.hpp"
+#include "bsml/shared/BSML/Components/ExternalComponents.hpp"
+#include "bsml/shared/Helpers/creation.hpp"
 
 #include "VRUIControls/VRGraphicRaycaster.hpp"
 #include "UnityEngine/UI/Button.hpp"
@@ -16,6 +16,7 @@
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/RectOffset.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
 
 #include "Utils/NoticeBoardText.hpp"
 #include "Utils/DonationText.hpp"
@@ -26,8 +27,8 @@
 
 DEFINE_TYPE(PinkCore::UI, NoticeBoard);
 
-using namespace QuestUI;
-using namespace QuestUI::BeatSaberUI;
+using namespace BSML::Lite;
+using namespace BSML;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace TMPro;
@@ -38,7 +39,7 @@ constexpr const char* titles[2] = { "<i>NoticeBoard</i>", "<i>Patreon</i>" };
 #define TEXT_SWITCH(theState, theText) \
 if (state == theState) return; \
 state = theState; \
-title->set_text(il2cpp_utils::newcsstr(titles[state]));
+title->set_text(titles[state]);
 
 namespace PinkCore::UI
 {
@@ -67,7 +68,8 @@ namespace PinkCore::UI
 			{
 				backgroundable = container->AddComponent<Backgroundable*>();
 			}
-			backgroundable->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
+			backgroundable->ApplyBackground("round-rect-panel");
+			backgroundable->ApplyAlpha(0.5f);
 
 			auto* layoutgroup = container->GetComponent<VerticalLayoutGroup*>();
 			RectOffset* offset = RectOffset::New_ctor(2, 2, 0, 0);
@@ -82,7 +84,7 @@ namespace PinkCore::UI
 	{
 		if (!instance)
 		{
-			instance = CreateViewController<PinkCore::UI::NoticeBoard*>();
+			instance = Helpers::CreateViewController<PinkCore::UI::NoticeBoard*>();
 		}
 		return instance;
 	}
@@ -96,7 +98,7 @@ namespace PinkCore::UI
 	{
 		
 		GameObject* canvas = CreateCanvas();
-		auto* canvas_T = canvas->get_transform();
+		auto canvas_T = canvas->get_transform();
 
 		canvas_T->SetParent(get_transform(), true);
 		VerticalLayoutGroup* layout = CreateVerticalLayoutGroup(canvas_T);
@@ -124,9 +126,9 @@ namespace PinkCore::UI
 		horizon->set_childControlWidth(true);
 		horizon->set_childForceExpandWidth(true);
 
-		canvas_T->set_localScale(Vector3::get_one() * 0.25f);
+		canvas_T->set_localScale(Vector3::op_Multiply(Vector3::get_one(), 0.25f));
 
-		noticeBoardButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
+		noticeBoardButton = CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
 			if (state == BoardState::Board) return;
 			state = BoardState::Board;
 			title->set_text(il2cpp_utils::newcsstr(titles[state]));
@@ -138,7 +140,7 @@ namespace PinkCore::UI
 
 		UIUtils::SwapButtonSprites(noticeBoardButton, ArrayToSprite(IncludedAssets::NewsIcon_png), ArrayToSprite(IncludedAssets::NewsIconActive_png));
 
-		donationButton = QuestUI::BeatSaberUI::CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
+		donationButton = CreateUIButton(horizon->get_transform(), "", "SettingsButton", [&](){ 
 			if (state == BoardState::Donation) return;
 			state = BoardState::Donation;
 			title->set_text(il2cpp_utils::newcsstr(titles[state]));
@@ -163,7 +165,7 @@ namespace PinkCore::UI
 
 		TextMeshProUGUI* tmproText = CreateText(layout->get_transform(), text, false);
 		tmproText->set_fontSize(tmproText->get_fontSize() * 0.65f);
-		tmproText->set_alignment(TextAlignmentOptions::_get_MidlineLeft());
+		tmproText->set_alignment(TextAlignmentOptions::MidlineLeft);
 		tmproText->set_enableWordWrapping(true);
 		
 		LayoutElement* noticelayout = tmproText->get_gameObject()->AddComponent<LayoutElement*>();

@@ -5,7 +5,7 @@
 config_t config;
 
 Configuration& getConfig() {
-	static Configuration config({MOD_ID, VERSION});
+	static Configuration config({MOD_ID, VERSION, 0});
 	config.Load();
 	return config;
 }
