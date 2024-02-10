@@ -22,6 +22,10 @@ namespace PinkCore::UI
     void RequirementModalListTableData::ctor()
     {
         reuseIdentifier = "RequirementModalListTableCell";
+    }
+
+    void RequirementModalListTableData::Awake()
+    {
         cellSize = 8.5f;
         missingSpriteSprite = ArrayToSprite(IncludedAssets::MissingSprite_png);
         requirementFoundSprite = ArrayToSprite(IncludedAssets::RequirementFound_png);
@@ -35,7 +39,7 @@ namespace PinkCore::UI
     
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetTableCell()
     {
-        auto tableCell = tableView->DequeueReusableCellForIdentifier(reuseIdentifier).cast<GlobalNamespace::LevelListTableCell>();
+        auto tableCell = tableView->DequeueReusableCellForIdentifier(reuseIdentifier).try_cast<GlobalNamespace::LevelListTableCell>().value_or(nullptr);
         if (!tableCell)
         {
             if (!songListTableCellInstance)

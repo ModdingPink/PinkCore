@@ -46,7 +46,7 @@ MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &G
     BeatmapCharacteristicSegmentedControlController_SetData(self, difficultyBeatmapSets,selectedBeatmapCharacteristic);
 	if (!SongUtils::SongInfo::get_mapData().isCustom || !config.enableCustomCharacteristics) return;
     int i = 0;
-    ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(self->_beatmapCharacteristics->_items->get_Length());
+    ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(self->_beatmapCharacteristics->Count);
 
     for(auto dataItem : self->_segmentedControl->_dataItems){
         UnityEngine::Sprite* characteristicSprite = nullptr;

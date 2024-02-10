@@ -314,7 +314,7 @@ namespace UIUtils
 
 			layout->GetComponent<RectTransform*>()->set_anchoredPosition(pos);
 
-			requirementsModal = CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), nullptr);
+			requirementsModal = CreateModal(button->get_transform(), UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector2(58.0f, 65.0f), nullptr);
 		
 			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(requirementsModal->get_transform(), Vector2(0.0f, -32.25f), Vector2(55.0f, 63.5f), [self](int cell) {
 				// can't capture requirementsList when it hasn't been set yet, and this is better than making it a global variable imo
