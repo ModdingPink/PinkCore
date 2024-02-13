@@ -214,7 +214,7 @@ namespace UIUtils
 
 		if (!coloursModalTranform) {
 			INFO("Colours modal did not exist, making it");
-			coloursModal = CreateModal(parent, {85, 35}, {-7.5, 8}, nullptr);
+			coloursModal = CreateModal(parent,  {-7.5, 8}, {85, 35}, nullptr);
 			coloursModal->set_name(modalName);
 
 			auto layout = CreateVerticalLayoutGroup(coloursModal);
@@ -307,6 +307,9 @@ namespace UIUtils
 				requirementsModal->transform.cast<UnityEngine::RectTransform>()->set_anchoredPosition(UnityEngine::Vector2(-27.0f, -15.0f));
 				requirementsModal->Show(true, false, nullptr);
 			});
+			auto elem = button->GetComponent<LayoutElement*>();
+			elem->preferredWidth = 9.0f;
+			elem->preferredHeight = 7.2f;
 			//haha YOINK, THANKS FOR THE BUTTON CODE METALIT WOOOOOOOOOOOOOOOOOO, WE LOVE GPL-3.0
 			auto text = button->GetComponentInChildren<TMPro::TextMeshProUGUI*>();
 			UnityEngine::Object::Destroy(button->get_transform()->Find(contentName)->GetComponent<UnityEngine::UI::LayoutElement*>());
@@ -317,7 +320,7 @@ namespace UIUtils
 
 			layout->GetComponent<RectTransform*>()->set_anchoredPosition(pos);
 
-			requirementsModal = CreateModal(button->get_transform(), UnityEngine::Vector2(58.0f, 65.0f), UnityEngine::Vector2(0.0f, 0.0f), nullptr);
+			requirementsModal = CreateModal(button->get_transform(), {0.0f, 0.0f}, {58.0f, 65.0f}, nullptr);
 
 			requirementsList = CreateScrollableCustomSourceList<PinkCore::UI::RequirementModalListTableData*>(requirementsModal->get_transform(), Vector2(0.0f, -32.25f), Vector2(55.0f, 63.5f), [self](int cell) {
 				// can't capture requirementsList when it hasn't been set yet, and this is better than making it a global variable imo
