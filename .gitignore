@@ -48,7 +48,6 @@ ndkpath.txt
 Android.mk
 *.log
 cover.gif
-qpm.shared.json
 extern/
 Android.mk.backup
 src/QuestNotes.cpp.txt
@@ -91,7 +90,7 @@ sysinfo.txt
 /Assets/AssetStoreTools*
 *.apk
 *.unitypackage
- 
+
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
@@ -109,7 +108,8 @@ sysinfo.txt
 .consulo/
 /*.tmp
 /*.svd
- 
+.cache/
+
 # ============ #
 # OS generated #
 # ============ #
@@ -135,7 +135,7 @@ sysinfo.txt
 /Assets/AssetStoreTools*
 *.apk
 *.unitypackage
- 
+
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
@@ -153,7 +153,7 @@ sysinfo.txt
 .consulo/
 /*.tmp
 /*.svd
- 
+
 # ============ #
 # OS generated #
 # ============ #

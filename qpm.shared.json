@@ -14,7 +14,13 @@
       }
     },
     "workspace": {
-      "scripts": {}
+      "scripts": {
+        "qmod": [
+          "pwsh ./scripts/build.ps1 -clean",
+          "qpm qmod build",
+          "pwsh ./scripts/createqmod.ps1 PinkCore -clean"
+        ]
+      }
     },
     "dependencies": [
       {
