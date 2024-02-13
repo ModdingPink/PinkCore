@@ -237,7 +237,7 @@ namespace RequirementUtils
 	*/
 	void UpdatePlayButton()
 	{
-		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>().LastOrDefault();
+		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>()->LastOrDefault();
 		if (levelViews) {
 			bool interactable = AllowPlayerToStart();
             bool isCustom = SongUtils::SongInfo::get_mapData().isCustom;

@@ -35,10 +35,10 @@ namespace PinkCore::UI
 
     GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetTableCell()
     {
-        auto tableCell = reinterpret_cast<GlobalNamespace::LevelListTableCell*>(tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
+        auto tableCell = tableView->DequeueReusableCellForIdentifier(reuseIdentifier).try_cast<GlobalNamespace::LevelListTableCell>().value_or(nullptr);
         if (!tableCell) {
             if (!songListTableCellInstance)
-                songListTableCellInstance = Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>().FirstOrDefault([](auto x){ return x->get_name() == "LevelListTableCell"; });
+                songListTableCellInstance = Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>()->FirstOrDefault([](auto x){ return x->get_name() == "LevelListTableCell"; });
 
             tableCell = Instantiate(songListTableCellInstance);
         }
@@ -60,8 +60,8 @@ namespace PinkCore::UI
         // tableCell->_layoutWidthLimiter->set_limitWidth(false);
 
         tableCell->get_transform()->Find(BpmIcon)->get_gameObject()->SetActive(false);
-        reinterpret_cast<RectTransform*>(tableCell->_songNameText->get_transform())->set_anchorMax({2, 0.5});
-        reinterpret_cast<RectTransform*>(tableCell->_songAuthorText->get_transform())->set_anchorMax({2, 0.5});
+        tableCell->_songNameText->transform.cast<RectTransform>()->set_anchorMax({2, 0.5});
+        tableCell->_songAuthorText->transform.cast<RectTransform>()->set_anchorMax({2, 0.5});
         tableCell->_selectedBackgroundColor = tableCell->_highlightBackgroundColor;
         tableCell->_selectedAndHighlightedBackgroundColor = tableCell->_highlightBackgroundColor;
         /*

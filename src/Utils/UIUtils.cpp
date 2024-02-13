@@ -201,7 +201,7 @@ namespace UIUtils
 
 
 	void SetPlaylistViewState(bool state){
-		auto levelPackView = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::AnnotatedBeatmapLevelCollectionsViewController*>().LastOrDefault();
+		auto levelPackView = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::AnnotatedBeatmapLevelCollectionsViewController*>()->LastOrDefault();
 		if (levelPackView) levelPackView->get_transform()->get_parent()->get_gameObject()->SetActive(state);
 	}
 
@@ -238,7 +238,7 @@ namespace UIUtils
 
 			CreateText(horizontal, "Selected Custom Song's Colors");
 
-			colourSchemeView = Object::Instantiate(Resources::FindObjectsOfTypeAll<GlobalNamespace::ColorSchemeView*>().Last(), horizontal->get_transform(), false);
+			colourSchemeView = Object::Instantiate(Resources::FindObjectsOfTypeAll<GlobalNamespace::ColorSchemeView*>()->Last(), horizontal->get_transform(), false);
 
 			// doesn't work? basically copied from songcore though
 			AddHoverHint(colourSchemeView->_saberAColorImage, "Left Saber Color");
@@ -264,7 +264,7 @@ namespace UIUtils
 
 		if (auto scheme = SongUtils::CustomData::GetCustomSongColourFromCustomData(voidColourScheme, false, customData))
 		{
-			reinterpret_cast<UnityEngine::RectTransform*>(coloursModal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-7.5, 8));
+			coloursModal->transform.cast<UnityEngine::RectTransform>()->set_anchoredPosition(UnityEngine::Vector2(-7.5, 8));
 			coloursModal->Show(true, false, nullptr);
 
 			colourSchemeView->SetColors(scheme->saberAColor, scheme->saberBColor, scheme->environmentColor0, scheme->environmentColor1, scheme->environmentColor0Boost, scheme->environmentColor1Boost, scheme->obstaclesColor);
@@ -283,11 +283,11 @@ namespace UIUtils
 		bool showModal = (RequirementUtils::IsAnythingNeeded() || ContributorUtils::DidAnyoneWorkOnThis() || SongUtils::SongInfo::get_mapData().isWIP || SongUtils::SongInfo::get_mapData().hasCustomColours);
 
 		auto levelViews = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::StandardLevelDetailView*>();
-		int length = levelViews.Length();
+		int length = levelViews.size();
 		UnityEngine::RectTransform* heartRectTrans;
 		if (length > 0)
 		{
-			heartRectTrans = reinterpret_cast<UnityEngine::RectTransform*>(levelViews[length - 1]->_favoriteToggle->get_transform());
+			heartRectTrans = levelViews[length - 1]->_favoriteToggle->transform.cast<UnityEngine::RectTransform>();
 			if(showModal) heartRectTrans->set_anchoredPosition({3, -2});
 			else heartRectTrans->set_anchoredPosition({3, 0});
 		}
@@ -304,7 +304,7 @@ namespace UIUtils
 			HorizontalLayoutGroup* horizon = CreateHorizontalLayoutGroup(layout->get_transform());
 
 			auto button = CreateUIButton(horizon->get_transform(), "?", "PlayButton", {0, 0}, {9.0f, 7.2f}, [] {
-				reinterpret_cast<UnityEngine::RectTransform*>(requirementsModal->get_transform())->set_anchoredPosition(UnityEngine::Vector2(-27.0f, -15.0f));
+				requirementsModal->transform.cast<UnityEngine::RectTransform>()->set_anchoredPosition(UnityEngine::Vector2(-27.0f, -15.0f));
 				requirementsModal->Show(true, false, nullptr);
 			});
 			//haha YOINK, THANKS FOR THE BUTTON CODE METALIT WOOOOOOOOOOOOOOOOOO, WE LOVE GPL-3.0

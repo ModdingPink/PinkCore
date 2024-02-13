@@ -95,9 +95,9 @@ namespace PinkCore::UI
 	{
 
 		GameObject* canvas = CreateCanvas();
-		auto* canvas_T = canvas->get_transform();
+		auto canvas_T = canvas->transform;
 
-		canvas_T->SetParent(get_transform(), true);
+		canvas_T->SetParent(transform, true);
 		VerticalLayoutGroup* layout = CreateVerticalLayoutGroup(canvas_T);
 		HorizontalLayoutGroup* horizon = CreateHorizontalLayoutGroup(layout->get_transform());
 
