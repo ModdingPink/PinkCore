@@ -4,16 +4,17 @@
   "info": {
     "name": "PinkCore",
     "id": "pinkcore",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "url": "https://github.com/BSMGPink/PinkCore",
     "additionalData": {
-      "overrideSoName": "libpinkcore.so"
+      "overrideSoName": "libpinkcore.so",
+      "cmake": true
     }
   },
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^3.14.0",
+      "versionRange": "^5.0.0",
       "additionalData": {
         "extraFiles": [
           "src/inline-hook"
@@ -21,29 +22,29 @@
       }
     },
     {
-      "id": "codegen",
-      "versionRange": "^0.33.0",
+      "id": "bs-cordl",
+      "versionRange": "^3402.*",
       "additionalData": {
         "private": true
       }
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.22",
+      "versionRange": "^0.16.0",
       "additionalData": {
         "private": true
       }
     },
     {
-      "id": "questui",
-      "versionRange": "^0.17.11",
+      "id": "bsml",
+      "versionRange": "^0.4.0",
       "additionalData": {
         "private": true
       }
     },
     {
       "id": "songloader",
-      "versionRange": "^0.10.15",
+      "versionRange": "^0.11.0",
       "additionalData": {
         "private": true
       }
@@ -57,14 +58,14 @@
     },
     {
       "id": "libil2cpp",
-      "versionRange": "^0.2.3",
+      "versionRange": "^0.3.0",
       "additionalData": {
         "private": true
       }
     },
     {
-      "id": "modloader",
-      "versionRange": "^1.2.3",
+      "id": "scotland2",
+      "versionRange": "^0.1.0",
       "additionalData": {
         "private": true
       }
@@ -73,7 +74,12 @@
       "id": "sombrero",
       "versionRange": "^0.1.37",
       "additionalData": {}
+    },
+    {
+      "id": "kaleb",
+      "versionRange": "^0.1.7",
+      "additionalData": {}
     }
   ],
-  "additionalData": {}
+  "workspace": null
 }
