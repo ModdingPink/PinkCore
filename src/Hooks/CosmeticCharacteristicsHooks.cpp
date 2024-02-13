@@ -42,19 +42,25 @@
 #include "GlobalNamespace/EnvironmentInfoSO.hpp"
 #include "Zenject/MonoInstaller.hpp"
 
-MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &GlobalNamespace::BeatmapCharacteristicSegmentedControlController::SetData, void, GlobalNamespace::BeatmapCharacteristicSegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<::GlobalNamespace::IDifficultyBeatmapSet*>* difficultyBeatmapSets, GlobalNamespace::BeatmapCharacteristicSO* selectedBeatmapCharacteristic)
-{
+MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &GlobalNamespace::BeatmapCharacteristicSegmentedControlController::SetData, void, GlobalNamespace::BeatmapCharacteristicSegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<::GlobalNamespace::IDifficultyBeatmapSet*>* difficultyBeatmapSets, GlobalNamespace::BeatmapCharacteristicSO* selectedBeatmapCharacteristic) {
     BeatmapCharacteristicSegmentedControlController_SetData(self, difficultyBeatmapSets,selectedBeatmapCharacteristic);
 	if (!SongUtils::SongInfo::get_mapData().isCustom || !config.enableCustomCharacteristics) return;
-    int i = 0;
-    ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(self->_segmentedControl->_dataItems.size());
+    ListW<::UnityW<::GlobalNamespace::BeatmapCharacteristicSO>> beatmapCharacteristics = self->_beatmapCharacteristics;
+    ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(beatmapCharacteristics.size());
 
-    for(auto dataItem : self->_segmentedControl->_dataItems){
+    INFO("beatmapCharacteristics: %p", beatmapCharacteristics.convert());
+    for(int i = 0; auto characteristic : beatmapCharacteristics){
         UnityEngine::Sprite* characteristicSprite = nullptr;
         StringW characteristicText = "";
-        SongUtils::CustomData::GetCustomCharacteristicItems(self->_beatmapCharacteristics->get_Item(i), characteristicSprite, characteristicText);
-        if(characteristicText == "") characteristicText = Polyglot::Localization::Get(self->_beatmapCharacteristics->get_Item(i)->characteristicNameLocalizationKey);
-        if(characteristicSprite == nullptr) characteristicSprite = self->_beatmapCharacteristics->get_Item(i)->get_icon();
+
+        SongUtils::CustomData::GetCustomCharacteristicItems(
+            characteristic,
+            characteristicSprite,
+            characteristicText
+        );
+
+        if(characteristicText == "") characteristicText = Polyglot::Localization::Get(characteristic->characteristicNameLocalizationKey);
+        if(characteristicSprite == nullptr) characteristicSprite = characteristic->icon;
         dataItemArray[i] = HMUI::IconSegmentedControl::DataItem::New_ctor(characteristicSprite, characteristicText);
         i++;
     }
