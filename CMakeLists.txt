@@ -29,8 +29,8 @@ RECURSE_FILES(c_file_list ${SOURCE_DIR}/*.c)
 
 # add all src files to compile
 add_library(
-    ${COMPILE_ID} 
-    SHARED 
+    ${COMPILE_ID}
+    SHARED
     ${cpp_file_list}
     ${c_file_list}
 )
@@ -53,7 +53,7 @@ add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
             COMMAND ${CMAKE_STRIP} -g -S -d --strip-all
             "lib${COMPILE_ID}.so" -o "stripped_lib${COMPILE_ID}.so"
             COMMENT "Strip debug symbols done on final binary.")
-        
+
 add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory debug
         COMMENT "Make directory for debug symbols"
@@ -89,5 +89,3 @@ add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy ${a_file} debug/${file}
     COMMENT "Copy a files for ndk stack")
 endforeach()
-
-include(assets_include.cmake)
