@@ -22,6 +22,10 @@ namespace PinkCore::UI
     void RequirementModalListTableData::ctor()
     {
         reuseIdentifier = "RequirementModalListTableCell";
+    }
+
+    void RequirementModalListTableData::Awake()
+    {
         cellSize = 8.5f;
         missingSpriteSprite = ArrayToSprite(Assets::Requirements::MissingSprite_png);
         requirementFoundSprite = ArrayToSprite(Assets::Requirements::RequirementFound_png);
