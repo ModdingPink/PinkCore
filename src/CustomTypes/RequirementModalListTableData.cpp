@@ -22,11 +22,11 @@ namespace PinkCore::UI
     void RequirementModalListTableData::ctor()
     {
         reuseIdentifier = "RequirementModalListTableCell";
+        cellSize = 8.5f;
     }
 
     void RequirementModalListTableData::Awake()
     {
-        cellSize = 8.5f;
         missingSpriteSprite = ArrayToSprite(Assets::Requirements::MissingSprite_png);
         requirementFoundSprite = ArrayToSprite(Assets::Requirements::RequirementFound_png);
         requirementMissingSprite = ArrayToSprite(Assets::Requirements::RequirementMissing_png);
@@ -191,26 +191,19 @@ namespace PinkCore::UI
             else idx--;
         }
 
-        if (idx < mapData.currentRequirements.size())
-        {
+        if (idx < mapData.currentRequirements.size()) {
             return GetRequirementCell(idx);
-        }
-        else
-        {
+        } else {
             idx -= mapData.currentRequirements.size();
         }
 
-        if (idx < mapData.currentSuggestions.size())
-        {
+        if (idx < mapData.currentSuggestions.size()) {
             return GetSuggestionCell(idx);
-        }
-        else
-        {
+        } else {
             idx -= mapData.currentSuggestions.size();
         }
 
-        if (SongUtils::SongInfo::get_mapData().isWIP)
-        {
+        if (SongUtils::SongInfo::get_mapData().isWIP) {
             if (idx == 0) return GetWipCell();
             else idx--;
         }
@@ -228,6 +221,6 @@ namespace PinkCore::UI
     {
         // iswip is 0 or 1, requirements size, suggestions size, contributor size
         auto mapData = SongUtils::SongInfo::get_mapData();
-        return mapData.isWIP + mapData.hasCustomColours + mapData.currentRequirements.size() + mapData.currentSuggestions.size() + mapData.currentContributors.size();
+        return int(mapData.isWIP) + int(mapData.hasCustomColours) + mapData.currentRequirements.size() + mapData.currentSuggestions.size() + mapData.currentContributors.size();
     }
 }
