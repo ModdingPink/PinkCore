@@ -17,28 +17,33 @@ using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace BSML::Lite;
 
+#define SPRITE_INIT(variable, asset) if (!(variable && variable->m_CachedPtr)) variable = ArrayToSprite(asset)
+
 namespace PinkCore::UI
 {
-    void RequirementModalListTableData::ctor()
-    {
+    void RequirementModalListTableData::ctor() {
         reuseIdentifier = "RequirementModalListTableCell";
         cellSize = 8.5f;
     }
 
-    void RequirementModalListTableData::Awake()
-    {
-        missingSpriteSprite = ArrayToSprite(Assets::Requirements::MissingSprite_png);
-        requirementFoundSprite = ArrayToSprite(Assets::Requirements::RequirementFound_png);
-        requirementMissingSprite = ArrayToSprite(Assets::Requirements::RequirementMissing_png);
-        suggestionFoundSprite = ArrayToSprite(Assets::Requirements::SuggestionFound_png);
-        suggestionMissingSprite = ArrayToSprite(Assets::Requirements::SuggestionMissing_png);
-        infoSprite = ArrayToSprite(Assets::Requirements::Info_png);
-        wipSprite = ArrayToSprite(Assets::Requirements::WIP_png);
-        coloursSprite = ArrayToSprite(Assets::Requirements::Colors_png);
+    void RequirementModalListTableData::SpriteInit() {
+        SPRITE_INIT(missingSpriteSprite, Assets::Requirements::MissingSprite_png);
+        SPRITE_INIT(requirementFoundSprite, Assets::Requirements::RequirementFound_png);
+        SPRITE_INIT(requirementMissingSprite, Assets::Requirements::RequirementMissing_png);
+        SPRITE_INIT(suggestionFoundSprite, Assets::Requirements::SuggestionFound_png);
+        SPRITE_INIT(suggestionMissingSprite, Assets::Requirements::SuggestionMissing_png);
+        SPRITE_INIT(infoSprite, Assets::Requirements::Info_png);
+        SPRITE_INIT(wipSprite, Assets::Requirements::WIP_png);
+        SPRITE_INIT(coloursSprite, Assets::Requirements::Colors_png);
     }
 
-    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetTableCell()
-    {
+    void RequirementModalListTableData::Awake() {
+        SpriteInit();
+    }
+
+    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetTableCell() {
+        SpriteInit();
+
         auto tableCell = tableView->DequeueReusableCellForIdentifier(reuseIdentifier).try_cast<GlobalNamespace::LevelListTableCell>().value_or(nullptr);
         if (!tableCell) {
             if (!songListTableCellInstance)
@@ -81,8 +86,7 @@ namespace PinkCore::UI
         return tableCell;
     }
 
-    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetWipCell()
-    {
+    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetWipCell() {
         auto tableCell = GetTableCell();
         tableCell->set_interactable(false);
         static auto WIPLevel = ConstString("WIP Level");
@@ -94,8 +98,7 @@ namespace PinkCore::UI
     }
 
 
-    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetCustomColoursCell()
-    {
+    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetCustomColoursCell() {
         auto tableCell = GetTableCell();
         tableCell->set_interactable(true);
         static auto colourAvailable = ConstString("Custom Colours Available");
@@ -106,8 +109,7 @@ namespace PinkCore::UI
         return tableCell;
     }
 
-    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetRequirementOrSuggestionCell(std::string requirementName)
-    {
+    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetRequirementOrSuggestionCell(std::string requirementName) {
         auto tableCell = GetTableCell();
         tableCell->set_interactable(false);
 
@@ -121,8 +123,8 @@ namespace PinkCore::UI
 		bool suggested = RequirementUtils::GetSongHasSuggestion(requirementName);
 		bool forcedSuggestion = RequirementUtils::GetIsForcedSuggestion(requirementName);
 
-        UnityEngine::Sprite* sprite;
-        StringW subText;
+        UnityEngine::Sprite* sprite = nullptr;
+        StringW subText = {};
 
 		if (required && (!forcedSuggestion || suggested)) {
             if (installed) {
@@ -149,18 +151,15 @@ namespace PinkCore::UI
         return tableCell;
     }
 
-    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetRequirementCell(int idx)
-    {
+    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetRequirementCell(int idx) {
         return GetRequirementOrSuggestionCell(SongUtils::SongInfo::get_mapData().currentRequirements[idx]);
     }
 
-    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetSuggestionCell(int idx)
-    {
+    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetSuggestionCell(int idx) {
         return GetRequirementOrSuggestionCell(SongUtils::SongInfo::get_mapData().currentSuggestions[idx]);
     }
 
-    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetContributorCell(int idx)
-    {
+    GlobalNamespace::LevelListTableCell* RequirementModalListTableData::GetContributorCell(int idx) {
         auto tableCell = GetTableCell();
         auto& contributor = SongUtils::SongInfo::get_mapData().currentContributors[idx];
         tableCell->set_interactable(false);
@@ -169,24 +168,22 @@ namespace PinkCore::UI
         if (contributor.iconPath.empty()) {
             tableCell->_coverImage->set_sprite(infoSprite);
         } else {
-            tableCell->_coverImage->set_sprite(UIUtils::FileToSprite(SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath));
+            auto sprite = UIUtils::FileToSprite(SongUtils::GetCurrentSongPath() + u"/" + contributor.iconPath);
+            tableCell->_coverImage->set_sprite(sprite);
         }
 
         return tableCell;
     }
 
-    void RequirementModalListTableData::Refresh()
-    {
+    void RequirementModalListTableData::Refresh() {
         tableView->ReloadData();
         tableView->RefreshCells(true, true);
         tableView->ScrollToCellWithIdx(0, HMUI::TableView::ScrollPositionType::Beginning, true);
     }
 
-    HMUI::TableCell* RequirementModalListTableData::CellForIdx(HMUI::TableView* tableView, int idx)
-    {
+    HMUI::TableCell* RequirementModalListTableData::CellForIdx(HMUI::TableView* tableView, int idx) {
         auto mapData = SongUtils::SongInfo::get_mapData();
-        if (mapData.hasCustomColours)
-        {
+        if (mapData.hasCustomColours) {
             if (idx == 0) return GetCustomColoursCell();
             else idx--;
         }
@@ -212,15 +209,13 @@ namespace PinkCore::UI
     }
 
 
-    float RequirementModalListTableData::CellSize()
-    {
+    float RequirementModalListTableData::CellSize() {
         return cellSize;
     }
 
-    int RequirementModalListTableData::NumberOfCells()
-    {
+    int RequirementModalListTableData::NumberOfCells() {
         // iswip is 0 or 1, requirements size, suggestions size, contributor size
-        auto mapData = SongUtils::SongInfo::get_mapData();
+        auto& mapData = SongUtils::SongInfo::get_mapData();
         return int(mapData.isWIP) + int(mapData.hasCustomColours) + mapData.currentRequirements.size() + mapData.currentSuggestions.size() + mapData.currentContributors.size();
     }
 }

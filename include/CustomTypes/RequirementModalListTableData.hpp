@@ -25,6 +25,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(PinkCore::UI, RequirementModalListTableData, Un
         DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, infoSprite);
         DECLARE_INSTANCE_METHOD(void, Awake);
         DECLARE_INSTANCE_METHOD(void, Refresh);
+        DECLARE_INSTANCE_METHOD(void, SpriteInit);
         DECLARE_OVERRIDE_METHOD_MATCH(HMUI::TableCell*, CellForIdx, &HMUI::TableView::IDataSource::CellForIdx, HMUI::TableView* tableView, int idx);
         DECLARE_OVERRIDE_METHOD_MATCH(float, CellSize, &HMUI::TableView::IDataSource::CellSize);
         DECLARE_OVERRIDE_METHOD_MATCH(int, NumberOfCells, &HMUI::TableView::IDataSource::NumberOfCells);
