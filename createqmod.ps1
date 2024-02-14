@@ -30,7 +30,7 @@ foreach ($mod in $modJson.modFiles)
     $filelist += $path
 }
 
-foreach ($mod in $modJson.earlyModFiles)
+foreach ($mod in $modJson.lateModFiles)
 {
     $path = "./build/" + $mod
     if (-not (Test-Path $path))
