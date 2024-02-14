@@ -51,7 +51,7 @@ MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &G
     INFO("beatmapCharacteristics: %p", beatmapCharacteristics.convert());
     for(int i = 0; auto characteristic : beatmapCharacteristics){
         UnityEngine::Sprite* characteristicSprite = nullptr;
-        StringW characteristicText = "";
+        StringW characteristicText = nullptr;
 
         SongUtils::CustomData::GetCustomCharacteristicItems(
             characteristic,
@@ -59,7 +59,7 @@ MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &G
             characteristicText
         );
 
-        if(characteristicText == "") characteristicText = Polyglot::Localization::Get(characteristic->characteristicNameLocalizationKey);
+        if(characteristicText == nullptr || characteristicText == "") characteristicText = Polyglot::Localization::Get(characteristic->characteristicNameLocalizationKey);
         if(characteristicSprite == nullptr) characteristicSprite = characteristic->icon;
         dataItemArray[i] = HMUI::IconSegmentedControl::DataItem::New_ctor(characteristicSprite, characteristicText);
         i++;
