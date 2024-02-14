@@ -36,11 +36,6 @@ using namespace HMUI;
 
 constexpr const char* titles[2] = { "<i>NoticeBoard</i>", "<i>Patreon</i>" };
 
-#define TEXT_SWITCH(theState, theText) \
-if (state == theState) return; \
-state = theState; \
-title->set_text(il2cpp_utils::newcsstr(titles[state]));
-
 namespace PinkCore::UI
 {
 	NoticeBoard* NoticeBoard::instance = nullptr;
@@ -128,7 +123,7 @@ namespace PinkCore::UI
 		noticeBoardButton = CreateUIButton(horizon, "", "SettingsButton", [&](){
 			if (state == BoardState::Board) return;
 			state = BoardState::Board;
-			title->set_text(il2cpp_utils::newcsstr(titles[state]));
+			title->text = titles[state];
 
 			if (donationLayout) donationLayout->SetActive(false);
 			if (boardLayout) boardLayout->SetActive(true);
@@ -140,7 +135,7 @@ namespace PinkCore::UI
 		donationButton = CreateUIButton(horizon, "", "SettingsButton", [&](){
 			if (state == BoardState::Donation) return;
 			state = BoardState::Donation;
-			title->set_text(il2cpp_utils::newcsstr(titles[state]));
+			title->text = titles[state];
 
 			if (boardLayout) boardLayout->SetActive(false);
 			if (donationLayout) donationLayout->SetActive(true);
