@@ -5,7 +5,7 @@
 config_t config;
 
 Configuration& getConfig() {
-	static Configuration config({MOD_ID, VERSION});
+	static Configuration config({MOD_ID, VERSION, VERSION_LONG});
 	config.Load();
 	return config;
 }
@@ -17,7 +17,7 @@ Configuration& getConfig() {
 	auto itr_ ##name = doc.FindMember(#name); \
 	if (itr_ ##name != doc.MemberEnd()) { \
 		config.name = itr_ ##name->value.method; \
-	}else { foundEverything = false; } 
+	}else { foundEverything = false; }
 
 void SaveConfig()
 {
@@ -26,7 +26,7 @@ void SaveConfig()
 	doc.RemoveAllMembers();
 	doc.SetObject();
 	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
-	
+
 	SAVE(enableExtraSongDetails);
 	SAVE(enableCustomSongColours);
 	SAVE(forceNoteColours);
@@ -48,12 +48,12 @@ bool LoadConfig()
 	LOAD(enableExtraSongDetails, GetBool());
 	LOAD(enableCustomSongColours, GetBool());
 	LOAD(enableCustomDiffNames, GetBool());
-	LOAD(forceNoteColours, GetBool());	
+	LOAD(forceNoteColours, GetBool());
 	LOAD(enableCustomCharacteristics, GetBool());
 	LOAD(enableBurnMarks, GetBool());
 	LOAD(openToCustomLevels, GetBool());
 
-	if (!foundEverything) 
+	if (!foundEverything)
 	{
 		ERROR("Configuration values were missing!");
 		return false;

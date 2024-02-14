@@ -46,11 +46,11 @@ MAKE_AUTO_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace:
 
 	// Rounding BPM display for all maps, including official ones
 	StringW BPMIl2cppString(std::to_string((int)level->get_beatsPerMinute()));
-	self->songBpmText->set_text(BPMIl2cppString);
+	self->_songBpmText->set_text(BPMIl2cppString);
 	bool isCustom = SongUtils::SongInfo::isCustom(level);
 	if (isCustom && config.enableExtraSongDetails)
 	{
-		self->songAuthorText->set_richText(true);
+		self->_songAuthorText->set_richText(true);
 		if (!level->get_levelAuthorName()->IsNullOrWhiteSpace(level->get_levelAuthorName())) {
 			std::u16string songAuthorName(level->get_songAuthorName());
 			std::u16string levelAuthorName(level->get_levelAuthorName());
@@ -67,14 +67,14 @@ MAKE_AUTO_HOOK_MATCH(LevelListTableCell_SetDataFromLevelAsync, &GlobalNamespace:
 			}
 
 			StringW newAuthorIl2cppString(u"<size=80%>" + songAuthorName + u"</size> <size=90%>[<color=#" + colourToUse + u">" + levelAuthorName + u"</color>]</size>");
-			self->songAuthorText->set_text(newAuthorIl2cppString);
+			self->_songAuthorText->set_text(newAuthorIl2cppString);
 		}
-		
+
 	}
 	if(isFavorite) {
 		Sombrero::FastColor newColour = Sombrero::FastColor(1,1,1,1);
 		if(isCustom) newColour = {1, 0.41, 0.71, 0.7};
-		self->favoritesBadgeImage->set_color(newColour);
-		self->favoritesBadgeImage->get_transform()->set_localScale(favouriteSize);
+		self->_favoritesBadgeImage->set_color(newColour);
+		self->_favoritesBadgeImage->get_transform()->set_localScale(favouriteSize);
 	}
 }

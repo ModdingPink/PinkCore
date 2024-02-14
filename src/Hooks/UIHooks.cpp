@@ -28,7 +28,6 @@
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/Sprite.hpp"
-#include "HMUI/IconSegmentedControl_DataItem.hpp"
 #include "HMUI/ModalView.hpp"
 #include "HMUI/Screen.hpp"
 #include "Polyglot/Localization.hpp"
@@ -38,13 +37,13 @@
 MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_SetContent, &GlobalNamespace::StandardLevelDetailView::SetContent, void, GlobalNamespace::StandardLevelDetailView* self, ::GlobalNamespace::IBeatmapLevel* level, GlobalNamespace::BeatmapDifficulty defaultDifficulty, GlobalNamespace::BeatmapCharacteristicSO* defaultBeatmapCharacteristic, GlobalNamespace::PlayerData* playerData)
 {
 	auto currentSelectedLevel = reinterpret_cast<GlobalNamespace::IPreviewBeatmapLevel*>(level);
-	
+
 	//this will only work on a post fix, which we cant do because refresh is in the method which we need to do shit on anyway so AAAAAAAAAAAAAAAAAAA 3:<
 	//GlobalNamespace::BeatmapDifficulty difficulty = defaultDifficulty;
 	//if(!difficulty) difficulty = self->beatmapDifficultySegmentedControlController->selectedDifficulty;
 	//GlobalNamespace::BeatmapCharacteristicSO* characteristic = defaultBeatmapCharacteristic;
 	//if(!characteristic) characteristic = self->beatmapCharacteristicSegmentedControlController->selectedBeatmapCharacteristic;
-	
+
 	SongUtils::CustomData::HandleGetMapInfoData(currentSelectedLevel);
 
 	//this ensures we get the info dat at the earliest point
@@ -73,7 +72,7 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelDetailView_RefreshContent, &GlobalNamespace::S
 }
 
 MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDifficultyMethods::Name, StringW, GlobalNamespace::BeatmapDifficulty difficulty) {
-	
+
 	if (SongUtils::SongInfo::get_mapData().isCustom && config.enableCustomDiffNames) {
 		StringW newDifficultyLabel = DifficultyNameUtils::GetDifficultyNameFromCache(difficulty);
 		if (newDifficultyLabel->get_Length() != 0) {
@@ -84,7 +83,7 @@ MAKE_AUTO_HOOK_MATCH(BeatmapDifficultyMethods_Name, &GlobalNamespace::BeatmapDif
 }
 
 MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &GlobalNamespace::BeatmapDifficultySegmentedControlController::SetData, void, GlobalNamespace::BeatmapDifficultySegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<GlobalNamespace::IDifficultyBeatmap*>* difficultyBeatmapsList, GlobalNamespace::BeatmapDifficulty selectedDifficulty)
-{	
+{
 
 	auto difficultyBeatmaps = ArrayW<GlobalNamespace::IDifficultyBeatmap*>(difficultyBeatmapsList);
 
@@ -97,4 +96,3 @@ MAKE_AUTO_HOOK_MATCH(BeatmapDifficultySegmentedControlController_SetData, &Globa
 	}
 	BeatmapDifficultySegmentedControlController_SetData(self, difficultyBeatmapsList, selectedDifficulty);
 }
-

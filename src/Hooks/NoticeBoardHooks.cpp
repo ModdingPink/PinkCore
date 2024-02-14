@@ -11,8 +11,7 @@
 #include "HMUI/ViewController.hpp"
 #include "HMUI/HoverHint.hpp"
 #include "HMUI/ButtonSpriteSwap.hpp"
-#include "HMUI/ViewController_AnimationType.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
+#include "bsml/shared/BSML.hpp"
 #include "Zenject/DiContainer.hpp"
 #include "System/Action_1.hpp"
 
@@ -21,13 +20,12 @@
 #include "UnityEngine/SceneManagement/SceneManager.hpp"
 #include "UnityEngine/UI/Button.hpp"
 #include "UnityEngine/Events/UnityAction.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "bsml/shared/BSML/MainThreadScheduler.hpp"
 #include "custom-types/shared/delegate.hpp"
 
 #include "Utils/NoticeBoardText.hpp"
 #include "Utils/DonationText.hpp"
-#include "Polyglot/Localization.hpp" 
-#include "questui/shared/BeatSaberUI.hpp"
+#include "Polyglot/Localization.hpp"
 
 bool firstWarmup = true;
 bool setIcons = false;
@@ -36,16 +34,16 @@ bool setIcons = false;
 // pink told me to comment this out idk
 // MAKE_AUTO_HOOK_MATCH(MainMenuViewController_DidActivate, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 // {
-//     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling); 
-//     if(setIcons) return; 
+//     MainMenuViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+//     if(setIcons) return;
 //     //reusing the editor button
 //     auto newsButton = UnityEngine::GameObject::Instantiate(self->beatmapEditorButton->get_gameObject(), self->beatmapEditorButton->get_transform()->get_parent(), false);
-// 	newsButton->get_gameObject()->set_active(true);
-// 	QuestUI::BeatSaberUI::AddHoverHint(newsButton, "Beat Saber Modding News");
+// 	   newsButton->get_gameObject()->set_active(true);
+// 	   BSML::Lite::AddHoverHint(newsButton, "Beat Saber Modding News");
 //     //swap the default button icons to our own button images
 //     HMUI::ButtonSpriteSwap* spriteSwap = newsButton->get_gameObject()->GetComponent<HMUI::ButtonSpriteSwap*>();
-//     auto highlightedImage = QuestUI::BeatSaberUI::ArrayToSprite(IncludedAssets::MainMenuIconHighlight_png);
-//     auto defaultImage = QuestUI::BeatSaberUI::ArrayToSprite(IncludedAssets::MainMenuIcon_png);
+//     auto highlightedImage = BSML::Lite::ArrayToSprite(Assets::MainMenu::IconHighlight_png);
+//     auto defaultImage = BSML::Lite::ArrayToSprite(Assets::MainMenu::Icon_png);
 //     spriteSwap->normalStateSprite = defaultImage;
 //     spriteSwap->highlightStateSprite = highlightedImage;
 //     spriteSwap->pressedStateSprite = highlightedImage;
@@ -61,7 +59,7 @@ MAKE_AUTO_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement:
 	std::string activeSceneName("");
 	if (sceneNameCS) activeSceneName = static_cast<std::string>(sceneNameCS);
 	INFO("Found scene %s", activeSceneName.c_str());
-	
+
 	bool result = SceneManager_SetActiveScene(scene);
 
 	// this is a good way of doing a thing really early on, like downloading text
@@ -80,7 +78,7 @@ MAKE_AUTO_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement:
 MAKE_AUTO_HOOK_MATCH(MainFlowCoordinator_DidActivate, &GlobalNamespace::MainFlowCoordinator::DidActivate, void, GlobalNamespace::MainFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 {
 	if (firstActivation)
-		self->providedRightScreenViewController = PinkCore::UI::NoticeBoard::get_instance();
+		self->_providedRightScreenViewController = PinkCore::UI::NoticeBoard::get_instance();
 	MainFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 

@@ -1,0 +1,263 @@
+{
+  "config": {
+    "version": "0.1.0",
+    "sharedDir": "shared",
+    "dependenciesDir": "extern",
+    "info": {
+      "name": "PinkCore",
+      "id": "pinkcore",
+      "version": "1.9.0",
+      "url": "https://github.com/BSMGPink/PinkCore",
+      "additionalData": {
+        "overrideSoName": "libpinkcore.so",
+        "cmake": true
+      }
+    },
+    "workspace": {
+      "scripts": {
+        "qmod": [
+          "pwsh ./scripts/build.ps1 -clean",
+          "qpm qmod build",
+          "pwsh ./scripts/createqmod.ps1 PinkCore -clean"
+        ]
+      }
+    },
+    "dependencies": [
+      {
+        "id": "beatsaber-hook",
+        "versionRange": "^5.0.0",
+        "additionalData": {
+          "extraFiles": [
+            "src/inline-hook"
+          ]
+        }
+      },
+      {
+        "id": "bs-cordl",
+        "versionRange": "3402.*",
+        "additionalData": {
+          "private": true
+        }
+      },
+      {
+        "id": "custom-types",
+        "versionRange": "^0.16.0",
+        "additionalData": {
+          "private": true
+        }
+      },
+      {
+        "id": "bsml",
+        "versionRange": "^0.4.0",
+        "additionalData": {
+          "private": true
+        }
+      },
+      {
+        "id": "songloader",
+        "versionRange": "^0.11.0",
+        "additionalData": {
+          "private": true
+        }
+      },
+      {
+        "id": "libcurl",
+        "versionRange": "*",
+        "additionalData": {
+          "private": true
+        }
+      },
+      {
+        "id": "libil2cpp",
+        "versionRange": "^0.3.0",
+        "additionalData": {
+          "private": true
+        }
+      },
+      {
+        "id": "scotland2",
+        "versionRange": "^0.1.0",
+        "additionalData": {
+          "private": true
+        }
+      },
+      {
+        "id": "sombrero",
+        "versionRange": "^0.1.37",
+        "additionalData": {}
+      },
+      {
+        "id": "kaleb",
+        "versionRange": "^0.1.7",
+        "additionalData": {}
+      }
+    ]
+  },
+  "restoredDependencies": [
+    {
+      "dependency": {
+        "id": "bsml",
+        "versionRange": "=0.4.7",
+        "additionalData": {
+          "soLink": "https://github.com/RedBrumbler/Quest-BSML/releases/download/v0.4.7/libbsml.so",
+          "debugSoLink": "https://github.com/RedBrumbler/Quest-BSML/releases/download/v0.4.7/debug_libbsml.so",
+          "overrideSoName": "libbsml.so",
+          "modLink": "https://github.com/RedBrumbler/Quest-BSML/releases/download/v0.4.7/BSML.qmod",
+          "branchName": "version/v0_4_7",
+          "cmake": true
+        }
+      },
+      "version": "0.4.7"
+    },
+    {
+      "dependency": {
+        "id": "libil2cpp",
+        "versionRange": "=0.3.1",
+        "additionalData": {
+          "headersOnly": true
+        }
+      },
+      "version": "0.3.1"
+    },
+    {
+      "dependency": {
+        "id": "songloader",
+        "versionRange": "=0.11.1",
+        "additionalData": {
+          "soLink": "https://github.com/darknight1050/SongLoader/releases/download/v0.11.1/libsongloader.so",
+          "debugSoLink": "https://github.com/darknight1050/SongLoader/releases/download/v0.11.1/debug_libsongloader.so",
+          "overrideSoName": "libsongloader.so",
+          "modLink": "https://github.com/darknight1050/SongLoader/releases/download/v0.11.1/SongLoader.qmod",
+          "branchName": "version/v0_11_1",
+          "cmake": true
+        }
+      },
+      "version": "0.11.1"
+    },
+    {
+      "dependency": {
+        "id": "sombrero",
+        "versionRange": "=0.1.37",
+        "additionalData": {
+          "headersOnly": true,
+          "branchName": "version-v0.1.37"
+        }
+      },
+      "version": "0.1.37"
+    },
+    {
+      "dependency": {
+        "id": "custom-types",
+        "versionRange": "=0.16.17",
+        "additionalData": {
+          "soLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.16.17/libcustom-types.so",
+          "debugSoLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.16.17/debug_libcustom-types.so",
+          "overrideSoName": "libcustom-types.so",
+          "modLink": "https://github.com/QuestPackageManager/Il2CppQuestTypePatching/releases/download/v0.16.17/CustomTypes.qmod",
+          "branchName": "version/v0_16_17",
+          "compileOptions": {
+            "cppFlags": [
+              "-Wno-invalid-offsetof"
+            ]
+          },
+          "cmake": true
+        }
+      },
+      "version": "0.16.17"
+    },
+    {
+      "dependency": {
+        "id": "bs-cordl",
+        "versionRange": "=3402.1.2",
+        "additionalData": {
+          "headersOnly": true,
+          "branchName": "version/v3402_1_2",
+          "compileOptions": {
+            "includePaths": [
+              "include"
+            ],
+            "cppFeatures": [],
+            "cppFlags": [
+              "-DNEED_UNSAFE_CSHARP",
+              "-fdeclspec",
+              "-DUNITY_2021",
+              "-DHAS_CODEGEN"
+            ]
+          }
+        }
+      },
+      "version": "3402.1.2"
+    },
+    {
+      "dependency": {
+        "id": "libcurl",
+        "versionRange": "=8.5.0",
+        "additionalData": {
+          "staticLinking": true,
+          "soLink": "https://github.com/darknight1050/openssl-curl-android/releases/download/v8.5.0/libcurl.a",
+          "overrideSoName": "libcurl.a",
+          "branchName": "version-v8.5.0"
+        }
+      },
+      "version": "8.5.0"
+    },
+    {
+      "dependency": {
+        "id": "beatsaber-hook",
+        "versionRange": "=5.0.9",
+        "additionalData": {
+          "soLink": "https://github.com/QuestPackageManager/beatsaber-hook/releases/download/v5.0.9/libbeatsaber-hook_5_0_9.so",
+          "debugSoLink": "https://github.com/QuestPackageManager/beatsaber-hook/releases/download/v5.0.9/debug_libbeatsaber-hook_5_0_9.so",
+          "branchName": "version/v5_0_9",
+          "cmake": true
+        }
+      },
+      "version": "5.0.9"
+    },
+    {
+      "dependency": {
+        "id": "scotland2",
+        "versionRange": "=0.1.4",
+        "additionalData": {
+          "soLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.4/libsl2.so",
+          "debugSoLink": "https://github.com/sc2ad/scotland2/releases/download/v0.1.4/debug_libsl2.so",
+          "overrideSoName": "libsl2.so",
+          "branchName": "version/v0_1_4"
+        }
+      },
+      "version": "0.1.4"
+    },
+    {
+      "dependency": {
+        "id": "tinyxml2",
+        "versionRange": "=9.0.7",
+        "additionalData": {
+          "soLink": "https://github.com/MillzyDev/NDK-tinyxml2/releases/download/v9.0.7/libtinyxml2.so",
+          "debugSoLink": "https://github.com/MillzyDev/NDK-tinyxml2/releases/download/v9.0.7/debug_libtinyxml2.so",
+          "overrideSoName": "libtinyxml2.so",
+          "modLink": "https://github.com/MillzyDev/NDK-tinyxml2/releases/download/v9.0.7/tinyxml2.qmod",
+          "branchName": "version/v9_0_7",
+          "cmake": true
+        }
+      },
+      "version": "9.0.7"
+    },
+    {
+      "dependency": {
+        "id": "kaleb",
+        "versionRange": "=0.1.7",
+        "additionalData": {
+          "headersOnly": true,
+          "branchName": "version/v0_1_7",
+          "compileOptions": {
+            "cppFlags": [
+              "-DKALEB_VERSION=\"0.1.7\""
+            ]
+          },
+          "cmake": false
+        }
+      },
+      "version": "0.1.7"
+    }
+  ]
+}

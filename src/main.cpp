@@ -1,8 +1,7 @@
-#include "modloader/shared/modloader.hpp"
 #include "beatsaber-hook/shared/utils/logging.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "custom-types/shared/register.hpp"
-#include "questui/shared/QuestUI.hpp"
+#include "bsml/shared/BSML.hpp"
 
 #include "songloader/shared/CustomTypes/CustomLevelInfoSaveData.hpp"
 
@@ -26,39 +25,27 @@
 
 #include "config.hpp"
 
-ModInfo modInfo;
+#include "scotland2/shared/modloader.h"
 
-extern "C" void setup(ModInfo& info)
-{
-	info.id = MOD_ID;
-	info.version = VERSION;
+modloader::ModInfo modInfo{MOD_ID, VERSION, VERSION_LONG};
 
-	modInfo = info;
+extern "C" void setup(CModInfo* info) {
+	info->id = MOD_ID;
+	info->version = VERSION;
+	info->version_long = VERSION_LONG;
 }
 
-extern "C" void load()
+extern "C" void late_load()
 {
-	il2cpp_functions::Class_Init(classof(HMUI::ImageView*));
-    il2cpp_functions::Class_Init(classof(HMUI::CurvedTextMeshPro*));
 	Logger& logger = PinkCore::Logging::getLogger();
 	logger.info("Loading pinkcore!");
-	QuestUI::Init();
-	
+	BSML::Init();
 
 	// if config load fails, save the config so it will work next time
 	if (!LoadConfig())
 		SaveConfig();
 
-	// StringW test = "a";
-    // std::function<void(HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*)> fun = [test](HMUI::SelectableCell* a, HMUI::SelectableCell::TransitionType b, Il2CppObject* c){
-         
-	// };
-	// auto delegate = il2cpp_utils::MakeDelegate<System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*>(classof(System::Action_3<HMUI::SelectableCell *, HMUI::SelectableCell::TransitionType, Il2CppObject*>*), fun);        
-
-
 	Hooks::InstallHooks(logger);
-
 	custom_types::Register::AutoRegister();
-
-	QuestUI::Register::RegisterModSettingsFlowCoordinator<PinkCore::UI::PinkCoreFlowCoordinator*>({MOD_ID, VERSION});
+	BSML::Register::RegisterMainMenu<PinkCore::UI::PinkCoreFlowCoordinator*>(MOD_ID, "");
 }

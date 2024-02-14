@@ -27,9 +27,10 @@
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/Sprite.hpp"
-#include "HMUI/IconSegmentedControl_DataItem.hpp"
 #include "HMUI/ModalView.hpp"
 #include "HMUI/Screen.hpp"
+#include "HMUI/SegmentedControl.hpp"
+#include "HMUI/IconSegmentedControl.hpp"
 #include "Polyglot/Localization.hpp"
 #include "GlobalNamespace/GameplayCoreInstaller.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
@@ -41,25 +42,31 @@
 #include "GlobalNamespace/EnvironmentInfoSO.hpp"
 #include "Zenject/MonoInstaller.hpp"
 
-MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &GlobalNamespace::BeatmapCharacteristicSegmentedControlController::SetData, void, GlobalNamespace::BeatmapCharacteristicSegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<::GlobalNamespace::IDifficultyBeatmapSet*>* difficultyBeatmapSets, GlobalNamespace::BeatmapCharacteristicSO* selectedBeatmapCharacteristic)
-{	
+MAKE_AUTO_HOOK_MATCH(BeatmapCharacteristicSegmentedControlController_SetData, &GlobalNamespace::BeatmapCharacteristicSegmentedControlController::SetData, void, GlobalNamespace::BeatmapCharacteristicSegmentedControlController* self, System::Collections::Generic::IReadOnlyList_1<::GlobalNamespace::IDifficultyBeatmapSet*>* difficultyBeatmapSets, GlobalNamespace::BeatmapCharacteristicSO* selectedBeatmapCharacteristic) {
     BeatmapCharacteristicSegmentedControlController_SetData(self, difficultyBeatmapSets,selectedBeatmapCharacteristic);
 	if (!SongUtils::SongInfo::get_mapData().isCustom || !config.enableCustomCharacteristics) return;
-    int i = 0;
-    ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(self->segmentedControl->dataItems->Length());
+    ListW<::UnityW<::GlobalNamespace::BeatmapCharacteristicSO>> beatmapCharacteristics = self->_beatmapCharacteristics;
+    ArrayW<HMUI::IconSegmentedControl::DataItem*> dataItemArray(beatmapCharacteristics.size());
 
-    for(auto dataItem : self->segmentedControl->dataItems){
+    INFO("beatmapCharacteristics: %p", beatmapCharacteristics.convert());
+    for(int i = 0; auto characteristic : beatmapCharacteristics){
         UnityEngine::Sprite* characteristicSprite = nullptr;
-        StringW characteristicText = "";
-        SongUtils::CustomData::GetCustomCharacteristicItems(self->beatmapCharacteristics->get_Item(i), characteristicSprite, characteristicText);
-        if(characteristicText == "") characteristicText = Polyglot::Localization::Get(self->beatmapCharacteristics->get_Item(i)->characteristicNameLocalizationKey);
-        if(characteristicSprite == nullptr) characteristicSprite = self->beatmapCharacteristics->get_Item(i)->get_icon();
+        StringW characteristicText = nullptr;
+
+        SongUtils::CustomData::GetCustomCharacteristicItems(
+            characteristic,
+            characteristicSprite,
+            characteristicText
+        );
+
+        if(characteristicText == nullptr || characteristicText == "") characteristicText = Polyglot::Localization::Get(characteristic->characteristicNameLocalizationKey);
+        if(characteristicSprite == nullptr) characteristicSprite = characteristic->icon;
         dataItemArray[i] = HMUI::IconSegmentedControl::DataItem::New_ctor(characteristicSprite, characteristicText);
         i++;
     }
-	int selectedCell = self->segmentedControl->selectedCellNumber;
-    self->segmentedControl->SetData(dataItemArray);
-    self->segmentedControl->SelectCellWithNumber(selectedCell);
+	int selectedCell = self->_segmentedControl->selectedCellNumber;
+    self->_segmentedControl->SetData(dataItemArray);
+    self->_segmentedControl->SelectCellWithNumber(selectedCell);
 }
 
 MAKE_AUTO_HOOK_MATCH(GameplayCoreInstaller_InstallBindings, &GlobalNamespace::GameplayCoreInstaller::InstallBindings, void, GlobalNamespace::GameplayCoreInstaller* self)
@@ -69,10 +76,10 @@ MAKE_AUTO_HOOK_MATCH(GameplayCoreInstaller_InstallBindings, &GlobalNamespace::Ga
     int newSaberNum = SongUtils::SongInfo::get_mapData().saberCount;
     if(newSaberNum == -1) { GameplayCoreInstaller_InstallBindings(self); return; }
 
-	int colourNum = self->sceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->numberOfColors;
-	self->sceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->numberOfColors = newSaberNum;
-	GameplayCoreInstaller_InstallBindings(self); 
-	self->sceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->numberOfColors = colourNum;
+	int colourNum = self->_sceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->numberOfColors;
+	self->_sceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->_numberOfColors = newSaberNum;
+	GameplayCoreInstaller_InstallBindings(self);
+	self->_sceneSetupData->difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->_numberOfColors = colourNum;
 
 }
 

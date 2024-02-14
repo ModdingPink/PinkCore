@@ -31,13 +31,47 @@ using namespace GlobalNamespace;
 std::shared_ptr<rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>> levelStartJSONptr;
 PinkCore::API::LevelDetails levelStartMapLevelDetails;
 
-MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Init, &StandardLevelScenesTransitionSetupDataSO::Init, void, StandardLevelScenesTransitionSetupDataSO* self, StringW gameMode, IDifficultyBeatmap* difficultyBeatmap, IPreviewBeatmapLevel* previewBeatmapLevel, OverrideEnvironmentSettings* overrideEnvironmentSettings, ColorScheme* overrideColorScheme, GameplayModifiers* gameplayModifiers, PlayerSpecificSettings* playerSpecificSettings, PracticeSettings* practiceSettings, StringW backButtonText, bool useTestNoteCutSoundEffects, bool startPaused, ::GlobalNamespace::BeatmapDataCache* beatmapDataCache)
-{
-	if(!SongUtils::SongInfo::isCustom(previewBeatmapLevel)){ 	
-		StandardLevelScenesTransitionSetupDataSO_Init(self, gameMode, difficultyBeatmap, previewBeatmapLevel, overrideEnvironmentSettings, overrideColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, backButtonText, useTestNoteCutSoundEffects, startPaused, beatmapDataCache);
-		return; 
+MAKE_AUTO_HOOK_MATCH(
+	StandardLevelScenesTransitionSetupDataSO_Init,
+	&StandardLevelScenesTransitionSetupDataSO::Init,
+	void,
+	StandardLevelScenesTransitionSetupDataSO* self,
+	StringW gameMode,
+	GlobalNamespace::IDifficultyBeatmap* difficultyBeatmap,
+	GlobalNamespace::IPreviewBeatmapLevel* previewBeatmapLevel,
+	GlobalNamespace::OverrideEnvironmentSettings* overrideEnvironmentSettings,
+	GlobalNamespace::ColorScheme* overrideColorScheme,
+	GlobalNamespace::ColorScheme* beatmapOverrideColorScheme,
+	GlobalNamespace::GameplayModifiers* gameplayModifiers,
+	GlobalNamespace::PlayerSpecificSettings* playerSpecificSettings,
+	GlobalNamespace::PracticeSettings* practiceSettings,
+	StringW backButtonText,
+	bool useTestNoteCutSoundEffects,
+	bool startPaused,
+	GlobalNamespace::BeatmapDataCache* beatmapDataCache,
+	System::Nullable_1<::GlobalNamespace::__RecordingToolManager__SetupData> recordingToolData
+) {
+	if(!SongUtils::SongInfo::isCustom(previewBeatmapLevel)){
+		StandardLevelScenesTransitionSetupDataSO_Init(
+			self,
+			gameMode,
+			difficultyBeatmap,
+			previewBeatmapLevel,
+			overrideEnvironmentSettings,
+			overrideColorScheme,
+			beatmapOverrideColorScheme,
+			gameplayModifiers,
+			playerSpecificSettings,
+			practiceSettings,
+			backButtonText,
+			useTestNoteCutSoundEffects,
+			startPaused,
+			beatmapDataCache,
+			recordingToolData
+		);
+		return;
 	}
-	
+
 	bool containRotEvent = difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents;
 
 	GlobalNamespace::ColorScheme* newColourScheme = nullptr;
@@ -56,23 +90,39 @@ MAKE_AUTO_HOOK_MATCH(StandardLevelScenesTransitionSetupDataSO_Init, &StandardLev
 
 			StringW envType = levelStartMapLevelDetails.environmentType;
 			if(envType == "allDirections"){
-				difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents = true;
+				difficultyBeatmap->parentDifficultyBeatmapSet->beatmapCharacteristic->_containsRotationEvents = true;
 			}else if(envType == "default"){
-				difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents = false;
+				difficultyBeatmap->parentDifficultyBeatmapSet->beatmapCharacteristic->_containsRotationEvents = false;
 			}
-			
+
 		}
 	}
 
-	StandardLevelScenesTransitionSetupDataSO_Init(self, gameMode, difficultyBeatmap, previewBeatmapLevel, overrideEnvironmentSettings, overrideColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, backButtonText, useTestNoteCutSoundEffects, startPaused, beatmapDataCache);
-	
-	difficultyBeatmap->get_parentDifficultyBeatmapSet()->get_beatmapCharacteristic()->containsRotationEvents = containRotEvent;
+	StandardLevelScenesTransitionSetupDataSO_Init(
+		self,
+		gameMode,
+		difficultyBeatmap,
+		previewBeatmapLevel,
+		overrideEnvironmentSettings,
+		overrideColorScheme,
+		beatmapOverrideColorScheme,
+		gameplayModifiers,
+		playerSpecificSettings,
+		practiceSettings,
+		backButtonText,
+		useTestNoteCutSoundEffects,
+		startPaused,
+		beatmapDataCache,
+		recordingToolData
+	);
+
+	difficultyBeatmap->parentDifficultyBeatmapSet->beatmapCharacteristic->_containsRotationEvents = containRotEvent;
 }
 
 
 MAKE_AUTO_HOOK_MATCH(MultiplayerLevelScenesTransitionSetupDataSO_Init, &MultiplayerLevelScenesTransitionSetupDataSO::Init, void, MultiplayerLevelScenesTransitionSetupDataSO* self, StringW gameMode, IPreviewBeatmapLevel* previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty, BeatmapCharacteristicSO* beatmapCharacteristic, IDifficultyBeatmap* difficultyBeatmap, ColorScheme* overrideColorScheme, GameplayModifiers* gameplayModifiers, PlayerSpecificSettings* playerSpecificSettings, PracticeSettings* practiceSettings, bool useTestNoteCutSoundEffects)
 {
-	if(!difficultyBeatmap || !SongUtils::SongInfo::isCustom(previewBeatmapLevel)){ 
+	if(!difficultyBeatmap || !SongUtils::SongInfo::isCustom(previewBeatmapLevel)){
 		MultiplayerLevelScenesTransitionSetupDataSO_Init(self, gameMode, previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, difficultyBeatmap, overrideColorScheme, gameplayModifiers, playerSpecificSettings, practiceSettings, useTestNoteCutSoundEffects);
 		return;
 	}

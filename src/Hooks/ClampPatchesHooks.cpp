@@ -8,15 +8,17 @@
 #include "GlobalNamespace/BeatmapObjectsInTimeRowProcessor.hpp"
 #include "GlobalNamespace/NoteData.hpp"
 #include "GlobalNamespace/SliderData.hpp"
-#include "GlobalNamespace/BeatmapObjectsInTimeRowProcessor_TimeSliceContainer_1.hpp"
 #include "GlobalNamespace/StaticBeatmapObjectSpawnMovementData.hpp"
 #include "GlobalNamespace/NoteCutDirectionExtensions.hpp"
 #include "GlobalNamespace/Vector2Extensions.hpp"
-#include "GlobalNamespace/BeatmapObjectsInTimeRowProcessor_SliderTailData.hpp"
 
 #include "sombrero/shared/linq_functional.hpp"
 
 using namespace GlobalNamespace;
+
+static inline UnityEngine::Vector2 operator -(UnityEngine::Vector2 a, UnityEngine::Vector2 b) {
+    return { a.x - b.x, a.y - b.y };
+}
 
 template<typename T>
 auto OfType(auto range) {
@@ -31,7 +33,7 @@ auto OfType(auto range) {
 
 void BeatmapObjectsInTimeRowProcessor_HandleCurrentTimeSliceAllNotesAndSlidersDidFinishTimeSliceTranspile(BeatmapObjectsInTimeRowProcessor* self,
                GlobalNamespace::BeatmapObjectsInTimeRowProcessor::TimeSliceContainer_1<::GlobalNamespace::BeatmapDataItem*>* allObjectsTimeSlice, float nextTimeSliceTime) {
-    auto notesInColumnsReusableProcessingListOfLists = self->notesInColumnsReusableProcessingListOfLists;
+    auto notesInColumnsReusableProcessingListOfLists = self->_notesInColumnsReusableProcessingListOfLists;
     for (auto const &l: notesInColumnsReusableProcessingListOfLists) {
         l->Clear();
     }
@@ -50,7 +52,7 @@ void BeatmapObjectsInTimeRowProcessor_HandleCurrentTimeSliceAllNotesAndSlidersDi
 
         // TRANSPILE HERE
         // CLAMP
-        auto list = ListWrapper<GlobalNamespace::NoteData*>(self->notesInColumnsReusableProcessingListOfLists[std::clamp(noteData->lineIndex, 0, 3)]);
+        ListW<GlobalNamespace::NoteData*> list {self->_notesInColumnsReusableProcessingListOfLists[std::clamp(noteData->lineIndex, 0, 3)]};
         // TRANSPILE HERE
 
         bool flag = false;
@@ -66,8 +68,8 @@ void BeatmapObjectsInTimeRowProcessor_HandleCurrentTimeSliceAllNotesAndSlidersDi
             list->Add(noteData);
         }
     }
-    for (auto const& notesInColumnsReusableProcessingListOfList : self->notesInColumnsReusableProcessingListOfLists) {
-        auto list2 = ListWrapper<GlobalNamespace::NoteData*>(notesInColumnsReusableProcessingListOfList);
+    for (auto const& notesInColumnsReusableProcessingListOfList : self->_notesInColumnsReusableProcessingListOfLists) {
+        ListW<GlobalNamespace::NoteData*> list2{notesInColumnsReusableProcessingListOfList};
         for (int l = 0; l < list2.size(); l++) {
             list2[l]->SetBeforeJumpNoteLineLayer((NoteLineLayer) l);
         }
@@ -80,7 +82,7 @@ void BeatmapObjectsInTimeRowProcessor_HandleCurrentTimeSliceAllNotesAndSlidersDi
         for (auto data : items) {
             auto noteData2 = il2cpp_utils::try_cast<NoteData>(data).value_or(nullptr);
             if (!noteData2) continue;
-            
+
             if (BeatmapObjectsInTimeRowProcessor::SliderHeadPositionOverlapsWithNote(sliderData, noteData2)) {
                 sliderData->SetHasHeadNote(true);
                 sliderData->SetHeadBeforeJumpLineLayer(noteData2->beforeJumpNoteLineLayer);
@@ -88,10 +90,10 @@ void BeatmapObjectsInTimeRowProcessor_HandleCurrentTimeSliceAllNotesAndSlidersDi
                     noteData2->ChangeToBurstSliderHead();
                     if (noteData2->cutDirection == sliderData->tailCutDirection) {
                         auto line = StaticBeatmapObjectSpawnMovementData::Get2DNoteOffset(noteData2->lineIndex,
-                                                                                          self->numberOfLines,
+                                                                                          self->_numberOfLines,
                                                                                           noteData2->noteLineLayer) -
                                     StaticBeatmapObjectSpawnMovementData::Get2DNoteOffset(sliderData->tailLineIndex,
-                                                                                          self->numberOfLines,
+                                                                                          self->_numberOfLines,
                                                                                           sliderData->tailLineLayer);
                         float num = Vector2Extensions::SignedAngleToLine(
                                 NoteCutDirectionExtensions::Direction(noteData2->cutDirection), line);
