@@ -408,11 +408,7 @@ namespace SongUtils
 				}
 				StringW colorSchemeId = "PinkCoreMapColorScheme";
 				StringW colorSchemeNameLocalizationKey = "PinkCore Map Color Scheme";
-				auto newColorScheme = *il2cpp_utils::New<GlobalNamespace::ColorScheme*>(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false, colorLeft, colorRight, envColorLeft, envColorRight, colorScheme->supportsEnvironmentColorBoost, envColorLeftBoost, envColorRightBoost, obstacleColor);
-
-				// Apply the new colours to the scheme directly since there is no constructor for this
-				newColorScheme->_environmentColorW = envColorWhite;
-				newColorScheme->_environmentColorWBoost = envColorWhiteBoost;
+				auto newColorScheme = GlobalNamespace::ColorScheme::New_ctor(colorSchemeId, colorSchemeNameLocalizationKey, true, colorSchemeNameLocalizationKey, false, colorLeft, colorRight, envColorLeft, envColorRight, envColorWhite, colorScheme->supportsEnvironmentColorBoost, envColorLeftBoost, envColorRightBoost, envColorWhiteBoost, obstacleColor);
 
 				return newColorScheme;
 
